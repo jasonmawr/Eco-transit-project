@@ -309,10 +309,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
           {user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
             <button
               onClick={() => {
-                const el = document.getElementById('admin-console');
-                if (el) {
-                  (el as any)['scroll' + 'IntoView']({ behavior: 'smooth' });
-                }
+                window.location.hash = 'admin';
               }}
               className="px-3 py-1.5 bg-eco-ink hover:bg-eco-ink/90 text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 flex items-center space-x-1"
             >

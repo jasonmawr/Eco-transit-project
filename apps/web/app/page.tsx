@@ -16,7 +16,7 @@ import XanhWrapSection from '../components/XanhWrapSection';
 import GuidesSection from '../components/GuidesSection';
 import { apiFetch } from '../lib/api';
 
-const SCENE_ORDER = ['route', 'stations', 'tickets', 'rewards', 'xanhwrap', 'guides'];
+const SCENE_ORDER = ['route', 'stations', 'tickets', 'rewards', 'xanhwrap', 'guides', 'admin'];
 
 export default function Home() {
   const [apiState, setApiState] = useState<'connecting' | 'online' | 'error'>('connecting');
@@ -209,25 +209,22 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-between eco-mesh-bg font-inter" style={{ overflowX: 'hidden' }}>
+    <div className="h-screen w-screen flex flex-col justify-between eco-mesh-bg font-inter overflow-hidden relative">
       
       {/* Premium Navigation Header */}
       <EcoTransitHeader onSectionSelect={handleSectionSelect} />
 
       {/* Main Content Container */}
-      <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
+      <main className="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 overflow-hidden">
         
-        {/* Storytelling Hero Section */}
-        <HeroSection onSectionSelect={handleSectionSelect} />
-
         {/* Campaign Journey Map Hub */}
         <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} />
 
         {/* Scene viewport container (perspective boundary) */}
         <div
           id="scene-viewport"
-          className="scroll-mt-20 my-10 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-3xl shadow-lg p-6 sm:p-8 overflow-hidden min-h-[550px]"
-          style={{ perspective: '1600px', transformStyle: 'preserve-3d' }}
+          className="flex-grow my-2 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-3xl shadow-lg p-4 sm:p-6 overflow-hidden flex flex-col min-h-0"
+          style={{ perspective: '1400px', transformStyle: 'preserve-3d' }}
         >
           {/* Subtle page creases overlay */}
           {!isMobile && !prefersReducedMotion && (
@@ -245,14 +242,18 @@ export default function Home() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full relative overflow-y-auto max-h-[72vh] min-h-[500px] pr-2 scroll-smooth"
+              className="w-full h-full relative overflow-y-auto pr-1 no-scrollbar flex flex-col"
               style={{
                 backfaceVisibility: 'hidden',
                 transformStyle: 'preserve-3d',
               }}
             >
               {activeSection === 'route' && (
-                <RoutePlannerShell onStationSelect={setSelectedStationId} />
+                <div className="space-y-6 flex-grow flex flex-col">
+                  {/* Hero Section embedded inside Route Scene */}
+                  <HeroSection onSectionSelect={handleSectionSelect} />
+                  <RoutePlannerShell onStationSelect={setSelectedStationId} />
+                </div>
               )}
               {activeSection === 'stations' && (
                 <StationExperience
@@ -274,37 +275,17 @@ export default function Home() {
               {activeSection === 'guides' && (
                 <GuidesSection />
               )}
+              {activeSection === 'admin' && user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
+                <AdminConsoleSection user={user} onLoginClick={() => setIsAuthOpen(true)} />
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
-
-        {/* Moderator / Admin Console Panel */}
-        {user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
-          <section id="admin-console" className="scroll-mt-20 bg-white/80 backdrop-blur-md border border-eco-mint p-6 sm:p-8 rounded-3xl shadow-lg mb-10 animate-fade-in">
-            <AdminConsoleSection user={user} onLoginClick={() => setIsAuthOpen(true)} />
-          </section>
-        )}
-
       </main>
 
-      {/* Footer Branding */}
-      <footer className="bg-eco-ink text-white py-8 border-t border-eco-primary/10 relative z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center md:flex md:justify-between md:items-center">
-          <div className="mb-4 md:mb-0">
-            <div className="flex items-center space-x-1.5 justify-center md:justify-start">
-              <span className="text-base font-black tracking-tight text-white uppercase font-display-campaign">
-                Lướt Khói
-              </span>
-              <span className="text-base font-black tracking-tight text-eco-accentGreen uppercase font-display-campaign">
-                Chạm Xanh
-              </span>
-            </div>
-            <p className="text-[10px] text-eco-muted mt-1">Nền tảng di chuyển công cộng thông minh & bền vững. Vận hành bởi EcoTransit.</p>
-          </div>
-          <div className="text-[10px] text-eco-muted md:text-right mt-2 md:mt-0">
-            &copy; 2026 Lướt Khói Chạm Xanh. Vận hành dưới dạng campaign wordmark tạm thời.
-          </div>
-        </div>
+      {/* Mini status bar footer */}
+      <footer className="bg-eco-ink text-white py-1.5 border-t border-eco-primary/10 relative z-10 shrink-0 text-center text-[10px] text-eco-muted">
+        &copy; 2026 Lướt Khói Chạm Xanh. Vận hành bởi EcoTransit.
       </footer>
 
       {/* Auth Modal Overlay */}

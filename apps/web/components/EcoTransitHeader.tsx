@@ -60,6 +60,10 @@ export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderPr
     { label: 'Cẩm nang', targetId: 'guides' },
   ];
 
+  if (user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) {
+    navItems.push({ label: '🛠️ Admin', targetId: 'admin' });
+  }
+
   return (
     <>
       <header className="glass-header sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-eco-primary/10 transition-all duration-300">
