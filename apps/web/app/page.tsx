@@ -134,14 +134,6 @@ export default function Home() {
 
     // Update URL hash without forcing full page reload
     window.history.pushState(null, '', `#${mappedId}`);
-
-    // Smooth scroll straight to viewport container
-    setTimeout(() => {
-      const el = document.getElementById('scene-viewport');
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
   };
 
   const handleRetry = () => {
@@ -178,12 +170,12 @@ export default function Home() {
         })
       };
     }
-    // High-performance premium 3D page flip
+    // High-performance premium 3D page flip (right-to-left on forward direction)
     return {
       initial: (dir: number) => ({
-        rotateY: dir > 0 ? 60 : -60,
+        rotateY: dir > 0 ? 80 : -80,
         opacity: 0,
-        scale: 0.98,
+        scale: 0.95,
         transformOrigin: dir > 0 ? 'right center' : 'left center',
       }),
       animate: {
@@ -196,9 +188,9 @@ export default function Home() {
         }
       },
       exit: (dir: number) => ({
-        rotateY: dir > 0 ? -60 : 60,
+        rotateY: dir > 0 ? -80 : 80,
         opacity: 0,
-        scale: 0.98,
+        scale: 0.95,
         transformOrigin: dir > 0 ? 'left center' : 'right center',
         transition: {
           duration: 0.65,
@@ -253,7 +245,7 @@ export default function Home() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full relative"
+              className="w-full relative overflow-y-auto max-h-[72vh] min-h-[500px] pr-2 scroll-smooth"
               style={{
                 backfaceVisibility: 'hidden',
                 transformStyle: 'preserve-3d',

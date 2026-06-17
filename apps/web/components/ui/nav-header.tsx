@@ -23,12 +23,6 @@ export function NavHeader({ items, onUpcomingClick, onItemClick }: NavHeaderProp
     if (onItemClick) {
       onItemClick(targetId);
     }
-    setTimeout(() => {
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 80);
   };
 
   return (

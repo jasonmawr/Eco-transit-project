@@ -64,40 +64,43 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
   }
 
   return (
-    <div className="bg-white/90 backdrop-blur-md border border-eco-mint p-6 sm:p-8 rounded-3xl shadow-lg mb-10 relative overflow-hidden">
+    <div className="sticky top-16 sm:top-[72px] z-40 bg-white/95 backdrop-blur-md border border-eco-mint p-4 sm:p-5 rounded-3xl shadow-lg mb-6 relative overflow-hidden">
       
       {/* Decorative ambient lights */}
       <div className="absolute -top-12 -right-12 w-48 h-48 bg-eco-accentGreen/10 blur-3xl rounded-full pointer-events-none" />
       <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-eco-primary/10 blur-3xl rounded-full pointer-events-none" />
 
       {/* Header with Avatar Selection Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-eco-primary/10 pb-5 mb-6 gap-4">
-        <div>
+      <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4">
+        <div className="hidden sm:block">
           <span className="text-[10px] font-black text-eco-primary uppercase tracking-widest bg-eco-mint px-2.5 py-1 rounded-full border border-eco-primary/10">
             🗺️ CAMPAIGN MAP HUB
           </span>
-          <h2 className="text-xl sm:text-2xl font-black text-eco-ink mt-2 tracking-tight font-display-campaign uppercase">
+          <h2 className="text-sm sm:text-lg font-black text-eco-ink mt-1.5 tracking-tight font-display-campaign uppercase">
             HÀNH TRÌNH LƯỚT KHÓI CHẠM XANH
           </h2>
-          <p className="text-xs text-eco-muted mt-1 leading-normal">
-            Bản đồ di chuyển bền vững qua 6 ga chức năng. Khám phá từng chặng và tích điểm đổi quà!
-          </p>
+        </div>
+
+        {/* Mobile-only compact title */}
+        <div className="sm:hidden flex flex-col">
+          <span className="text-[9px] font-black text-eco-primary uppercase tracking-wider">🗺️ Campaign Hub</span>
+          <span className="text-[10px] font-extrabold text-eco-ink uppercase">6 chặng lướt xanh</span>
         </div>
 
         {/* Selected character badge & selector trigger */}
         <div className="relative">
           <button
             onClick={() => setShowAvatarSelector(!showAvatarSelector)}
-            className="flex items-center space-x-2.5 bg-eco-mint hover:bg-eco-primary hover:text-white border border-eco-primary/20 px-4 py-2 rounded-2xl shadow-sm transition-all duration-200 group text-left"
+            className="flex items-center space-x-1.5 sm:space-x-2.5 bg-eco-mint hover:bg-eco-primary hover:text-white border border-eco-primary/20 px-2 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-2xl shadow-sm transition-all duration-200 group text-left"
           >
-            <span className="text-2xl group-hover:scale-110 transition-transform duration-200">
+            <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform duration-200">
               {getCharEmoji(selectedChar)}
             </span>
-            <div>
-              <span className="text-[9px] text-eco-muted group-hover:text-white/80 block font-bold uppercase tracking-wider">
+            <div className="leading-none">
+              <span className="hidden sm:block text-[9px] text-eco-muted group-hover:text-white/80 font-bold uppercase tracking-wider mb-0.5">
                 Nhân vật đồng hành
               </span>
-              <span className="text-xs font-black text-eco-ink group-hover:text-white block">
+              <span className="text-[10px] sm:text-xs font-black text-eco-ink group-hover:text-white block">
                 {getCharName(selectedChar)}
               </span>
             </div>
@@ -220,67 +223,25 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
         </div>
       </div>
 
-      {/* Mobile View (Width < 640px): Vertical Metro Route Line */}
-      <div className="sm:hidden relative pl-8 pr-2 py-4">
-        
-        {/* Steel Rail Line Background */}
-        <div className="absolute top-0 bottom-0 left-[18px] w-1.5 pointer-events-none z-0">
-          <div className="w-full h-full bg-gradient-to-b from-eco-primary/30 to-eco-accentGreen/30 rounded-full" />
-        </div>
-
-        {/* Vertical List of Stations */}
-        <div className="space-y-6 relative z-10">
-          {JOURNEY_STATIONS.map((station) => {
-            const isActive = activeSection === station.id;
-
-            return (
-              <div key={station.id} className="flex items-center space-x-4 relative">
-                
-                {/* Active character floating to the left of active node */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="journey-avatar-mobile"
-                      className="absolute -left-12 text-2xl animate-pulse"
-                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    >
-                      {getCharEmoji(selectedChar)} 👉
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* The station dot */}
-                <button
-                  onClick={() => onSectionSelect(station.id)}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 relative shadow-sm focus:outline-none ${
-                    isActive
-                      ? 'bg-eco-primary text-white border-eco-primary ring-4 ring-eco-mint scale-105'
-                      : 'bg-white text-eco-ink border-gray-200'
-                  }`}
-                >
-                  <span className="text-sm">{station.icon}</span>
-                  <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[7px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
-                    {station.num}
-                  </span>
-                </button>
-
-                {/* Text details */}
-                <div className="flex-grow">
-                  <button
-                    onClick={() => onSectionSelect(station.id)}
-                    className={`text-xs font-black uppercase tracking-wider block text-left hover:text-eco-primary transition-colors ${
-                      isActive ? 'text-eco-primary font-bold' : 'text-eco-ink'
-                    }`}
-                  >
-                    {station.name}
-                  </button>
-                  <span className="text-[9px] text-eco-muted block font-medium">Ga số {station.num}</span>
-                </div>
-
-              </div>
-            );
-          })}
-        </div>
+      {/* Mobile View (Width < 640px): Horizontal Scrollable Chip Rail */}
+      <div className="sm:hidden relative py-1 overflow-x-auto no-scrollbar scroll-smooth flex items-center space-x-2 px-1 border-t border-eco-primary/5 mt-2">
+        {JOURNEY_STATIONS.map((station) => {
+          const isActive = activeSection === station.id;
+          return (
+            <button
+              key={station.id}
+              onClick={() => onSectionSelect(station.id)}
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border shrink-0 transition-all duration-200 focus:outline-none ${
+                isActive
+                  ? 'bg-eco-primary text-white border-eco-primary scale-105 shadow-sm shadow-eco-primary/10'
+                  : 'bg-white text-eco-ink border-gray-200'
+              }`}
+            >
+              <span className="text-xs">{station.icon}</span>
+              <span className="text-[9px] font-black uppercase tracking-wider">{station.name}</span>
+            </button>
+          );
+        })}
       </div>
 
     </div>

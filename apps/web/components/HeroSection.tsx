@@ -13,11 +13,6 @@ export default function HeroSection({ onSectionSelect }: HeroSectionProps) {
     const targetId = id === 'planner' ? 'route' : id;
     if (onSectionSelect) {
       onSectionSelect(targetId);
-    } else {
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     }
   };
 
