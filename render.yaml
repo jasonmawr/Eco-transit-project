@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: ecotransit-api
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build --workspace=packages/db --workspace=packages/shared --workspace=apps/api
+    startCommand: npm run start --workspace=apps/api
+    envVars:
+      - key: APP_MODE
+        value: demo
+      - key: PROVIDER_MODE
+        value: free_demo
+      - key: REDIS_ENABLED
+        value: "false"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecotransit-db
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://ecotransit-web.vercel.app
+
+databases:
+  - name: ecotransit-db
+    plan: free

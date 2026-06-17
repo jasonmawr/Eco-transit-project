@@ -1,0 +1,23 @@
+{
+  "name": "@ecotransit/db",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node prisma/seed.ts --mode=standard",
+    "demo:seed": "ts-node prisma/seed.ts --mode=demo",
+    "demo:reset": "prisma migrate reset --force && ts-node prisma/seed.ts --mode=demo"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.12.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

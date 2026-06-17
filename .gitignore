@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+
+# builds
+.next/
+apps/web/.next/
+dist/
+build/
+coverage/
+
+# env/secrets
+.env
+.env.*
+!.env.example
+!.env.local.example
+!.env.demo.example
+
+# logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# runtime uploads
+uploads/
+apps/api/uploads/
+apps/api/uploads/**
+uploads/tickets/
+uploads/tickets/**
+
+# local OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/healthz",
+      "destination": "https://ecotransit-api.onrender.com/healthz"
+    },
+    {
+      "source": "/readyz",
+      "destination": "https://ecotransit-api.onrender.com/readyz"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://ecotransit-api.onrender.com/api/:path*"
+    }
+  ]
+}

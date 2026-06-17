@@ -1,0 +1,304 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                 String              @id @default(uuid())
+  email              String              @unique
+  passwordHash       String
+  role               String              @default("USER") // "USER", "MODERATOR", "ADMIN"
+  pointsBalanceCache Int                 @default(0)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  tickets            Ticket[]
+  pointsLedger       PointsLedger[]
+  redemptions        VoucherRedemption[]
+  reviews            UGCReview[]
+  wallet             UserWallet?
+  timeBills          TimeBill[]
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
+model Ticket {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl            String?
+  ocrText             String?
+  status              String   @default("pending") // "pending", "verified", "rejected", "manual_review"
+  confidenceScore     Float?
+  tripDate            DateTime?
+  duplicateHash       String?
+  base64DataFallback  String?  // Base64 thumbnail compressed, max 500KB
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  pointsLedgerId      String?  @unique
+
+  type                String   @default("other") // "metro", "bus", "ebus", "other"
+  stationId           String?
+  station             Station? @relation(fields: [stationId], references: [id], onDelete: SetNull)
+  routeLabel          String?
+  amount              Int?
+  originalFileName    String?
+  mimeType            String   @default("image/jpeg")
+  sizeBytes           Int      @default(0)
+  thumbnailPath       String?
+  imagePath           String?
+  ocrStatus           String   @default("not_started") // "not_started", "mocked", "failed"
+  reviewNote          String?
+  reviewedAt          DateTime?
+  reviewedById        String?
+
+  @@unique([userId, duplicateHash])
+}
+
+model PointsLedger {
+  id             String   @id @default(uuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  delta          Int
+  balanceAfter   Int
+  sourceType     String   // "ticket", "redeem", "bonus", "admin_adjust", "reversal", "quiz"
+  sourceId       String?
+  idempotencyKey String   @unique
+  status         String   @default("success")
+  eventType      String?
+  createdAt      DateTime @default(now())
+}
+
+model UserWallet {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance        Int      @default(0)
+  lifetimeEarned Int      @default(0)
+  lifetimeSpent  Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Voucher {
+  id             String              @id @default(uuid())
+  name           String
+  cost           Int
+  quantity       Int
+  status         String              @default("active") // "draft", "active", "paused", "expired", "sold_out", "archived"
+  encryptedCodes String              // Comma-separated or JSON list of pre-seeded codes
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  redemptions    VoucherRedemption[]
+
+  // Batch 04 extended fields (Slug is nullable to safely migrate/backfill)
+  slug           String?             @unique
+  description    String?
+  brandName      String              @default("")
+  category       String              @default("other") // "food", "drink", "transit", "shopping", "study", "experience", "other"
+  pointsCost     Int                 @default(0)
+  stockTotal     Int                 @default(0)
+  stockRemaining Int                 @default(0)
+  perUserLimit   Int                 @default(1)
+  validFrom      DateTime?
+  validUntil     DateTime?
+  terms          String?
+  imageUrl       String?
+  isActive       Boolean             @default(true)
+}
+
+model VoucherRedemption {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voucherId      String
+  voucher        Voucher   @relation(fields: [voucherId], references: [id], onDelete: Cascade)
+  code           String
+  redeemedAt     DateTime  @default(now())
+  idempotencyKey String    @unique
+
+  // Batch 04 extended fields
+  status         String    @default("active") // "active", "used", "expired", "cancelled"
+  pointsSpent    Int       @default(0)
+  usedAt         DateTime?
+  expiresAt      DateTime?
+  metadata       Json?
+}
+
+model UGCReview {
+  id            String   @id @default(uuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stationId     String?
+  station       Station? @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  placeId       String?
+  place         Place?   @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  displayName   String?
+  rating        Int
+  content       String
+  status        String   @default("pending") // "pending", "approved", "rejected"
+  moderatorNote String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Moderation fields for Batch 05
+  moderationNote String?
+  reviewedAt     DateTime?
+  reviewedById   String?
+}
+
+model Station {
+  id          String      @id @default(uuid())
+  name        String
+  lineName    String
+  orderNumber Int
+  lat         Float
+  lng         Float
+  description String?
+  facilities  String?     // CSV or JSON list of amenities
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  places      Place[]
+  reviews     UGCReview[]
+  guides      Guide[]
+  tickets     Ticket[]
+}
+
+model Place {
+  id               String      @id @default(uuid())
+  stationId        String
+  station          Station     @relation(fields: [stationId], references: [id], onDelete: Cascade)
+  slug             String      @unique
+  name             String
+  category         String      // "cafe", "food", "shopping", "service", "attraction", "study/work friendly"
+  lat              Float
+  lng              Float
+  address          String?
+  shortDescription String      @default("")
+  description      String?
+  district         String?
+  walkingMinutes   Int?
+  distanceMeters   Float?
+  priceLevel       Int?
+  tags             String[]    @default([])
+  highlights       String[]    @default([])
+  imageUrl         String?
+  featured         Boolean     @default(false)
+  isPublished      Boolean     @default(true)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  reviews          UGCReview[]
+}
+
+model Guide {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  title            String
+  excerpt          String
+  content          String
+  tags             String[] @default([])
+  relatedStationId String?
+  relatedStation   Station? @relation(fields: [relatedStationId], references: [id], onDelete: SetNull)
+  isPublished      Boolean  @default(true)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model RouteLine {
+  id        String      @id @default(uuid())
+  name      String
+  code      String
+  mode      String      // "metro", "bus", "walk"
+  fareBase  Int
+  color     String
+  active    Boolean     @default(true)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  stops     RouteStop[]
+}
+
+model RouteStop {
+  id         String    @id @default(uuid())
+  lineId     String
+  line       RouteLine @relation(fields: [lineId], references: [id], onDelete: Cascade)
+  stationId  String
+  orderIndex Int
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model RouteEdge {
+  id              String   @id @default(uuid())
+  fromStationId   String
+  toStationId     String
+  mode            String   // "metro", "bus", "walk"
+  distanceMeters  Float
+  durationMinutes Float
+  fareEstimate    Int
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorUserId String?
+  actorRole   String?
+  action      String
+  entityType  String
+  entityId    String?
+  summary     String
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+}
+
+model AppSettings {
+  key   String @id
+  value String
+}
+
+model JobQueue {
+  id        String   @id @default(uuid())
+  taskType  String
+  payload   String
+  status    String   @default("pending") // "pending", "processing", "completed", "failed"
+  error     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimeBill {
+  id                     String   @id @default(uuid())
+  shareSlug              String   @unique
+  userId                 String?
+  user                   User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  originLabel            String
+  destinationLabel       String
+  routeTitle             String?
+  durationMinutes        Int
+  walkingMinutes         Int?
+  transferCount          Int?
+  distanceKm             Float?
+  weatherSummary         String?
+  preferenceSummary      String?
+  greenScore             Int?
+  estimatedCo2SavedGrams Int?
+  estimatedMoneySavedVnd Int?
+  headline               String
+  storyText              String
+  routeSnapshot          Json?
+  isPublic               Boolean  @default(true)
+  createdAt              DateTime @default(now())
+  expiresAt              DateTime?
+}
