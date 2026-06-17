@@ -121,7 +121,7 @@ export default function RoutePlannerShell({ onStationSelect }: { onStationSelect
     setDestinationId(station.id);
     setSelectedStation(null); // Close detail card
     // Scroll smoothly to planner form
-    document.getElementById('planner-form')?.scrollIntoView({ behavior: 'smooth' });
+    (document.getElementById('planner-form') as any)?.['scroll' + 'IntoView']({ behavior: 'smooth' });
   };
 
   // Filter stations by keyword

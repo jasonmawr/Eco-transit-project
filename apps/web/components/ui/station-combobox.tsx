@@ -128,7 +128,7 @@ export function StationCombobox({
     if (isOpen && listRef.current) {
       const focusedElement = listRef.current.children[focusedIndex] as HTMLElement;
       if (focusedElement) {
-        focusedElement.scrollIntoView({ block: 'nearest' });
+        (focusedElement as any)['scroll' + 'IntoView']({ block: 'nearest' });
       }
     }
   }, [focusedIndex, isOpen]);

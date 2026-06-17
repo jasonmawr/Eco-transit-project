@@ -79,8 +79,8 @@ export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderPr
                   EcoTransit
                 </span>
               </div>
-              <span className="text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-mono">
-                temporary campaign wordmark placeholder
+              <span className="text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
+                Chiến dịch giao thông xanh TP.HCM
               </span>
             </div>
           </div>
@@ -97,12 +97,6 @@ export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderPr
                 if (onSectionSelect) {
                   onSectionSelect('tickets');
                 }
-                setTimeout(() => {
-                  const el = document.getElementById('scene-viewport');
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth' });
-                  }
-                }, 80);
               }}
               className="px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-eco-primary bg-eco-mint border border-eco-primary/20 rounded-full hover:bg-eco-primary hover:text-white transition-all duration-200"
             >
