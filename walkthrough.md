@@ -45,6 +45,11 @@ Tài liệu ghi nhận chi tiết kết quả triển khai, bàn giao và kiểm
 - **XanhWrap Manual Form**: Bổ sung form nhập tay hành trình để nhận XanhWrap card kèm caption và hashtag truyền thông nhanh (#XanhWrap #LuotKhoiChamXanh #EcoTransit).
 - **Milestones 1 vé = 10 điểm**: Căn chỉnh đồng bộ tỷ lệ điểm thưởng trên backend và UI (mốc 3/6/9/99 vé tương ứng 30/60/90/990đ).
 
+### Batch 09-HF4 — Fix Scene Clipping + Active Navigation States
+- **Bố cục True App-Deck**: Chuyển đổi root thành `h-dvh` và đặt SceneViewport thành `flex-1 min-h-0` với scroll nội bộ. Giúp CampaignHub chiếm row layout tĩnh cố định, loại bỏ triệt để hiện tượng đè hoặc clipping nội dung tiêu đề các phân cảnh (#stations, #tickets, #rewards).
+- **Trạng thái Active/Hover Header Nav**: Bổ sung pill active màu `eco-primary`, hiệu ứng lướt hover spring backdrop qua `framer-motion`, chấm tròn indicator ở chân tab, và đầy đủ accessibility focus-ring. Đồng bộ chính xác theo hash URL hoặc mount state.
+- **Trạng thái Ga Chặng CampaignHub**: Ga active tự động phóng to `scale-110`, bổ sung ring halo bao quanh, và nhãn chữ nổi bật. Tối ưu kích thước compact để avatar di chuyển linh hoạt mà không bị container cắt cụt nhờ thiết lập `overflow-visible`.
+
 ---
 
 ## 2. Verification Outcomes
