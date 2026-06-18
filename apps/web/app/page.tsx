@@ -209,10 +209,10 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col justify-between eco-mesh-bg font-inter overflow-hidden relative">
+    <div className="h-dvh w-screen flex flex-col eco-mesh-bg font-inter overflow-hidden relative">
       
       {/* Premium Navigation Header */}
-      <EcoTransitHeader onSectionSelect={handleSectionSelect} />
+      <EcoTransitHeader activeSection={activeSection} onSectionSelect={handleSectionSelect} />
 
       {/* Main Content Container */}
       <main className="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 overflow-hidden">
@@ -223,7 +223,7 @@ export default function Home() {
         {/* Scene viewport container (perspective boundary) */}
         <div
           id="scene-viewport"
-          className="flex-grow my-2 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-3xl shadow-lg p-4 sm:p-6 overflow-hidden flex flex-col min-h-0"
+          className="flex-1 min-h-0 my-2 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-3xl shadow-lg p-4 sm:p-6 overflow-hidden flex flex-col"
           style={{ perspective: '1400px', transformStyle: 'preserve-3d' }}
         >
           {/* Subtle page creases overlay */}

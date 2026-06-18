@@ -11,11 +11,12 @@ interface NavItem {
 
 interface NavHeaderProps {
   items: NavItem[];
+  activeSection: string;
   onUpcomingClick: (feature: string) => void;
   onItemClick?: (targetId: string) => void;
 }
 
-export function NavHeader({ items, onUpcomingClick, onItemClick }: NavHeaderProps) {
+export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }: NavHeaderProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const handleScroll = (e: React.MouseEvent, targetId: string) => {
@@ -26,9 +27,10 @@ export function NavHeader({ items, onUpcomingClick, onItemClick }: NavHeaderProp
   };
 
   return (
-    <nav className="relative flex items-center space-x-1 py-1 px-1 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none">
+    <nav className="relative flex items-center space-x-1.5 py-1 px-1.5 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none">
       {items.map((item, index) => {
         const isUpcoming = item.isUpcoming;
+        const isActive = activeSection === item.targetId;
 
         return (
           <div
@@ -43,6 +45,13 @@ export function NavHeader({ items, onUpcomingClick, onItemClick }: NavHeaderProp
                 layoutId="nav-hover-pill"
                 className="absolute inset-0 bg-eco-accentGreen rounded-full z-0 border border-eco-accentGreenDeep/10"
                 transition={{ type: 'spring', stiffness: 350, damping: 26 }}
+              />
+            )}
+
+            {/* Permanent Active indicator backdrop if NOT hovered */}
+            {isActive && hoveredIndex !== index && (
+              <div
+                className="absolute inset-0 bg-eco-primary rounded-full z-0 border border-eco-primaryDeep/10 shadow-sm"
               />
             )}
 
@@ -65,11 +74,24 @@ export function NavHeader({ items, onUpcomingClick, onItemClick }: NavHeaderProp
               <a
                 href={`#${item.targetId}`}
                 onClick={(e) => handleScroll(e, item.targetId)}
-                className={`relative z-10 px-4 py-2 text-xs font-black uppercase tracking-wider block focus:outline-none transition-colors duration-200 ${
-                  hoveredIndex === index ? 'text-eco-ink' : 'text-eco-primary hover:text-eco-primaryDeep'
+                className={`relative z-10 px-4 py-2 text-xs font-black uppercase tracking-wider block focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary rounded-full transition-all duration-200 ${
+                  isActive
+                    ? hoveredIndex === index 
+                      ? 'text-eco-ink font-extrabold'
+                      : 'text-white font-extrabold'
+                    : hoveredIndex === index
+                    ? 'text-eco-ink font-bold'
+                    : 'text-eco-primary hover:text-eco-primaryDeep font-bold'
                 }`}
+                aria-current={isActive ? 'page' : undefined}
               >
-                {item.label}
+                <div className="flex flex-col items-center relative">
+                  <span>{item.label}</span>
+                  {/* Subtle active dot indicator */}
+                  {isActive && (
+                    <span className={`absolute -bottom-1.5 w-1.5 h-1.5 rounded-full ${isActive && hoveredIndex !== index ? 'bg-eco-accentGreen animate-pulse' : 'bg-eco-primary'}`} />
+                  )}
+                </div>
               </a>
             )}
           </div>

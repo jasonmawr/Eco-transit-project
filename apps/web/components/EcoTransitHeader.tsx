@@ -6,10 +6,11 @@ import AuthModal from './AuthModal';
 import { apiFetch } from '../lib/api';
 
 interface EcoTransitHeaderProps {
+  activeSection: string;
   onSectionSelect?: (sectionId: string) => void;
 }
 
-export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderProps) {
+export default function EcoTransitHeader({ activeSection, onSectionSelect }: EcoTransitHeaderProps) {
   const [showTooltip, setShowTooltip] = useState<string | null>(null);
   const [user, setUser] = useState<any>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -66,7 +67,7 @@ export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderPr
 
   return (
     <>
-      <header className="glass-header sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-eco-primary/10 transition-all duration-300">
+      <header className="glass-header shrink-0 h-16 z-50 bg-white/80 backdrop-blur-md border-b border-eco-primary/10 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Brand Logo & Name (Lướt Khói Chạm Xanh) */}
@@ -91,7 +92,7 @@ export default function EcoTransitHeader({ onSectionSelect }: EcoTransitHeaderPr
 
           {/* Navigation items (Pill effect, hidden on mobile) */}
           <div className="hidden md:flex items-center justify-center flex-1 px-4">
-            <NavHeader items={navItems} onUpcomingClick={triggerUpcoming} onItemClick={onSectionSelect} />
+            <NavHeader items={navItems} activeSection={activeSection} onUpcomingClick={triggerUpcoming} onItemClick={onSectionSelect} />
           </div>
 
           {/* CTAs (Responsive sizing to avoid 390px overflow) */}
