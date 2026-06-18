@@ -64,11 +64,13 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
   }
 
   return (
-    <div className="sticky top-16 sm:top-[72px] z-40 bg-white/95 backdrop-blur-md border border-eco-mint p-4 sm:p-5 rounded-3xl shadow-lg mb-6 relative overflow-hidden">
+    <div className="relative z-40 bg-white/95 border border-eco-mint p-3 sm:p-4 rounded-3xl shadow-md mb-2 flex-shrink-0">
       
-      {/* Decorative ambient lights */}
-      <div className="absolute -top-12 -right-12 w-48 h-48 bg-eco-accentGreen/10 blur-3xl rounded-full pointer-events-none" />
-      <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-eco-primary/10 blur-3xl rounded-full pointer-events-none" />
+      {/* Decorative ambient lights wrapper with overflow-hidden */}
+      <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none z-0">
+        <div className="absolute -top-12 -right-12 w-48 h-48 bg-eco-accentGreen/10 blur-3xl rounded-full" />
+        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-eco-primary/10 blur-3xl rounded-full" />
+      </div>
 
       {/* Header with Avatar Selection Button */}
       <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4">
@@ -148,7 +150,7 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
       </div>
 
       {/* Desktop View: Horizontal Journey Map with SVG Tracks */}
-      <div className="hidden sm:block relative py-10 px-4">
+      <div className="hidden sm:block relative py-4 px-2">
         
         {/* SVG Railway Track Background */}
         <div className="absolute top-1/2 left-0 right-0 h-4 -translate-y-1/2 pointer-events-none z-0 px-12">
@@ -181,7 +183,7 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
                   {isActive && (
                     <motion.div
                       layoutId="journey-avatar"
-                      className="absolute -top-12 z-20 text-3xl drop-shadow-md filter select-none pointer-events-none animate-bounce"
+                      className="absolute -top-11 z-20 text-2xl drop-shadow-md filter select-none pointer-events-none animate-bounce"
                       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                     >
                       {getCharEmoji(selectedChar)}
@@ -192,29 +194,29 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
                 {/* The station dot/node button */}
                 <button
                   onClick={() => onSectionSelect(station.id)}
-                  className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative z-10 shadow-sm focus:outline-none ${
+                  className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative z-10 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary ${
                     isActive
-                      ? 'bg-eco-primary text-white border-eco-primary scale-110 shadow-lg shadow-eco-primary/20 ring-4 ring-eco-mint'
-                      : 'bg-white text-eco-ink border-gray-200 hover:border-eco-primary hover:scale-105'
+                      ? 'bg-eco-primary text-white border-eco-primary scale-110 shadow-md shadow-eco-primary/30 ring-4 ring-eco-mint'
+                      : 'bg-white text-eco-ink border-gray-200 hover:border-eco-primary hover:text-eco-primary hover:scale-105 hover:shadow'
                   }`}
                 >
-                  <span className="text-lg">{station.icon}</span>
-                  <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[8px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  <span className="text-base">{station.icon}</span>
+                  <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[7px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
                     {station.num}
                   </span>
                 </button>
 
                 {/* Station labels */}
-                <div className="mt-3.5 space-y-0.5">
+                <div className="mt-2 space-y-0.5">
                   <button
                     onClick={() => onSectionSelect(station.id)}
-                    className={`text-xs font-black uppercase tracking-wider block hover:text-eco-primary transition-colors ${
-                      isActive ? 'text-eco-primary font-extrabold' : 'text-eco-ink'
+                    className={`text-[11px] font-black uppercase tracking-wider block hover:text-eco-primary transition-all duration-200 ${
+                      isActive ? 'text-eco-primary scale-105 font-black' : 'text-eco-ink'
                     }`}
                   >
                     {station.name}
                   </button>
-                  <span className="text-[9px] text-eco-muted block font-medium">Ga số {station.num}</span>
+                  <span className="text-[8px] text-eco-muted block font-medium">Ga số {station.num}</span>
                 </div>
 
               </div>
