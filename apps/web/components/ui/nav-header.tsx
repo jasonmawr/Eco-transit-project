@@ -27,7 +27,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
   };
 
   return (
-    <nav className="relative flex items-center space-x-1.5 py-1 px-1.5 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none">
+    <nav className="relative flex items-center space-x-1 py-1 px-1 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none overflow-x-auto no-scrollbar max-w-full shrink-0">
       {items.map((item, index) => {
         const isUpcoming = item.isUpcoming;
         const isActive = activeSection === item.targetId;
@@ -35,7 +35,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
         return (
           <div
             key={index}
-            className="relative"
+            className="relative shrink-0 flex items-center justify-center"
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
@@ -59,7 +59,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
               <button
                 type="button"
                 onClick={() => onUpcomingClick(item.label)}
-                className={`relative z-10 px-4 py-2 text-xs font-black uppercase tracking-wider flex items-center space-x-1 focus:outline-none transition-colors duration-200 cursor-not-allowed ${
+                className={`relative z-10 h-9 sm:h-10 px-3 sm:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1 focus:outline-none transition-colors duration-200 cursor-not-allowed whitespace-nowrap shrink-0 ${
                   hoveredIndex === index ? 'text-eco-ink' : 'text-eco-muted'
                 }`}
               >
@@ -74,7 +74,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
               <a
                 href={`#${item.targetId}`}
                 onClick={(e) => handleScroll(e, item.targetId)}
-                className={`relative z-10 px-4 py-2 text-xs font-black uppercase tracking-wider block focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary rounded-full transition-all duration-200 ${
+                className={`relative z-10 h-9 sm:h-10 px-3 sm:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider inline-flex items-center justify-center whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary rounded-full transition-all duration-200 shrink-0 ${
                   isActive
                     ? hoveredIndex === index 
                       ? 'text-eco-ink font-extrabold'
@@ -85,11 +85,11 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
                 }`}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <div className="flex flex-col items-center relative">
+                <div className="flex flex-col items-center justify-center relative leading-none py-1 shrink-0">
                   <span>{item.label}</span>
                   {/* Subtle active dot indicator */}
                   {isActive && (
-                    <span className={`absolute -bottom-1.5 w-1.5 h-1.5 rounded-full ${isActive && hoveredIndex !== index ? 'bg-eco-accentGreen animate-pulse' : 'bg-eco-primary'}`} />
+                    <span className={`absolute -bottom-1 w-1 h-1 rounded-full ${isActive && hoveredIndex !== index ? 'bg-eco-accentGreen animate-pulse' : 'bg-eco-primary'}`} />
                   )}
                 </div>
               </a>

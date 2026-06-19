@@ -24,7 +24,7 @@ None. The brand visual parameters are fully detailed and approved for direct imp
 
 ### 1. Design System & Configuration
 
-#### [MODIFY] [apps/web/tailwind.config.js](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/tailwind.config.js)
+#### [MODIFY] [apps/web/tailwind.config.js](apps/web/tailwind.config.js)
 - Cấu hình lại mã màu `eco` trong bảng theme:
   - `primary`: `#0066FF` (Electric Blue)
   - `primaryDeep`: `#004ecc` (Deep Electric Blue)
@@ -34,7 +34,7 @@ None. The brand visual parameters are fully detailed and approved for direct imp
   - `ink`: `#0A1118` (Dark Charcoal)
   - `muted`: `#4B5E70` (Muted Blue-Grey)
 
-#### [MODIFY] [apps/web/app/globals.css](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/app/globals.css)
+#### [MODIFY] [apps/web/app/globals.css](apps/web/app/globals.css)
 - Thiết lập biến môi trường màu sắc theo theme mới.
 - Định nghĩa hiển thị Font Display: Cấu hình phong cách hiển thị chữ giống thiết kế `SG85-CHi SON 1` thông qua kiểu `font-display` (ultra-bold, geometric, futuristic square-grooves, custom letter-spacing) để dễ dàng hoán đổi khi có tệp font local thật.
 - Bổ sung lớp phủ cấu trúc hạt bụi mịn **Grain Texture** (~10% opacity) và đường sóng chuyển động mềm mại **Motion Flow** để tạo chất liệu thị giác cao cấp.
@@ -44,49 +44,49 @@ None. The brand visual parameters are fully detailed and approved for direct imp
 
 ### 2. Premium UI Primitives (`apps/web/components/ui`)
 
-#### [NEW] [apps/web/components/ui/nav-header.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/ui/nav-header.tsx)
+#### [NEW] [apps/web/components/ui/nav-header.tsx](apps/web/components/ui/nav-header.tsx)
 - Thanh menu hoạt họa. Sử dụng `framer-motion` để tạo con trỏ pill (hover cursor pill) di chuyển mượt mà theo vị trí rê chuột của người dùng, đổi màu chữ tương ứng với độ tương phản cao.
 
-#### [NEW] [apps/web/components/ui/fluid-dropdown.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/ui/fluid-dropdown.tsx)
+#### [NEW] [apps/web/components/ui/fluid-dropdown.tsx](apps/web/components/ui/fluid-dropdown.tsx)
 - Hộp chọn hoạt họa lỏng (fluid dropdown) hỗ trợ `AnimatePresence`, đóng mở mượt mà bằng phím Escape hoặc click-outside. Sử dụng icon từ `lucide-react`. Áp dụng trực tiếp làm bộ chọn điều kiện thời tiết (Weather Preset Selector) thay thế cho chip chọn tĩnh cũ.
 
-#### [NEW] [apps/web/components/ui/motion-flow-background.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/ui/motion-flow-background.tsx)
+#### [NEW] [apps/web/components/ui/motion-flow-background.tsx](apps/web/components/ui/motion-flow-background.tsx)
 - Component tạo nền hoạt họa chuyển động dạng sóng nhẹ nhàng, đi kèm các điểm nhấn lá xanh rụng bay nhè nhẹ (Leaf Accents) và phủ lớp Grain Texture mịn màng cho phần Hero.
 
-#### [NEW] [apps/web/components/ui/premium-cta.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/ui/premium-cta.tsx)
+#### [NEW] [apps/web/components/ui/premium-cta.tsx](apps/web/components/ui/premium-cta.tsx)
 - Nút bấm hoạt họa viền phát sáng chạy vòng quanh (moving border style), có hiệu ứng nảy từ tính (magnetic-inspired spring scale) dành riêng cho nút "Tìm kiếm lộ trình xanh" và "Tìm lộ trình ngay".
 
 ---
 
 ### 3. Redesign Components (`apps/web/components`)
 
-#### [MODIFY] [apps/web/components/EcoTransitHeader.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/EcoTransitHeader.tsx)
+#### [MODIFY] [apps/web/components/EcoTransitHeader.tsx](apps/web/components/EcoTransitHeader.tsx)
 - Đổi tên tiêu đề hiển thị và logo phụ sang nhận diện **Lướt Khói Chạm Xanh**.
 - Tích hợp primitive `NavHeader` cho menu điều hướng.
 - Gắn thẻ "Sắp ra mắt" và thông báo trực quan rõ ràng cho các CTA chưa khả dụng.
 
-#### [MODIFY] [apps/web/components/HeroSection.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/HeroSection.tsx)
+#### [MODIFY] [apps/web/components/HeroSection.tsx](apps/web/components/HeroSection.tsx)
 - Tái thiết kế Hero Section để truyền tải câu chuyện chiến dịch: *"Lướt khỏi khói xe, chạm vào nhịp xanh"* theo tinh thần di chuyển đô thị hiện đại "hands-free, stress-less, smart-spending".
 - Bổ sung `MotionFlowBackground` làm nền phía dưới.
 - Vẽ lại sơ đồ hoạt họa Metro/Bus và các thẻ chỉ số thật bằng Electric Blue và Vibrant Green.
 
-#### [MODIFY] [apps/web/components/RoutePlannerCard.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/RoutePlannerCard.tsx)
+#### [MODIFY] [apps/web/components/RoutePlannerCard.tsx](apps/web/components/RoutePlannerCard.tsx)
 - Đổi các input điểm đi/đến sang viền màu Electric Blue.
 - Tích hợp bộ chọn `FluidDropdown` cho phần lựa chọn thời tiết và bộ lọc ưu tiên.
 - Áp dụng `PremiumCta` cho nút tìm kiếm chính.
 
-#### [MODIFY] [apps/web/components/MapPanel.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/MapPanel.tsx)
+#### [MODIFY] [apps/web/components/MapPanel.tsx](apps/web/components/MapPanel.tsx)
 - Nâng cấp sơ đồ mạng lưới ga hoạt họa ban đầu (Electric Blue cho Metro Line 1, Vibrant Green cho các nhánh Bus).
 - Nâng cấp đường polyline trên bản đồ địa lý thực: Metro vẽ bằng nét đôi phát sáng Electric Blue, Bus vẽ bằng Vibrant Green.
 
-#### [MODIFY] [apps/web/components/RouteResultsSheet.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/RouteResultsSheet.tsx)
+#### [MODIFY] [apps/web/components/RouteResultsSheet.tsx](apps/web/components/RouteResultsSheet.tsx)
 - Định dạng thẻ kết quả boarding pass theo tông Urban Beige và Electric Blue chủ đạo.
 
 ---
 
 ### 4. Tài liệu ghi nhận ý tưởng (`docs/UI_INSPIRATION_LOG.md`)
 
-#### [NEW] [docs/UI_INSPIRATION_LOG.md](file:///f:/HAILEO/My%20Project/Ecotransit-project/docs/UI_INSPIRATION_LOG.md)
+#### [NEW] [docs/UI_INSPIRATION_LOG.md](docs/UI_INSPIRATION_LOG.md)
 - Lưu trữ tài liệu phân tích ý tưởng thiết kế, so sánh các lựa chọn chuyển động, ghi chú khả năng tương thích tiếp cận (Accessibility) và tối ưu hóa hiệu năng thiết bị di động.
 
 ---
