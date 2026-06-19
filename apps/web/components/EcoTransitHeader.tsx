@@ -53,8 +53,8 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
   };
  
   const navItems = [
-    { label: 'Lập lộ trình', targetId: 'route' },
-    { label: 'Khám phá ga', targetId: 'stations' },
+    { label: 'Lộ trình', targetId: 'route' },
+    { label: 'Khám phá', targetId: 'stations' },
     { label: 'Tích điểm', targetId: 'tickets' },
     { label: 'Đổi thưởng', targetId: 'rewards' },
     { label: 'XanhWrap', targetId: 'xanhwrap' },
@@ -62,7 +62,7 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
   ];
 
   if (user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) {
-    navItems.push({ label: '🛠️ Admin', targetId: 'admin' });
+    navItems.push({ label: 'Admin', targetId: 'admin' });
   }
 
   return (
@@ -71,51 +71,51 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           
           {/* Brand Logo & Name (Lướt Khói Chạm Xanh) */}
-          <div className="flex items-center space-x-2.5 select-none shrink-0">
+          <div className="flex items-center space-x-2 select-none shrink-0">
             <div className="flex flex-col items-start leading-none py-1">
               <div className="flex items-center space-x-1 sm:space-x-1.5">
-                <span className="text-base sm:text-lg font-black tracking-tight text-eco-primary uppercase font-display-campaign">
+                <span className="text-xs sm:text-base md:text-lg font-black tracking-tight text-eco-primary uppercase font-display-campaign whitespace-nowrap">
                   Lướt Khói
                 </span>
-                <span className="text-base sm:text-lg font-black tracking-tight text-eco-accentGreen uppercase font-display-campaign">
+                <span className="text-xs sm:text-base md:text-lg font-black tracking-tight text-eco-accentGreen uppercase font-display-campaign whitespace-nowrap">
                   Chạm Xanh
                 </span>
                 <span className="hidden sm:inline-block text-[8px] text-eco-muted font-bold tracking-wider bg-eco-mint px-1.5 py-0.5 rounded border border-eco-primary/10">
                   EcoTransit
                 </span>
               </div>
-              <span className="text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
+              <span className="hidden sm:inline-block text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
                 Chiến dịch giao thông xanh TP.HCM
               </span>
             </div>
           </div>
 
-          {/* Navigation items (Pill effect, hidden on mobile) */}
-          <div className="hidden md:flex items-center justify-center flex-1 px-4">
+          {/* Navigation items (Pill effect, responsive scrollable container) */}
+          <div className="flex items-center justify-center flex-1 px-2 md:px-4 overflow-x-auto no-scrollbar min-w-0 mx-1.5 sm:mx-3">
             <NavHeader items={navItems} activeSection={activeSection} onUpcomingClick={triggerUpcoming} onItemClick={onSectionSelect} />
           </div>
 
           {/* CTAs (Responsive sizing to avoid 390px overflow) */}
-          <div className="flex items-center space-x-1.5 sm:space-x-3 relative shrink-0">
+          <div className="flex items-center space-x-1 sm:space-x-2 relative shrink-0">
             <button
               onClick={() => {
                 if (onSectionSelect) {
                   onSectionSelect('tickets');
                 }
               }}
-              className="px-2.5 py-1.5 text-[10px] sm:text-xs font-bold text-eco-primary bg-eco-mint border border-eco-primary/20 rounded-full hover:bg-eco-primary hover:text-white transition-all duration-200"
+              className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 text-[9px] sm:text-xs font-bold text-eco-primary bg-eco-mint border border-eco-primary/20 rounded-full hover:bg-eco-primary hover:text-white transition-all duration-200 whitespace-nowrap"
             >
               🎫 Vé xanh
             </button>
             
             {user ? (
-              <div className="flex items-center space-x-2">
-                <span className="hidden sm:inline-block text-xs font-semibold text-eco-muted bg-eco-bgBeige px-2.5 py-1 rounded-full border border-eco-primary/5">
+              <div className="flex items-center space-x-1 sm:space-x-2">
+                <span className="hidden md:inline-block text-[10px] sm:text-xs font-semibold text-eco-muted bg-eco-bgBeige px-2 py-1 rounded-full border border-eco-primary/5 whitespace-nowrap">
                   👤 Đã đăng nhập
                 </span>
                 <button
                   onClick={handleLogout}
-                  className="px-3.5 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-eco-primary bg-eco-mint hover:bg-eco-primary hover:text-white rounded-full shadow-sm transition-all duration-200"
+                  className="px-2 py-1.5 sm:px-3.5 sm:py-1.5 text-[9px] sm:text-xs font-black uppercase tracking-wider text-eco-primary bg-eco-mint hover:bg-eco-primary hover:text-white rounded-full shadow-sm transition-all duration-200 whitespace-nowrap"
                 >
                   Đăng xuất
                 </button>
@@ -123,7 +123,7 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
             ) : (
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="px-3.5 py-1.5 text-[10px] sm:text-xs font-black uppercase tracking-wider text-white bg-eco-primary hover:bg-eco-primaryDeep rounded-full shadow-sm transition-all duration-200"
+                className="px-2 py-1.5 sm:px-3.5 sm:py-1.5 text-[9px] sm:text-xs font-black uppercase tracking-wider text-white bg-eco-primary hover:bg-eco-primaryDeep rounded-full shadow-sm transition-all duration-200 whitespace-nowrap"
               >
                 Đăng nhập
               </button>
