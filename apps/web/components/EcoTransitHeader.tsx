@@ -61,6 +61,10 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
     { label: 'Cẩm nang', targetId: 'guides' },
   ];
 
+  if (user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) {
+    navItems.push({ label: 'Admin', targetId: 'admin' });
+  }
+
   return (
     <>
       <header className="glass-header shrink-0 h-16 z-50 bg-white/80 backdrop-blur-md border-b border-eco-primary/10 transition-all duration-300">
@@ -86,30 +90,13 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
             </div>
           </div>
 
-          {/* Navigation items (Pill effect, responsive scrollable container) */}
-          <div className="flex items-center justify-start flex-1 px-2 md:px-4 overflow-x-auto no-scrollbar min-w-0 mx-1.5 sm:mx-3">
+          {/* Navigation items (Scrollable Navigation Rail) */}
+          <div className="flex-1 min-w-0 mx-1.5 sm:mx-3 h-full flex items-center relative">
             <NavHeader items={navItems} activeSection={activeSection} onUpcomingClick={triggerUpcoming} onItemClick={onSectionSelect} />
           </div>
 
           {/* CTAs (Responsive sizing to avoid 390px overflow) */}
           <div className="flex items-center space-x-1 sm:space-x-2 relative shrink-0">
-            {user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
-              <button
-                onClick={() => {
-                  if (onSectionSelect) {
-                    onSectionSelect('admin');
-                  }
-                }}
-                className={`px-2 py-1.5 sm:px-3 sm:py-1.5 text-[9px] sm:text-xs font-black uppercase tracking-wider rounded-full transition-all duration-200 whitespace-nowrap shadow-sm border ${
-                  activeSection === 'admin'
-                    ? 'text-white bg-eco-primary border-transparent shadow-eco-primary/25 font-extrabold'
-                    : 'text-eco-primary bg-eco-mint border-eco-primary/20 hover:bg-eco-primary hover:text-white font-bold'
-                }`}
-              >
-                🛠️ Admin
-              </button>
-            )}
-
             <button
               onClick={() => {
                 if (onSectionSelect) {
