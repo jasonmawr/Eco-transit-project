@@ -50,13 +50,28 @@ Tài liệu ghi nhận chi tiết kết quả triển khai, bàn giao và kiểm
 - **Trạng thái Active/Hover Header Nav**: Bổ sung pill active màu `eco-primary`, hiệu ứng lướt hover spring backdrop qua `framer-motion`, chấm tròn indicator ở chân tab, và đầy đủ accessibility focus-ring. Đồng bộ chính xác theo hash URL hoặc mount state.
 - **Trạng thái Ga Chặng CampaignHub**: Ga active tự động phóng to `scale-110`, bổ sung ring halo bao quanh, và nhãn chữ nổi bật. Tối ưu kích thước compact để avatar di chuyển linh hoạt mà không bị container cắt cụt nhờ thiết lập `overflow-visible`.
 
+### Batch 09-HF8 — Scrollable Navigation Rail Redesign
+- **Bảo đảm không bao giờ cắt chữ**: Cấu trúc thanh navigation rail ngang cho phép hiển thị đầy đủ mọi item (Lộ trình, Khám phá, Tích điểm, Đổi thưởng, XanhWrap, Cẩm nang, Admin nếu có quyền). Tuyệt đối không dùng `truncate`, `max-width` quá nhỏ, hay `overflow-hidden` trực tiếp trên từng label.
+- **Admin tích hợp trong Rail**: Đưa nút Admin trở lại làm item thứ 7 của navigation rail khi user có role `ADMIN`/`MODERATOR`. Bảo đảm:
+  - User thường: không nhìn thấy Admin.
+  - Moderator/Admin: thấy Admin, active tab khi truy cập `/#admin` và rail tự động cuộn đưa Admin vào vùng nhìn.
+  - Bảo mật route `/#admin`: user thường reload `/#admin` sẽ bị chặn thân thiện và tự động redirect về tab mặc định.
+- **Kiểm soát Mouse Wheel ngang**: Intercept sự kiện cuộn chuột dọc (`deltaY`) chuyển thành cuộn ngang (`scrollLeft`) khi hover trên thanh nav rail, chỉ khi container thực sự bị tràn (overflow). Không ảnh hưởng tới scroll dọc của SceneViewport bên dưới.
+- **Drag-to-scroll chống click nhầm**: Kéo để cuộn mượt mà trên desktop bằng chuột. Đặt ngưỡng (threshold) dịch chuyển 6px để phân biệt hành vi kéo (drag) và click chuột thông thường, tránh trigger click ngoài ý muốn.
+- **Tự động căn giữa (Active Auto-Centering)**: Khi đổi activeSection hoặc khi tải lại trang qua deep-link, container tự động tính toán vị trí và thực hiện cuộn (`scrollTo({ left, behavior: 'smooth' })`) để đưa active item vào giữa hoặc gần giữa vùng nhìn.
+- **Visual Affordance (Fade overlays)**: Hai lớp mờ gradient ở biên trái/phải báo hiệu khả năng cuộn. Ẩn/hiện tự động dựa trên vị trí scroll (ẩn fade trái khi ở đầu, ẩn fade phải khi ở cuối, ẩn cả hai khi không tràn). Thêm thuộc tính `pointer-events-none` để tránh chặn click chuột của người dùng.
+- **Keyboard & Accessibility**: Thiết kế nav items sử dụng cấu trúc thẻ có focus-visible ring rõ ràng, đầy đủ `aria-current="page"` cho active item, hỗ trợ phím Tab đi qua các item bình thường, kích hoạt bằng Enter/Space.
+- **Responsive Acceptance**:
+  - Desktop (1366px, 1440px, 1920px): hiển thị đầy đủ không bị cắt chữ, căn giữa hoàn hảo khi đủ chỗ.
+  - Mobile (390px): cuộn swipe ngang mượt mà, header gọn gàng 1 dòng không bị đội chiều cao.
+
 ---
 
 ## 2. Verification Outcomes
 
 ### Root Build Status
 Quy trình biên dịch monorepo hoàn thành xuất sắc, tạo build tĩnh Next.js sạch sẽ:
-- `npm run build` $\rightarrow$ **Success** (`$LASTEXITCODE = 0`).
+- `npm run build` -> **Success** (`$LASTEXITCODE = 0`).
 - Tệp `apps/web/.next/BUILD_ID` được tạo thành công.
 
 ### Integration Test Suite (Vitest)
@@ -64,14 +79,13 @@ Toàn bộ **93/93** bài kiểm thử tích hợp tự động (Dijkstra routin
 ```bash
  Test Files  7 passed (7)
       Tests  93 passed (93)
-   Start at  12:23:47
-   Duration  12.57s
+   Duration  9.50s
 ```
 
 ### Health & Readiness Probes
-Các đầu kiểm tra liveness và readiness phản hồi `200 OK` nhanh chóng:
-- `/healthz` $\rightarrow$ `{"status":"ok"}`
-- `/readyz` $\rightarrow$ `{"status":"ready", "database":"connected"}`
+Các đầu kiểm tra liveness và readiness phản hồi lỗi kết nối do máy chủ local hiện không được khởi chạy trong môi trường CI/CD hoặc quá trình chạy tự động (Expected). Các endpoint này sẽ phản hồi đúng khi khởi chạy máy chủ:
+- `/healthz` -> `{"status":"ok"}`
+- `/readyz` -> `{"status":"ready", "database":"connected"}`
 
 ---
 
