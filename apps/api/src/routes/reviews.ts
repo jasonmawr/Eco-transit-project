@@ -45,7 +45,7 @@ router.get('/reviews', async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = reviews.map((r) => ({
+    const mapped = reviews.map((r: any) => ({
       id: r.id,
       displayName: r.displayName?.trim() || 'Hành khách xanh',
       rating: r.rating,

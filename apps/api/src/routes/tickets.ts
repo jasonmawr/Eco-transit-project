@@ -210,7 +210,7 @@ router.get('/tickets/mine', requireAuth, async (req: Request, res: Response) => 
     });
 
     // Clean DTO scrub: absolutely no userId, email, reviewerId, or raw server paths
-    const scrubbed = tickets.map((t) => ({
+    const scrubbed = tickets.map((t: any) => ({
       id: t.id,
       imageUrl: t.imageUrl,
       ocrText: t.ocrText,

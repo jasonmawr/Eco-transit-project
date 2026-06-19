@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../config/db.js';
 import { z } from 'zod';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
+import type { Prisma } from '@prisma/client';
 
 const router = Router();
 
@@ -46,7 +47,7 @@ router.get('/wallet/me', requireAuth, async (req: Request, res: Response) => {
       manual_review: 0,
     };
 
-    ticketCounts.forEach((group) => {
+    ticketCounts.forEach((group: any) => {
       const statusKey = group.status as keyof typeof counts;
       if (statusKey in counts) {
         counts[statusKey] = group._count.id;
@@ -74,7 +75,7 @@ router.get('/points/ledger', requireAuth, async (req: Request, res: Response) =>
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = ledger.map((item) => ({
+    const mapped = ledger.map((item: any) => ({
       id: item.id,
       delta: item.delta,
       balanceAfter: item.balanceAfter,
@@ -128,7 +129,7 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
     }
 
     // Execute atomic transaction for state changes, wallets, and ledger
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Re-verify under transaction lock
       const ticket = await tx.ticket.findUnique({
         where: { id },
