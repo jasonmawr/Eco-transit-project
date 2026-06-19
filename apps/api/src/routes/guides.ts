@@ -30,7 +30,7 @@ router.get('/guides', async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = guides.map((g) => ({
+    const mapped = guides.map((g: any) => ({
       id: g.id,
       slug: g.slug,
       title: g.title,

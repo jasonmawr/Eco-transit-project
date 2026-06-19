@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { prisma } from '../config/db.js';
 import { z } from 'zod';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
+import type { Prisma } from '@prisma/client';
 
 const router = Router();
 
@@ -103,7 +104,7 @@ router.get('/reviews', async (req: Request, res: Response) => {
       orderBy: { createdAt: 'desc' },
     });
 
-    const mapped = reviews.map((r) => ({
+    const mapped = reviews.map((r: any) => ({
       id: r.id,
       displayName: r.displayName || 'Hành khách xanh',
       rating: r.rating,
@@ -202,7 +203,7 @@ router.get('/tickets', async (req: Request, res: Response) => {
     });
 
     // Safe scrub: no server path, no email, only secure thumbnail URL
-    const mapped = tickets.map((t) => ({
+    const mapped = tickets.map((t: any) => ({
       id: t.id,
       type: t.type,
       status: t.status,
@@ -251,7 +252,7 @@ router.post('/tickets/:id/review', async (req: Request, res: Response) => {
 
     const awardPoints = Math.min(100, Math.max(5, points ?? 10));
 
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const ticket = await tx.ticket.findUnique({ where: { id } });
       if (!ticket) throw new Error('TICKET_NOT_FOUND');
       if (ticket.status === statusMapped) return { ticket, pointsAwarded: 0, skipped: true };
@@ -904,7 +905,7 @@ router.get('/audit-logs', async (req: Request, res: Response) => {
     });
 
     // Remove any passwords/secrets/tokens explicitly just in case (metadata checked)
-    const scrubbed = logs.map((l) => {
+    const scrubbed = logs.map((l: any) => {
       const meta = l.metadata as any;
       if (meta) {
         delete meta.password;

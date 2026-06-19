@@ -45,7 +45,7 @@ router.get('/places', async (req: Request, res: Response) => {
     let filtered = places;
     if (q) {
       const cleanQ = removeAccents(q.toLowerCase().trim());
-      filtered = places.filter((p) => {
+      filtered = places.filter((p: any) => {
         const cleanName = removeAccents(p.name.toLowerCase());
         const cleanShort = removeAccents(p.shortDescription.toLowerCase());
         const cleanDesc = p.description ? removeAccents(p.description.toLowerCase()) : '';
@@ -59,7 +59,7 @@ router.get('/places', async (req: Request, res: Response) => {
       });
     }
 
-    const mapped = filtered.map((p) => ({
+    const mapped = filtered.map((p: any) => ({
       id: p.id,
       stationId: p.stationId,
       stationName: p.station.name,
@@ -121,7 +121,7 @@ router.get('/places/:idOrSlug', async (req: Request, res: Response) => {
       });
     }
 
-    const mappedReviews = place.reviews.map((r) => ({
+    const mappedReviews = place.reviews.map((r: any) => ({
       id: r.id,
       displayName: r.displayName || 'Bạn đồng hành xanh',
       rating: r.rating,

@@ -38,7 +38,7 @@ router.get('/stations', async (req: Request, res: Response) => {
     let filtered = stations;
     if (q) {
       const cleanQ = removeAccents(q.toLowerCase().trim());
-      filtered = stations.filter((s) => {
+      filtered = stations.filter((s: any) => {
         const cleanName = removeAccents(s.name.toLowerCase());
         const cleanLine = removeAccents(s.lineName.toLowerCase());
         return cleanName.includes(cleanQ) || cleanLine.includes(cleanQ);
@@ -46,7 +46,7 @@ router.get('/stations', async (req: Request, res: Response) => {
     }
 
     // Exclude raw database details if necessary, but returning name, lineName, orderNumber, lat, lng, facilities is good.
-    const mapped = filtered.map((s) => ({
+    const mapped = filtered.map((s: any) => ({
       id: s.id,
       name: s.name,
       lineName: s.lineName,
@@ -92,7 +92,7 @@ router.get('/stations/:id', async (req: Request, res: Response) => {
       where: { stationId: id },
     });
 
-    const mappedPois = pois.map((p) => ({
+    const mappedPois = pois.map((p: any) => ({
       id: p.id,
       name: p.name,
       category: p.category,
@@ -155,7 +155,7 @@ router.get('/stations/:id/experience', async (req: Request, res: Response) => {
     });
 
     // Available categories in the nearby places
-    const categories = Array.from(new Set(places.map((p) => p.category)));
+    const categories = Array.from(new Set(places.map((p: any) => p.category)));
 
     // Fetch approved reviews for this station
     const stationReviews = await prisma.uGCReview.findMany({
@@ -170,10 +170,10 @@ router.get('/stations/:id/experience', async (req: Request, res: Response) => {
     const totalCount = stationReviews.length;
     const averageRating =
       totalCount > 0
-        ? parseFloat((stationReviews.reduce((sum, r) => sum + r.rating, 0) / totalCount).toFixed(1))
+        ? parseFloat((stationReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / totalCount).toFixed(1))
         : 0;
 
-    const mappedReviews = stationReviews.map((r) => ({
+    const mappedReviews = stationReviews.map((r: any) => ({
       id: r.id,
       displayName: r.displayName || 'Hành khách xanh',
       rating: r.rating,
@@ -201,7 +201,7 @@ router.get('/stations/:id/experience', async (req: Request, res: Response) => {
         facilities: station.facilities ? station.facilities.split(',') : [],
         description: station.description || '',
       },
-      places: places.map((p) => ({
+      places: places.map((p: any) => ({
         id: p.id,
         slug: p.slug,
         name: p.name,
@@ -226,7 +226,7 @@ router.get('/stations/:id/experience', async (req: Request, res: Response) => {
         totalCount,
         list: mappedReviews,
       },
-      guides: guides.map((g) => ({
+      guides: guides.map((g: any) => ({
         id: g.id,
         slug: g.slug,
         title: g.title,

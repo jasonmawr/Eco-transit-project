@@ -143,8 +143,8 @@ export class LocalRouteProvider implements TransitRouteProvider {
 
           const nextLeg: RouteLeg = {
             mode: edge.mode as 'metro' | 'bus' | 'walk',
-            fromStationName: stations.find(s => s.id === edge.fromStationId)?.name || 'Ga đi',
-            toStationName: stations.find(s => s.id === edge.toStationId)?.name || 'Ga đến',
+            fromStationName: stations.find((s: any) => s.id === edge.fromStationId)?.name || 'Ga đi',
+            toStationName: stations.find((s: any) => s.id === edge.toStationId)?.name || 'Ga đến',
             distanceMeters: edge.distanceMeters,
             durationMinutes: edge.durationMinutes,
             fareEstimate: legFare,

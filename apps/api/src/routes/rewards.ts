@@ -3,6 +3,7 @@ import { prisma } from '../config/db.js';
 import { z } from 'zod';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import crypto from 'crypto';
+import type { Prisma } from '@prisma/client';
 
 const router = Router();
 
@@ -119,12 +120,12 @@ router.get('/rewards', async (req: Request, res: Response) => {
         _count: { id: true },
       });
 
-      userRedemptions.forEach((group) => {
+      userRedemptions.forEach((group: any) => {
         redemptionsMap[group.voucherId] = group._count.id;
       });
     }
 
-    const list = vouchers.map((v) =>
+    const list = vouchers.map((v: any) =>
       mapVoucherToDTO(
         v,
         sessionUser?.id,
@@ -160,7 +161,7 @@ router.get('/rewards/mine', requireAuth, async (req: Request, res: Response) => 
     });
 
     // Privacy scrubbed: no userId/email or database keys exposed
-    const mapped = redemptions.map((r) => ({
+    const mapped = redemptions.map((r: any) => ({
       id: r.id,
       code: r.code,
       voucherTitle: r.voucher.name,
@@ -280,7 +281,7 @@ router.post('/rewards/:slug/redeem', requireAuth, async (req: Request, res: Resp
     const finalIdempKey = idempotencyKey || `voucher_redeemed:${sessionUser.id}:${voucher.id}:${Date.now()}`;
 
     // Execute atomic transaction for safety
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // 1. Lock/Fetch voucher again
       const v = await tx.voucher.findUnique({
         where: { id: voucher.id },
@@ -315,7 +316,7 @@ router.post('/rewards/:slug/redeem', requireAuth, async (req: Request, res: Resp
       // 4. Extract or generate code
       let finalCode = '';
       if (v.encryptedCodes) {
-        const codes = v.encryptedCodes.split(',').map((c) => c.trim()).filter(Boolean);
+        const codes = v.encryptedCodes.split(',').map((c: any) => c.trim()).filter(Boolean);
         if (codes.length > alreadyRedeemed) {
           finalCode = codes[alreadyRedeemed];
         }
