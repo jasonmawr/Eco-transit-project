@@ -76,18 +76,18 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
                 <span className="text-xs sm:text-base md:text-lg font-black tracking-tight text-eco-accentGreen uppercase font-display-campaign whitespace-nowrap">
                   Chạm Xanh
                 </span>
-                <span className="hidden sm:inline-block text-[8px] text-eco-muted font-bold tracking-wider bg-eco-mint px-1.5 py-0.5 rounded border border-eco-primary/10">
+                <span className="hidden lg:inline-block text-[8px] text-eco-muted font-bold tracking-wider bg-eco-mint px-1.5 py-0.5 rounded border border-eco-primary/10">
                   EcoTransit
                 </span>
               </div>
-              <span className="hidden sm:inline-block text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
+              <span className="hidden lg:inline-block text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
                 Chiến dịch giao thông xanh TP.HCM
               </span>
             </div>
           </div>
 
           {/* Navigation items (Pill effect, responsive scrollable container) */}
-          <div className="flex items-center justify-center flex-1 px-2 md:px-4 overflow-x-auto no-scrollbar min-w-0 mx-1.5 sm:mx-3">
+          <div className="flex items-center justify-start flex-1 px-2 md:px-4 overflow-x-auto no-scrollbar min-w-0 mx-1.5 sm:mx-3">
             <NavHeader items={navItems} activeSection={activeSection} onUpcomingClick={triggerUpcoming} onItemClick={onSectionSelect} />
           </div>
 
@@ -123,7 +123,7 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
             
             {user ? (
               <div className="flex items-center space-x-1 sm:space-x-2">
-                <span className="hidden md:inline-block text-[10px] sm:text-xs font-semibold text-eco-muted bg-eco-bgBeige px-2 py-1 rounded-full border border-eco-primary/5 whitespace-nowrap">
+                <span className="hidden xl:inline-block text-[10px] sm:text-xs font-semibold text-eco-muted bg-eco-bgBeige px-2 py-1 rounded-full border border-eco-primary/5 whitespace-nowrap">
                   👤 Đã đăng nhập
                 </span>
                 <button

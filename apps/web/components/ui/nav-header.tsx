@@ -27,7 +27,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
   };
 
   return (
-    <nav className="relative flex items-center space-x-1 py-1 px-1 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none overflow-x-auto no-scrollbar max-w-full shrink-0">
+    <nav className="relative flex items-center space-x-1 py-1 px-1 bg-eco-soft/50 rounded-full border border-eco-mint/30 select-none overflow-x-auto no-scrollbar max-w-full shrink-0 mx-auto w-max max-w-none flex">
       {items.map((item, index) => {
         const isUpcoming = item.isUpcoming;
         const isActive = activeSection === item.targetId;
@@ -59,7 +59,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
               <button
                 type="button"
                 onClick={() => onUpcomingClick(item.label)}
-                className={`relative z-10 h-9 sm:h-10 px-3 sm:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1 focus:outline-none transition-colors duration-200 cursor-not-allowed whitespace-nowrap shrink-0 ${
+                className={`relative z-10 h-9 sm:h-10 px-2 sm:px-3 md:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center space-x-1 focus:outline-none transition-colors duration-200 cursor-not-allowed whitespace-nowrap shrink-0 ${
                   hoveredIndex === index ? 'text-eco-ink' : 'text-eco-muted'
                 }`}
               >
@@ -74,7 +74,7 @@ export function NavHeader({ items, activeSection, onUpcomingClick, onItemClick }
               <a
                 href={`#${item.targetId}`}
                 onClick={(e) => handleScroll(e, item.targetId)}
-                className={`relative z-10 h-9 sm:h-10 px-3 sm:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider inline-flex items-center justify-center whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary rounded-full transition-all duration-200 shrink-0 ${
+                className={`relative z-10 h-9 sm:h-10 px-2 sm:px-3 md:px-[18px] text-[10px] sm:text-xs font-black uppercase tracking-wider inline-flex items-center justify-center whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary rounded-full transition-all duration-200 shrink-0 ${
                   isActive
                     ? hoveredIndex === index 
                       ? 'text-eco-ink font-extrabold'
