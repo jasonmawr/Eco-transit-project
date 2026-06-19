@@ -275,8 +275,26 @@ export default function Home() {
               {activeSection === 'guides' && (
                 <GuidesSection />
               )}
-              {activeSection === 'admin' && user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
-                <AdminConsoleSection user={user} onLoginClick={() => setIsAuthOpen(true)} />
+              {activeSection === 'admin' && (
+                !(user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) ? (
+                  <div className="flex flex-col items-center justify-center h-full p-6 text-center space-y-4">
+                    <div className="text-4xl animate-bounce">🔒</div>
+                    <h3 className="text-base font-black text-eco-ink uppercase tracking-wider font-display-campaign">
+                      Khu vực hạn chế
+                    </h3>
+                    <p className="text-xs text-eco-muted font-semibold max-w-sm leading-relaxed">
+                      Bạn cần quyền Kiểm duyệt viên hoặc Quản trị viên để mở khu vực này.
+                    </p>
+                    <button
+                      onClick={() => handleSectionSelect('route')}
+                      className="px-4 py-2 text-xs font-black uppercase tracking-wider text-white bg-eco-primary hover:bg-eco-primaryDeep rounded-xl shadow-sm transition-all duration-200"
+                    >
+                      Quay lại Lộ trình
+                    </button>
+                  </div>
+                ) : (
+                  <AdminConsoleSection user={user} onLoginClick={() => setIsAuthOpen(true)} />
+                )
               )}
             </motion.div>
           </AnimatePresence>

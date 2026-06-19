@@ -4,6 +4,20 @@ import React, { useState } from 'react';
 import { apiFetch, getApiBaseUrl } from '../lib/api';
 import { Share2, Copy, AlertCircle, CheckCircle, RefreshCw, Leaf, Landmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import FreeTextSuggestionInput from './ui/free-text-suggestion-input';
+
+const XANHWRAP_PLACE_SUGGESTIONS = [
+  'Ga Bến Thành',
+  'Ga Ba Son',
+  'Ga Nhà hát Thành phố',
+  'Thảo Điền',
+  'Suối Tiên',
+  'Nhà',
+  'Trường học',
+  'Văn phòng',
+  'Bến xe buýt điện',
+  'Highlands Coffee gần ga'
+];
 
 export default function XanhWrapSection() {
   const [form, setForm] = useState({
@@ -171,37 +185,28 @@ export default function XanhWrapSection() {
 
           {/* Path inputs */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-eco-ink uppercase tracking-wider block">
-                Điểm xuất phát <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="origin"
-                required
-                value={form.origin}
-                onChange={handleInputChange}
-                placeholder="VD: Ga Bến Thành"
-                maxLength={50}
-                className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-medium transition-all"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[10px] font-black text-eco-ink uppercase tracking-wider block">
-                Điểm đến <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="destination"
-                required
-                value={form.destination}
-                onChange={handleInputChange}
-                placeholder="VD: Ga Ba Son"
-                maxLength={50}
-                className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-medium transition-all"
-              />
-            </div>
+            <FreeTextSuggestionInput
+              label="Điểm xuất phát"
+              name="origin"
+              required
+              value={form.origin}
+              onChange={(val) => setForm((prev) => ({ ...prev, origin: val }))}
+              placeholder="VD: Ga Bến Thành, Nhà, Trường, Văn phòng..."
+              suggestions={XANHWRAP_PLACE_SUGGESTIONS}
+            />
+            <FreeTextSuggestionInput
+              label="Điểm đến"
+              name="destination"
+              required
+              value={form.destination}
+              onChange={(val) => setForm((prev) => ({ ...prev, destination: val }))}
+              placeholder="VD: Ga Bến Thành, Nhà, Trường, Văn phòng..."
+              suggestions={XANHWRAP_PLACE_SUGGESTIONS}
+            />
           </div>
+          <span className="text-[10px] text-eco-muted block font-medium -mt-2">
+            Bạn có thể nhập tự do hoặc chọn gợi ý ga/địa điểm quen thuộc.
+          </span>
 
           {/* Duration & Moment */}
           <div className="grid grid-cols-2 gap-4">

@@ -61,10 +61,6 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
     { label: 'Cẩm nang', targetId: 'guides' },
   ];
 
-  if (user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) {
-    navItems.push({ label: 'Admin', targetId: 'admin' });
-  }
-
   return (
     <>
       <header className="glass-header shrink-0 h-16 z-50 bg-white/80 backdrop-blur-md border-b border-eco-primary/10 transition-all duration-300">
@@ -97,6 +93,23 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
 
           {/* CTAs (Responsive sizing to avoid 390px overflow) */}
           <div className="flex items-center space-x-1 sm:space-x-2 relative shrink-0">
+            {user && (user.role === 'ADMIN' || user.role === 'MODERATOR') && (
+              <button
+                onClick={() => {
+                  if (onSectionSelect) {
+                    onSectionSelect('admin');
+                  }
+                }}
+                className={`px-2 py-1.5 sm:px-3 sm:py-1.5 text-[9px] sm:text-xs font-black uppercase tracking-wider rounded-full transition-all duration-200 whitespace-nowrap shadow-sm border ${
+                  activeSection === 'admin'
+                    ? 'text-white bg-eco-primary border-transparent shadow-eco-primary/25 font-extrabold'
+                    : 'text-eco-primary bg-eco-mint border-eco-primary/20 hover:bg-eco-primary hover:text-white font-bold'
+                }`}
+              >
+                🛠️ Admin
+              </button>
+            )}
+
             <button
               onClick={() => {
                 if (onSectionSelect) {
