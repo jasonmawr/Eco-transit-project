@@ -130,14 +130,17 @@ export default function RouteResultsSheet({
   };
 
   return (
-    <div className="flex flex-col space-y-4 w-full animate-fade-in">
+    <div className="flex flex-col space-y-4 w-full animate-fade-in" data-testid="route-result-summary">
       
       {/* Title section */}
       <div className="flex justify-between items-center px-1">
         <h3 className="text-xs font-black text-eco-ink tracking-widest uppercase flex items-center space-x-1.5">
           <span>🛣️ Lộ Trình Tìm Thấy ({options.length})</span>
         </h3>
-        <span className="text-[9px] text-eco-muted font-extrabold uppercase">Tối ưu theo điểm số</span>
+        <div className="text-[9px] text-eco-muted font-extrabold uppercase">
+          <span>Lộ trình đến: </span>
+          <strong className="text-eco-primary font-black" data-testid="route-destination-label">{destinationLabel}</strong>
+        </div>
       </div>
 
       <div className="space-y-4 max-h-[450px] overflow-y-auto pr-1">

@@ -36,14 +36,21 @@ test.describe('Route Planner E2E Tests', () => {
     await searchBtn.click();
 
     // 4. Assert route result thật xuất hiện: marker/polyline/route summary/state map-ready đáng tin cậy
-    // Assert results list header appears
-    await expect(page.locator('text=Lộ Trình Tìm Thấy')).toBeVisible({ timeout: 10000 });
+    // Assert results list summary is visible
+    const resultSummary = page.locator('[data-testid="route-result-summary"]');
+    await expect(resultSummary).toBeVisible({ timeout: 10000 });
+
+    // Assert summary contains correct destination label
+    const destLabel = page.locator('[data-testid="route-destination-label"]');
+    await expect(destLabel).toContainText(destName || '');
+
     // Assert the map is ready and has the testid
     const routeMap = page.locator('[data-testid="route-map-ready"]');
     await expect(routeMap).toBeVisible({ timeout: 10000 });
-    // Assert the Leaflet map container has been initialized and contains leaflet-pane
-    const mapPane = routeMap.locator('.leaflet-pane').first();
-    await expect(mapPane).toBeAttached();
+
+    // Assert that Leaflet has rendered at least one route polyline path on the map
+    const routePolyline = page.locator('path.route-polyline').first();
+    await expect(routePolyline).toBeAttached();
 
     // 5. Đổi điểm đến
     await destComboboxBtn.click();
@@ -59,8 +66,9 @@ test.describe('Route Planner E2E Tests', () => {
     await searchBtn.click();
 
     // 7. Assert route/map cập nhật
-    await expect(page.locator('text=Lộ Trình Tìm Thấy')).toBeVisible({ timeout: 10000 });
+    await expect(resultSummary).toBeVisible({ timeout: 10000 });
+    await expect(destLabel).toContainText(newDestName || '');
     await expect(routeMap).toBeVisible();
-    await expect(mapPane).toBeAttached();
+    await expect(routePolyline).toBeAttached();
   });
 });

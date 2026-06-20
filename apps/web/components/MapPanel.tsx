@@ -37,6 +37,14 @@ export default function MapPanel({
   const [mapStatus, setMapStatus] = useState<'loading' | 'ready' | 'fallback'>('loading');
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const hasRoute = activeLegs && activeLegs.length > 0;
   const isInteracting = hasRoute || selectedStation !== null;
 
@@ -116,9 +124,13 @@ export default function MapPanel({
         try {
           mapInstance.remove();
         } catch (err) {
-          console.warn('MapPanel: Error removing Leaflet map instance:', err);
+          // Leaflet's remove() method may throw a TypeError if the container element has already been detached
+          // from the DOM by React before the cleanup function executes. This is safe to ignore as the DOM is already clean.
+          console.warn('MapPanel: Safe catch of Leaflet map remove error during unmount:', err);
         }
-        setMapInstance(null);
+        if (isMountedRef.current) {
+          setMapInstance(null);
+        }
       }
     };
   }, [mapStatus, isInteracting, mapInstance]);
@@ -237,6 +249,7 @@ export default function MapPanel({
             opacity: 0.25,
             lineCap: 'round',
             lineJoin: 'round',
+            className: 'route-polyline',
           }).addTo(polylinesGroup);
         } else if (leg.mode === 'bus') {
           color = '#9FCE1A';
@@ -249,6 +262,7 @@ export default function MapPanel({
             opacity: 0.2,
             lineCap: 'round',
             lineJoin: 'round',
+            className: 'route-polyline',
           }).addTo(polylinesGroup);
         }
 
@@ -259,6 +273,7 @@ export default function MapPanel({
           opacity: 0.95,
           lineCap: 'round',
           lineJoin: 'round',
+          className: 'route-polyline',
         }).addTo(polylinesGroup);
       }
     });
@@ -317,7 +332,7 @@ export default function MapPanel({
   }
 
   return (
-    <div 
+    <div
       className="w-full h-full relative rounded-3xl overflow-hidden border border-eco-mint shadow-inner"
       data-testid={mapInstance ? "route-map-ready" : undefined}
     >
