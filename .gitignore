@@ -33,3 +33,7 @@ uploads/tickets/**
 Thumbs.db
 .vscode/
 .idea/
+
+# testing
+test-results/
+playwright-report/

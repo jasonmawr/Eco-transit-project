@@ -29,8 +29,8 @@ export default function MapPanel({
   onSelectStationId,
   activeLegs,
 }: MapPanelProps) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
+   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [mapInstance, setMapInstance] = useState<any>(null);
   const markersGroupRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
   
@@ -43,6 +43,7 @@ export default function MapPanel({
   // Dynamic Leaflet asset injector - only trigger when user begins interacting
   useEffect(() => {
     if (typeof window === 'undefined' || !isInteracting) return;
+    if (mapStatus === 'ready') return;
 
     let isMounted = true;
 
@@ -87,7 +88,6 @@ export default function MapPanel({
       .then((L) => {
         if (!isMounted) return;
         setMapStatus('ready');
-        initializeMap(L);
       })
       .catch((err) => {
         if (!isMounted) return;
@@ -97,15 +97,34 @@ export default function MapPanel({
 
     return () => {
       isMounted = false;
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
+    };
+  }, [isInteracting, mapStatus]);
+
+  // Map initialization effect - only trigger when mapStatus is ready and container DOM element is mounted
+  useEffect(() => {
+    if (mapStatus !== 'ready' || !isInteracting) {
+      return;
+    }
+
+    const L = (window as any).L;
+    if (L && !mapInstance) {
+      initializeMap(L);
+    }
+
+    return () => {
+      if (mapInstance) {
+        try {
+          mapInstance.remove();
+        } catch (err) {
+          console.warn('MapPanel: Error removing Leaflet map instance:', err);
+        }
+        setMapInstance(null);
       }
     };
-  }, [isInteracting]);
+  }, [mapStatus, isInteracting, mapInstance]);
 
   const initializeMap = (L: any) => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    if (!mapContainerRef.current || mapInstance) return;
 
     const defaultCenter = [10.7715, 106.6980];
     const defaultZoom = 13;
@@ -123,17 +142,14 @@ export default function MapPanel({
       }).addTo(map);
 
       markersGroupRef.current = L.featureGroup().addTo(map);
-      mapRef.current = map;
-
-      renderMarkers(L);
+      setMapInstance(map);
     } catch (err) {
       console.error('Leaflet initialization failed:', err);
       setMapStatus('fallback');
     }
   };
 
-  const renderMarkers = (L: any) => {
-    const map = mapRef.current;
+  const renderMarkers = (L: any, map: any) => {
     const markersGroup = markersGroupRef.current;
     if (!map || !markersGroup) return;
 
@@ -174,21 +190,27 @@ export default function MapPanel({
     }
   };
 
+  // Render markers reactive effect
+  useEffect(() => {
+    const L = (window as any).L;
+    if (!L || !mapInstance) return;
+    renderMarkers(L, mapInstance);
+  }, [stations, selectedStation, mapInstance]);
+
   // Redraw polyline path route whenever active legs update
   useEffect(() => {
     const L = (window as any).L;
-    const map = mapRef.current;
-    if (!L || !map) return;
+    if (!L || !mapInstance) return;
 
     // Remove existing polyline if any
     if (polylineRef.current) {
-      map.removeLayer(polylineRef.current);
+      mapInstance.removeLayer(polylineRef.current);
       polylineRef.current = null;
     }
 
     if (!activeLegs || activeLegs.length === 0) return;
 
-    const polylinesGroup = L.featureGroup().addTo(map);
+    const polylinesGroup = L.featureGroup().addTo(mapInstance);
 
     activeLegs.forEach((leg) => {
       const fromSt = stations.find((s) => s.name === leg.fromStationName);
@@ -245,26 +267,22 @@ export default function MapPanel({
 
     if (activeLegs.length > 0) {
       try {
-        map.fitBounds(polylinesGroup.getBounds(), { padding: [40, 40] });
+        mapInstance.fitBounds(polylinesGroup.getBounds(), { padding: [40, 40] });
       } catch (err) {
         console.warn('Error fitting bounds:', err);
       }
     }
-  }, [activeLegs, stations]);
+  }, [activeLegs, stations, mapInstance]);
 
   // Center maps on selected station when clicked
   useEffect(() => {
-    const map = mapRef.current;
-    const L = (window as any).L;
-    if (!map || !L || !selectedStation) return;
+    if (!mapInstance || !selectedStation) return;
 
-    map.setView([selectedStation.lat, selectedStation.lng], 15, {
+    mapInstance.setView([selectedStation.lat, selectedStation.lng], 15, {
       animate: true,
       duration: 1.0,
     });
-
-    renderMarkers(L);
-  }, [selectedStation]);
+  }, [selectedStation, mapInstance]);
 
   // If no search or selection, show the premium network schematic overlay
   if (!isInteracting) {
@@ -299,7 +317,10 @@ export default function MapPanel({
   }
 
   return (
-    <div className="w-full h-full relative rounded-3xl overflow-hidden border border-eco-mint shadow-inner">
+    <div 
+      className="w-full h-full relative rounded-3xl overflow-hidden border border-eco-mint shadow-inner"
+      data-testid={mapInstance ? "route-map-ready" : undefined}
+    >
       <div ref={mapContainerRef} className="w-full h-full min-h-[300px] z-0" />
       <div className="absolute top-2 left-2 z-10 bg-white/85 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[8px] text-eco-muted border border-eco-mint font-extrabold shadow-xs select-none">
         © OpenStreetMap contributors

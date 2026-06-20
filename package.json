@@ -17,6 +17,7 @@
     "demo:reset": "npx prisma db push --force-reset --schema=packages/db/prisma/schema.prisma && ts-node packages/db/prisma/seed.ts"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
