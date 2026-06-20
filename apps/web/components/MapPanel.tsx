@@ -29,13 +29,15 @@ export default function MapPanel({
   onSelectStationId,
   activeLegs,
 }: MapPanelProps) {
-   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [mapInstance, setMapInstance] = useState<any>(null);
+  const mapRef = useRef<any>(null);
   const markersGroupRef = useRef<any>(null);
   const polylineRef = useRef<any>(null);
   
   const [mapStatus, setMapStatus] = useState<'loading' | 'ready' | 'fallback'>('loading');
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [routeRenderVersion, setRouteRenderVersion] = useState(0);
 
   const isMountedRef = useRef(true);
   useEffect(() => {
@@ -51,7 +53,7 @@ export default function MapPanel({
   // Dynamic Leaflet asset injector - only trigger when user begins interacting
   useEffect(() => {
     if (typeof window === 'undefined' || !isInteracting) return;
-    if (mapStatus === 'ready') return;
+    if (mapStatus !== 'loading') return;
 
     let isMounted = true;
 
@@ -61,15 +63,38 @@ export default function MapPanel({
           return (window as any).L;
         }
 
-        // 1. Inject CSS Link
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
-        link.setAttribute('data-leaflet', 'true');
-        document.head.appendChild(link);
+        // 1. Inject CSS Link (only if not already present)
+        let link = document.querySelector('link[data-leaflet="true"]') as HTMLLinkElement;
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+          link.setAttribute('data-leaflet', 'true');
+          document.head.appendChild(link);
+        }
 
-        // 2. Inject JS Script
-        const script = document.createElement('script');
+        // 2. Inject JS Script (only if not already present)
+        let script = document.querySelector('script[data-leaflet="true"]') as HTMLScriptElement;
+        if (script) {
+          return new Promise((resolve, reject) => {
+            if ((window as any).L) {
+              resolve((window as any).L);
+              return;
+            }
+            const handleLoad = () => {
+              if ((window as any).L) {
+                resolve((window as any).L);
+              } else {
+                reject(new Error('Leaflet object L is missing after existing script loaded.'));
+              }
+            };
+            const handleError = () => reject(new Error('Failed to load existing Leaflet script.'));
+            script.addEventListener('load', handleLoad);
+            script.addEventListener('error', handleError);
+          });
+        }
+
+        script = document.createElement('script');
         script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
         script.setAttribute('data-leaflet', 'true');
         
@@ -115,28 +140,29 @@ export default function MapPanel({
     }
 
     const L = (window as any).L;
-    if (L && !mapInstance) {
+    if (L && !mapRef.current) {
       initializeMap(L);
     }
 
     return () => {
-      if (mapInstance) {
+      if (mapRef.current) {
         try {
-          mapInstance.remove();
+          mapRef.current.remove();
         } catch (err) {
           // Leaflet's remove() method may throw a TypeError if the container element has already been detached
           // from the DOM by React before the cleanup function executes. This is safe to ignore as the DOM is already clean.
           console.warn('MapPanel: Safe catch of Leaflet map remove error during unmount:', err);
         }
+        mapRef.current = null;
         if (isMountedRef.current) {
           setMapInstance(null);
         }
       }
     };
-  }, [mapStatus, isInteracting, mapInstance]);
+  }, [mapStatus, isInteracting]);
 
   const initializeMap = (L: any) => {
-    if (!mapContainerRef.current || mapInstance) return;
+    if (!mapContainerRef.current || mapRef.current) return;
 
     const defaultCenter = [10.7715, 106.6980];
     const defaultZoom = 13;
@@ -154,6 +180,7 @@ export default function MapPanel({
       }).addTo(map);
 
       markersGroupRef.current = L.featureGroup().addTo(map);
+      mapRef.current = map;
       setMapInstance(map);
     } catch (err) {
       console.error('Leaflet initialization failed:', err);
@@ -287,6 +314,8 @@ export default function MapPanel({
         console.warn('Error fitting bounds:', err);
       }
     }
+
+    setRouteRenderVersion(v => v + 1);
   }, [activeLegs, stations, mapInstance]);
 
   // Center maps on selected station when clicked
@@ -335,6 +364,7 @@ export default function MapPanel({
     <div
       className="w-full h-full relative rounded-3xl overflow-hidden border border-eco-mint shadow-inner"
       data-testid={mapInstance ? "route-map-ready" : undefined}
+      data-route-render-version={routeRenderVersion}
     >
       <div ref={mapContainerRef} className="w-full h-full min-h-[300px] z-0" />
       <div className="absolute top-2 left-2 z-10 bg-white/85 backdrop-blur-xs px-2.5 py-1 rounded-lg text-[8px] text-eco-muted border border-eco-mint font-extrabold shadow-xs select-none">
