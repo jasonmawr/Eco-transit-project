@@ -327,4 +327,41 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
   }
 });
 
+const AvatarSchema = z.object({
+  characterId: z.enum(['student', 'office', 'explorer', 'hunter', 'commuter'], {
+    errorMap: () => ({ message: 'Nhân vật đồng hành không hợp lệ.' }),
+  }),
+});
+
+// 7. PATCH /auth/avatar
+router.patch('/avatar', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const parseResult = AvatarSchema.safeParse(req.body);
+    if (!parseResult.success) {
+      return res.status(400).json({ message: parseResult.error.errors[0].message });
+    }
+
+    const { characterId } = parseResult.data;
+
+    // Update user in DB
+    const updatedUser = await prisma.user.update({
+      where: { id: req.session.user!.id },
+      data: {
+        avatarConfig: { characterId },
+      },
+    });
+
+    // Update session
+    req.session.user!.avatarConfig = { characterId };
+
+    return res.status(200).json({
+      message: 'Cập nhật nhân vật đồng hành thành công.',
+      avatarConfig: updatedUser.avatarConfig,
+    });
+  } catch (err: any) {
+    console.error('Update avatar error:', err);
+    return res.status(500).json({ message: 'Lỗi hệ thống khi cập nhật nhân vật đồng hành.' });
+  }
+});
+
 export default router;

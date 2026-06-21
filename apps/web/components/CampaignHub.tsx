@@ -25,9 +25,10 @@ export const JOURNEY_STATIONS = [
 interface CampaignHubProps {
   activeSection: string;
   onSectionSelect: (sectionId: string) => void;
+  user?: any;
 }
 
-export default function CampaignHub({ activeSection, onSectionSelect }: CampaignHubProps) {
+export default function CampaignHub({ activeSection, onSectionSelect, user }: CampaignHubProps) {
   const [mounted, setMounted] = useState(false);
   const [selectedChar, setSelectedChar] = useState<string>('student');
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
@@ -36,25 +37,51 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
   // SSR hydration guard
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('ecotransit_character');
-    if (saved) {
-      setSelectedChar(saved);
+    
+    // Set selected character from user config if present, else fallback to localStorage
+    if (user && user.avatarConfig && user.avatarConfig.characterId) {
+      setSelectedChar(user.avatarConfig.characterId);
+    } else {
+      const saved = localStorage.getItem('ecotransit_character');
+      if (saved) {
+        setSelectedChar(saved);
+      }
     }
 
-    // Check prefers-reduced-motion
+    // Auto-prompt onboarding if user is verified but has no avatar, or hash is #onboarding
     if (typeof window !== 'undefined') {
+      const isHashOnboarding = window.location.hash === '#onboarding';
+      const needsOnboarding = user && user.emailVerified === true && (!user.avatarConfig || !user.avatarConfig.characterId);
+      
+      if (isHashOnboarding || needsOnboarding) {
+        setShowAvatarSelector(true);
+      }
+
+      // Check prefers-reduced-motion
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       setPrefersReducedMotion(mediaQuery.matches);
       const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
       mediaQuery.addEventListener('change', handler);
       return () => mediaQuery.removeEventListener('change', handler);
     }
-  }, []);
+  }, [user]);
 
-  const selectCharacter = (id: string) => {
+  const selectCharacter = async (id: string) => {
     setSelectedChar(id);
     localStorage.setItem('ecotransit_character', id);
     setShowAvatarSelector(false);
+
+    if (user) {
+      try {
+        const { apiFetch } = await import('../lib/api');
+        await apiFetch('/api/auth/avatar', {
+          method: 'PATCH',
+          body: JSON.stringify({ characterId: id }),
+        });
+      } catch (err) {
+        console.error('Failed to persist avatar server-side:', err);
+      }
+    }
   };
 
   const getCharEmoji = (id: string) => {
@@ -83,12 +110,12 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-eco-accentGreen/10 blur-3xl rounded-full" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-eco-primary/10 blur-3xl rounded-full" />
       </div>
-
+      
       {/* Header with Avatar Selection Button */}
       <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4">
         <div className="hidden sm:block">
           <span className="text-[10px] font-black text-eco-primary uppercase tracking-widest bg-eco-mint px-2.5 py-1 rounded-full border border-eco-primary/10">
-            🗺️ CAMPAIGN MAP HUB
+            🗺️ BẢN ĐỒ HÀNH TRÌNH XANH
           </span>
           <h2 className="text-sm sm:text-lg font-black text-eco-ink mt-1.5 tracking-tight font-display-campaign uppercase">
             HÀNH TRÌNH LƯỚT KHÓI CHẠM XANH
@@ -97,7 +124,7 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
 
         {/* Mobile-only compact title */}
         <div className="sm:hidden flex flex-col">
-          <span className="text-[9px] font-black text-eco-primary uppercase tracking-wider">🗺️ Campaign Hub</span>
+          <span className="text-[9px] font-black text-eco-primary uppercase tracking-wider">🗺️ Bản đồ hành trình</span>
           <span className="text-[10px] font-extrabold text-eco-ink uppercase">6 chặng lướt xanh</span>
         </div>
 

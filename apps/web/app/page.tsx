@@ -246,7 +246,7 @@ export default function Home() {
         )}
 
         {/* Campaign Journey Map Hub */}
-        <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} />
+        <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} user={user} />
 
         {/* Scene viewport container (perspective boundary) */}
         <div

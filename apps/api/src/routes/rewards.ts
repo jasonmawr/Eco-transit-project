@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { requireAuth } from '../middleware/auth.middleware.js';
 import crypto from 'crypto';
 import type { Prisma } from '@prisma/client';
+import { createWalletWithUniqueAlias } from '../utils/alias.js';
 
 const router = Router();
 
@@ -299,9 +300,10 @@ router.post('/rewards/:slug/redeem', requireAuth, async (req: Request, res: Resp
         where: { userId: sessionUser.id },
       });
       if (!wallet) {
-        wallet = await tx.userWallet.create({
-          data: { userId: sessionUser.id, balance: 0 },
-        });
+        wallet = await createWalletWithUniqueAlias(tx, sessionUser.id);
+      }
+      if (!wallet) {
+        throw new Error('WALLET_CREATION_FAILED');
       }
       if (wallet.balance < v.pointsCost) throw new Error('INSUFFICIENT_BALANCE');
 

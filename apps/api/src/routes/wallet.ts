@@ -3,6 +3,7 @@ import { prisma } from '../config/db.js';
 import { z } from 'zod';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
 import type { Prisma } from '@prisma/client';
+import { createWalletWithUniqueAlias } from '../utils/alias.js';
 
 const router = Router();
 
@@ -23,14 +24,10 @@ router.get('/wallet/me', requireAuth, async (req: Request, res: Response) => {
     });
 
     if (!wallet) {
-      wallet = await prisma.userWallet.create({
-        data: {
-          userId: sessionUser.id,
-          balance: 0,
-          lifetimeEarned: 0,
-          lifetimeSpent: 0,
-        },
-      });
+      wallet = await createWalletWithUniqueAlias(prisma, sessionUser.id);
+    }
+    if (!wallet) {
+      return res.status(500).json({ message: 'Không thể khởi tạo ví điểm xanh.' });
     }
 
     // Get ticket counts grouped by status
@@ -161,14 +158,10 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
         });
 
         if (!wallet) {
-          wallet = await tx.userWallet.create({
-            data: {
-              userId: ticket.userId,
-              balance: 0,
-              lifetimeEarned: 0,
-              lifetimeSpent: 0,
-            },
-          });
+          wallet = await createWalletWithUniqueAlias(tx, ticket.userId);
+        }
+        if (!wallet) {
+          throw new Error('WALLET_CREATION_FAILED');
         }
 
         const nextBalance = wallet.balance + awardPoints;
@@ -222,14 +215,10 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
         // Rejected flow
         let wallet = await tx.userWallet.findUnique({ where: { userId: ticket.userId } });
         if (!wallet) {
-          wallet = await tx.userWallet.create({
-            data: {
-              userId: ticket.userId,
-              balance: 0,
-              lifetimeEarned: 0,
-              lifetimeSpent: 0,
-            },
-          });
+          wallet = await createWalletWithUniqueAlias(tx, ticket.userId);
+        }
+        if (!wallet) {
+          throw new Error('WALLET_CREATION_FAILED');
         }
 
         if (ticket.status === 'verified') {

@@ -3,6 +3,7 @@ import { prisma } from '../config/db.js';
 import { z } from 'zod';
 import { requireAuth, requireRole } from '../middleware/auth.middleware.js';
 import type { Prisma } from '@prisma/client';
+import { createWalletWithUniqueAlias } from '../utils/alias.js';
 
 const router = Router();
 
@@ -266,14 +267,10 @@ router.post('/tickets/:id/review', async (req: Request, res: Response) => {
 
         let wallet = await tx.userWallet.findUnique({ where: { userId: ticket.userId } });
         if (!wallet) {
-          wallet = await tx.userWallet.create({
-            data: {
-              userId: ticket.userId,
-              balance: 0,
-              lifetimeEarned: 0,
-              lifetimeSpent: 0,
-            },
-          });
+          wallet = await createWalletWithUniqueAlias(tx, ticket.userId);
+        }
+        if (!wallet) {
+          throw new Error('WALLET_CREATION_FAILED');
         }
 
         const nextBalance = wallet.balance + awardPoints;
@@ -322,14 +319,10 @@ router.post('/tickets/:id/review', async (req: Request, res: Response) => {
         // Rejected flow
         let wallet = await tx.userWallet.findUnique({ where: { userId: ticket.userId } });
         if (!wallet) {
-          wallet = await tx.userWallet.create({
-            data: {
-              userId: ticket.userId,
-              balance: 0,
-              lifetimeEarned: 0,
-              lifetimeSpent: 0,
-            },
-          });
+          wallet = await createWalletWithUniqueAlias(tx, ticket.userId);
+        }
+        if (!wallet) {
+          throw new Error('WALLET_CREATION_FAILED');
         }
 
         if (ticket.status === 'verified') {
