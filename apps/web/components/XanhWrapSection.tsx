@@ -25,6 +25,7 @@ export default function XanhWrapSection() {
     origin: '',
     destination: '',
     duration: '15',
+    luckyNumber: '555',
     moment: 'Buổi sáng đi làm',
   });
 
@@ -72,16 +73,26 @@ export default function XanhWrapSection() {
       return;
     }
 
-    if (!form.nickname.trim() || !form.origin.trim() || !form.destination.trim()) {
+    if (!form.nickname.trim() || !form.origin.trim() || !form.destination.trim() || !form.duration.trim() || !form.luckyNumber.trim()) {
       setError('Vui lòng điền đầy đủ các thông tin bắt buộc.');
+      return;
+    }
+
+    const durationVal = parseInt(form.duration, 10);
+    if (isNaN(durationVal) || durationVal < 1 || durationVal > 1440) {
+      setError('Thời gian di chuyển phải là số nguyên từ 1 đến 1440 phút.');
+      return;
+    }
+
+    const luckyVal = parseInt(form.luckyNumber, 10);
+    if (isNaN(luckyVal) || luckyVal < 1 || luckyVal > 999) {
+      setError('Con số may mắn dự thi phải là số nguyên từ 1 đến 999.');
       return;
     }
 
     setLoading(true);
 
     try {
-      const durationVal = parseInt(form.duration, 10) || 15;
-      
       // Ước tính khoảng cách thực tế (giả định tốc độ trung bình 20km/h cho buýt/metro nội thành)
       // distanceKm = (durationVal * 20) / 60
       const estimatedDistance = parseFloat(((durationVal * 20) / 60).toFixed(1));
@@ -99,6 +110,9 @@ export default function XanhWrapSection() {
           distanceKm: estimatedDistance,
           preferenceSummary: `Hành khách: ${form.nickname.trim()} | Khoảnh khắc: ${form.moment}`,
           weatherSummary: 'normal',
+          nickname: form.nickname.trim(),
+          moment: form.moment.trim(),
+          luckyNumber: luckyVal,
         }),
         credentials: 'include',
       });
@@ -123,7 +137,7 @@ export default function XanhWrapSection() {
 
   // Caption share bám sát yêu cầu
   const shareCaption = result
-    ? `Tôi vừa hoàn thành XanhWrap - Hóa đơn lướt khỏi khói của mình! 🛤️ Hành trình từ ${result.originLabel} đến ${result.destinationLabel} trong ${result.durationMinutes} phút đạt điểm xanh ${result.greenScore}/100! Hãy cùng lướt khói chạm xanh vì một tương lai trong lành hơn. #XanhWrap #LuotKhoiChamXanh #EcoTransit ${shareUrl}`
+    ? `Tôi vừa hoàn thành XanhWrap - Hóa đơn lướt khỏi khói của mình! 🛤️ Hành trình từ ${result.originLabel} đến ${result.destinationLabel} trong ${result.durationMinutes} phút đạt điểm xanh ${result.greenScore}/100! Con số may mắn dự thi của tôi là #${result.luckyNumber}. Hãy cùng lướt khói chạm xanh vì một tương lai trong lành hơn. #XanhWrap #LuotKhoiChamXanh #EcoTransit ${shareUrl}`
     : '';
 
   const handleCopyLink = async () => {
@@ -208,41 +222,56 @@ export default function XanhWrapSection() {
             Bạn có thể nhập tự do hoặc chọn gợi ý ga/địa điểm quen thuộc.
           </span>
 
-          {/* Duration & Moment */}
+          {/* Duration & Lucky Number */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[10px] font-black text-eco-ink uppercase tracking-wider block">
-                Thời gian đi (Phút)
+                Thời gian đi (Phút) <span className="text-red-500">*</span>
               </label>
-              <select
+              <input
+                type="number"
                 name="duration"
+                min="1"
+                max="1440"
+                required
                 value={form.duration}
                 onChange={handleInputChange}
+                placeholder="VD: 15"
                 className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-bold transition-all"
-              >
-                <option value="5">5 phút</option>
-                <option value="10">10 phút</option>
-                <option value="15">15 phút</option>
-                <option value="20">20 phút</option>
-                <option value="30">30 phút</option>
-                <option value="45">45 phút</option>
-                <option value="60">60 phút</option>
-              </select>
+              />
             </div>
             <div className="space-y-1">
               <label className="text-[10px] font-black text-eco-ink uppercase tracking-wider block">
-                Khoảnh khắc di chuyển
+                Số may mắn dự thi (1-999) <span className="text-red-500">*</span>
               </label>
               <input
-                type="text"
-                name="moment"
-                value={form.moment}
+                type="number"
+                name="luckyNumber"
+                min="1"
+                max="999"
+                required
+                value={form.luckyNumber}
                 onChange={handleInputChange}
-                placeholder="VD: Đi làm buổi sáng"
-                maxLength={50}
-                className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-medium transition-all"
+                placeholder="VD: 555"
+                className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-bold transition-all"
               />
             </div>
+          </div>
+
+          {/* Moment */}
+          <div className="space-y-1">
+            <label className="text-[10px] font-black text-eco-ink uppercase tracking-wider block">
+              Khoảnh khắc di chuyển
+            </label>
+            <input
+              type="text"
+              name="moment"
+              value={form.moment}
+              onChange={handleInputChange}
+              placeholder="VD: Đi làm buổi sáng, đi học lúc tan tầm..."
+              maxLength={50}
+              className="w-full bg-white border border-gray-200 focus:border-eco-primary focus:ring-1 focus:ring-eco-primary outline-none px-4 py-2.5 rounded-2xl text-xs text-eco-ink font-medium transition-all"
+            />
           </div>
 
           {/* Form Actions */}
@@ -261,7 +290,7 @@ export default function XanhWrapSection() {
             >
               {loading ? (
                 <>
-                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin animate-infinite" />
                   <span>Đang xử lý...</span>
                 </>
               ) : (
@@ -273,6 +302,21 @@ export default function XanhWrapSection() {
           </div>
 
         </form>
+
+        {/* Minigame Rules Panel */}
+        <div className="bg-emerald-50/50 border border-emerald-200/50 p-5 rounded-3xl space-y-2 mt-4">
+          <h4 className="text-xs font-black text-emerald-800 uppercase tracking-wide flex items-center space-x-1.5">
+            <span>🎁 THỂ LỆ MINIGAME XANHWRAP</span>
+          </h4>
+          <p className="text-[11px] text-emerald-900 leading-relaxed font-semibold">
+            Chia sẻ XanhWrap kèm hashtag <strong className="text-emerald-700">#XanhWrap #LuotKhoiChamXanh</strong> và một con số từ 1–999 để có cơ hội nhận vé tháng xe buýt/metro.
+          </p>
+          <div className="text-[9px] text-emerald-700/80 leading-normal space-y-1 pt-1.5 border-t border-emerald-200/30">
+            <p>• Ban tổ chức sẽ tiến hành đối soát và xác minh nội dung/tương tác thủ công trước khi trao giải.</p>
+            <p>• Hệ thống không tự động đo lường lượt tương tác trên mạng xã hội do không sử dụng API liên kết trực tiếp.</p>
+            <p>• Kết quả cuối cùng sẽ được công bố chính thức tại trang chủ chiến dịch.</p>
+          </div>
+        </div>
       </div>
 
       {/* Right Column: Dynamic XanhWrap Card & Share Details */}
@@ -303,7 +347,7 @@ export default function XanhWrapSection() {
                   <div className="text-right">
                     <span className="text-[8px] text-white/40 block font-bold uppercase">Người tạo</span>
                     <span className="text-xs font-black text-white/90 truncate max-w-[120px] block font-mono">
-                      @{form.nickname}
+                      @{result.nickname || 'commuter'}
                     </span>
                   </div>
                 </div>
@@ -337,14 +381,20 @@ export default function XanhWrapSection() {
                   </div>
 
                   <div className="col-span-7 pl-2 text-xs space-y-2">
-                    <div>
-                      <span className="text-[8px] text-white/40 font-bold uppercase block">Thời gian di chuyển</span>
-                      <span className="font-bold text-white/90 font-mono">{result.durationMinutes} phút</span>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <span className="text-[8px] text-white/40 font-bold uppercase block">Thời gian</span>
+                        <span className="font-bold text-white/90 font-mono block">{result.durationMinutes} phút</span>
+                      </div>
+                      <div>
+                        <span className="text-[8px] text-white/40 font-bold uppercase block">Số dự thi</span>
+                        <span className="font-black text-yellow-300 font-mono block">#{result.luckyNumber || 555}</span>
+                      </div>
                     </div>
                     <div>
                       <span className="text-[8px] text-white/40 font-bold uppercase block">Khoảnh khắc</span>
                       <span className="font-bold text-emerald-300 truncate block text-[11px]">
-                        {form.moment || 'Di chuyển trong ngày'}
+                        {result.moment || 'Di chuyển trong ngày'}
                       </span>
                     </div>
                   </div>

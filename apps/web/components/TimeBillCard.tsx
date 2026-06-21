@@ -21,6 +21,9 @@ export interface TimeBillDTO {
   isPublic: boolean;
   createdAt: string;
   estimateDisclaimer: string;
+  nickname?: string | null;
+  moment?: string | null;
+  luckyNumber?: number | null;
 }
 
 interface TimeBillCardProps {
@@ -94,8 +97,10 @@ export default function TimeBillCard({
           </div>
         </div>
         <div className="text-right shrink-0">
-          <span className="text-[9px] text-white/40 block font-bold">NGÀY TẠO</span>
-          <span className="text-[10px] text-white/80 font-mono">
+          <span className="text-[9px] text-white/40 block font-bold">
+            {bill.nickname ? `@${bill.nickname}` : 'NGÀY TẠO'}
+          </span>
+          <span className="text-[10px] text-white/80 font-mono block">
             {new Date(bill.createdAt).toLocaleDateString('vi-VN')}
           </span>
         </div>
@@ -155,6 +160,18 @@ export default function TimeBillCard({
             <div className="flex flex-col">
               <span className="text-[8px] text-white/40 font-bold uppercase">Quãng đường</span>
               <span className="text-xs font-mono font-black text-white/90">{bill.distanceKm} km</span>
+            </div>
+          )}
+          {bill.luckyNumber !== undefined && bill.luckyNumber !== null && (
+            <div className="flex flex-col">
+              <span className="text-[8px] text-white/40 font-bold uppercase">Số dự thi</span>
+              <span className="text-xs font-mono font-black text-yellow-300">#{bill.luckyNumber}</span>
+            </div>
+          )}
+          {bill.moment && (
+            <div className="flex flex-col col-span-2">
+              <span className="text-[8px] text-white/40 font-bold uppercase">Khoảnh khắc</span>
+              <span className="text-xs font-black text-emerald-300 truncate">{bill.moment}</span>
             </div>
           )}
         </div>

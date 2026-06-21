@@ -9,19 +9,24 @@ generator client {
 }
 
 model User {
-  id                 String              @id @default(uuid())
-  email              String              @unique
-  passwordHash       String
-  role               String              @default("USER") // "USER", "MODERATOR", "ADMIN"
-  pointsBalanceCache Int                 @default(0)
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-  tickets            Ticket[]
-  pointsLedger       PointsLedger[]
-  redemptions        VoucherRedemption[]
-  reviews            UGCReview[]
-  wallet             UserWallet?
-  timeBills          TimeBill[]
+  id                       String              @id @default(uuid())
+  email                    String              @unique
+  passwordHash             String
+  role                     String              @default("USER") // "USER", "MODERATOR", "ADMIN"
+  pointsBalanceCache       Int                 @default(0)
+  emailVerified            Boolean             @default(false)
+  verificationTokenHash    String?
+  verificationTokenExpires  DateTime?
+  verificationSentAt       DateTime?
+  avatarConfig             Json?
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  tickets                  Ticket[]
+  pointsLedger             PointsLedger[]
+  redemptions              VoucherRedemption[]
+  reviews                  UGCReview[]
+  wallet                   UserWallet?
+  timeBills                TimeBill[]
 }
 
 model Session {
@@ -79,14 +84,15 @@ model PointsLedger {
 }
 
 model UserWallet {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  balance        Int      @default(0)
-  lifetimeEarned Int      @default(0)
-  lifetimeSpent  Int      @default(0)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance                Int      @default(0)
+  lifetimeEarned         Int      @default(0)
+  lifetimeSpent          Int      @default(0)
+  publicLeaderboardAlias String?  @unique
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
 }
 
 model Voucher {
@@ -299,6 +305,9 @@ model TimeBill {
   storyText              String
   routeSnapshot          Json?
   isPublic               Boolean  @default(true)
+  nickname               String?
+  moment                 String?
+  luckyNumber            Int?
   createdAt              DateTime @default(now())
   expiresAt              DateTime?
 }

@@ -14,13 +14,16 @@ const CreateTimeBillSchema = z.object({
   originLabel: z.string({ required_error: 'Thiếu điểm xuất phát.' }),
   destinationLabel: z.string({ required_error: 'Thiếu điểm đến.' }),
   routeTitle: z.string().optional().nullable(),
-  durationMinutes: z.number({ required_error: 'Thiếu thời gian di chuyển.' }).int().nonnegative(),
+  durationMinutes: z.number({ required_error: 'Thiếu thời gian di chuyển.' }).int().min(1, 'Thời gian di chuyển phải từ 1 đến 1440 phút.').max(1440, 'Thời gian di chuyển phải từ 1 đến 1440 phút.'),
   walkingMinutes: z.number().int().nonnegative().optional().nullable(),
   transferCount: z.number().int().nonnegative().optional().nullable(),
   distanceKm: z.number().nonnegative().optional().nullable(),
   weatherSummary: z.string().optional().nullable(),
   preferenceSummary: z.string().optional().nullable(),
   routeSnapshot: z.any().optional(),
+  nickname: z.string().max(30, 'Biệt danh tối đa 30 ký tự.').optional().nullable(),
+  moment: z.string().max(55, 'Khoảnh khắc tối đa 55 ký tự.').optional().nullable(),
+  luckyNumber: z.number().int().min(1, 'Con số may mắn phải từ 1 đến 999.').max(999, 'Con số may mắn phải từ 1 đến 999.').optional().nullable(),
 });
 
 function checkHtmlRecursive(obj: any): boolean {
@@ -89,6 +92,9 @@ function toSafeDto(bill: any) {
     isPublic: bill.isPublic,
     createdAt: bill.createdAt,
     estimateDisclaimer: ESTIMATE_DISCLAIMER,
+    nickname: bill.nickname,
+    moment: bill.moment,
+    luckyNumber: bill.luckyNumber,
   };
 }
 
@@ -197,6 +203,9 @@ router.post('/time-bills', async (req: Request, res: Response) => {
         storyText,
         routeSnapshot: routeSnapshot ? JSON.parse(JSON.stringify(routeSnapshot)) : null,
         isPublic: true,
+        nickname: data.nickname,
+        moment: data.moment,
+        luckyNumber: data.luckyNumber,
       },
     });
 

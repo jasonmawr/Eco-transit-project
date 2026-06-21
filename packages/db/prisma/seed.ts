@@ -30,32 +30,41 @@ async function main() {
   console.log('Seeding Users...');
   const user = await prisma.user.upsert({
     where: { email: 'user@ecotransit.vn' },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: 'user@ecotransit.vn',
       passwordHash,
       role: 'USER',
       pointsBalanceCache: 150, // 100 (ticket) + 50 (quiz) + 200 (bonus) - 200 (redeem) = 150
+      emailVerified: true,
     },
   });
 
   await prisma.user.upsert({
     where: { email: 'moderator@ecotransit.vn' },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: 'moderator@ecotransit.vn',
       passwordHash: moderatorHash,
       role: 'MODERATOR',
+      emailVerified: true,
     },
   });
 
   await prisma.user.upsert({
     where: { email: 'admin@ecotransit.vn' },
-    update: {},
+    update: {
+      emailVerified: true,
+    },
     create: {
       email: 'admin@ecotransit.vn',
       passwordHash: adminHash,
       role: 'ADMIN',
+      emailVerified: true,
     },
   });
 
@@ -70,24 +79,29 @@ async function main() {
       balance: 150,
       lifetimeEarned: 350,
       lifetimeSpent: 200,
+      publicLeaderboardAlias: 'Hành khách xanh 151',
     },
     create: {
       userId: user.id,
       balance: 150,
       lifetimeEarned: 350,
       lifetimeSpent: 200,
+      publicLeaderboardAlias: 'Hành khách xanh 151',
     },
   });
 
   if (moderator) {
     await prisma.userWallet.upsert({
       where: { userId: moderator.id },
-      update: {},
+      update: {
+        publicLeaderboardAlias: 'Kiểm duyệt viên xanh',
+      },
       create: {
         userId: moderator.id,
         balance: 0,
         lifetimeEarned: 0,
         lifetimeSpent: 0,
+        publicLeaderboardAlias: 'Kiểm duyệt viên xanh',
       },
     });
   }
@@ -95,12 +109,15 @@ async function main() {
   if (admin) {
     await prisma.userWallet.upsert({
       where: { userId: admin.id },
-      update: {},
+      update: {
+        publicLeaderboardAlias: 'Đại sứ xanh tối cao',
+      },
       create: {
         userId: admin.id,
         balance: 0,
         lifetimeEarned: 0,
         lifetimeSpent: 0,
+        publicLeaderboardAlias: 'Đại sứ xanh tối cao',
       },
     });
   }
