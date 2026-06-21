@@ -56,6 +56,23 @@ export class MailProvider {
       console.log(`Subject: ${options.subject}`);
       console.log(`Text: ${options.text}`);
       console.log('--------------------------------------------------');
+
+      // Write to a temporary file in the workspace root for Playwright tests
+      try {
+        const fs = await import('fs');
+        const path = await import('path');
+        const filepath = path.join(process.cwd(), 'last-mock-email.json');
+        fs.writeFileSync(filepath, JSON.stringify({
+          to: options.to,
+          subject: options.subject,
+          text: options.text,
+          html: options.html,
+          timestamp: Date.now()
+        }, null, 2));
+      } catch (err) {
+        console.error('Failed to write mock email file:', err);
+      }
+
       return { sent: true, isMock: true };
     }
   }
