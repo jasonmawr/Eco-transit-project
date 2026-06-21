@@ -14,6 +14,7 @@ import walletRouter from './routes/wallet.js';
 import rewardsRouter from './routes/rewards.js';
 import adminRouter from './routes/admin.js';
 import timeBillsRouter from './routes/timeBills.js';
+import leaderboardRouter from './routes/leaderboard.js';
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api', ticketsRouter);
 app.use('/api', walletRouter);
 app.use('/api', rewardsRouter);
 app.use('/api', timeBillsRouter);
+app.use('/api', leaderboardRouter);
 app.use('/api/admin', adminRouter);
 
 // 5. Global Error Handler

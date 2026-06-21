@@ -35,6 +35,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
   const [walletStats, setWalletStats] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
   const [ledger, setLedger] = useState<any[]>([]);
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [brokenTickets, setBrokenTickets] = useState<Record<string, boolean>>({});
@@ -71,6 +72,13 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
 
       const ledgerList = await apiFetch('/api/points/ledger');
       setLedger(ledgerList);
+
+      try {
+        const leaderboardList = await apiFetch('/api/leaderboard');
+        setLeaderboard(leaderboardList);
+      } catch (err) {
+        console.error('Error fetching leaderboard:', err);
+      }
     } catch (err) {
       console.error('Error fetching wallet/ticket data:', err);
     } finally {
@@ -787,6 +795,75 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                           </td>
                           <td className="py-2.5 text-right font-bold text-eco-muted">
                             {item.balanceAfter}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* LEADERBOARD */}
+          <div className="bg-white rounded-3xl p-6 border border-eco-primary/10 shadow-sm">
+            <h3 className="text-base font-black text-eco-ink mb-4 uppercase tracking-tight">
+              🏆 Bảng xếp hạng chiến dịch xanh
+            </h3>
+            <p className="text-[10px] text-eco-muted mb-4 leading-normal font-semibold">
+              Bảng xếp hạng hiển thị thứ tự di chuyển xanh của các hành khách dựa trên tổng tích lũy trọn đời. 
+              Biệt danh được mã hóa ẩn danh để bảo mật.
+            </p>
+
+            {loadingStats ? (
+              <div className="space-y-2">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="h-8 bg-gray-50 rounded-xl animate-pulse" />
+                ))}
+              </div>
+            ) : leaderboard.length === 0 ? (
+              <div className="text-center py-6 text-eco-muted text-xs">
+                Chưa có dữ liệu bảng xếp hạng.
+              </div>
+            ) : (
+              <div className="max-h-[300px] overflow-y-auto pr-1">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-eco-primary/10 text-eco-muted font-bold text-[10px] uppercase tracking-wider">
+                      <th className="py-2 pl-2">Hạng</th>
+                      <th className="py-2">Hành khách</th>
+                      <th className="py-2 text-right pr-2">Trạng thái</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard.map((item, idx) => {
+                      const isTop3 = item.rank <= 3;
+                      const medal = item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : '';
+                      return (
+                        <tr 
+                          key={idx} 
+                          className={`border-b border-gray-50 transition-colors duration-150 ${
+                            item.isMe 
+                              ? 'bg-emerald-50/70 hover:bg-emerald-100/70 font-bold border-l-4 border-l-eco-primary' 
+                              : 'hover:bg-eco-soft/40'
+                          }`}
+                        >
+                          <td className="py-2.5 pl-2 font-mono font-black text-eco-ink">
+                            {isTop3 ? `${medal} ${item.rank}` : `#${item.rank}`}
+                          </td>
+                          <td className="py-2.5">
+                            <span className={`${item.isMe ? 'text-emerald-800' : 'text-eco-ink'}`}>
+                              {item.nickname}
+                            </span>
+                          </td>
+                          <td className="py-2.5 text-right pr-2 font-extrabold text-[10px]">
+                            {item.isMe ? (
+                              <span className="text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                Bạn
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">Ẩn danh</span>
+                            )}
                           </td>
                         </tr>
                       );
