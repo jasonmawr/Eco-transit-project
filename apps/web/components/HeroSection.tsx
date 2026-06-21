@@ -28,7 +28,7 @@ export default function HeroSection({ onSectionSelect }: HeroSectionProps) {
           <div className="inline-flex items-center space-x-2 bg-white/80 backdrop-blur-xs px-3.5 py-1.5 rounded-full border border-eco-primary/15 shadow-sm">
             <span className="flex h-2 w-2 rounded-full bg-eco-primary animate-pulse-glow" />
             <span className="text-[10px] font-black uppercase tracking-wider text-eco-primary">
-              The Gliding Privilege — Lướt Khói Chạm Xanh
+              Đặc quyền di chuyển xanh — Lướt Khói Chạm Xanh
             </span>
           </div>
 

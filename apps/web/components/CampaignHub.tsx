@@ -14,12 +14,12 @@ export const CHARACTERS = [
 ];
 
 export const JOURNEY_STATIONS = [
-  { id: 'route', name: 'Lập lộ trình xanh', num: 1, desc: 'Dijkstra route planner', icon: '🛤️' },
-  { id: 'stations', name: 'Khám phá ga', num: 2, desc: 'Explore stations & POIs', icon: '🚉' },
-  { id: 'tickets', name: 'Tích điểm vé xanh', num: 3, desc: 'Ticket ledger', icon: '🎫' },
-  { id: 'rewards', name: 'Đổi thưởng', num: 4, desc: 'Redeem points catalog', icon: '🎁' },
-  { id: 'xanhwrap', name: 'XanhWrap / Chia sẻ', num: 5, desc: 'Create share card', icon: '✨' },
-  { id: 'guides', name: 'Cẩm nang lướt xanh', num: 6, desc: 'Campaign tips & guides', icon: '📖' },
+  { id: 'route', name: 'Lập lộ trình xanh', num: 1, desc: 'Lập lộ trình tối ưu', icon: '🛤️' },
+  { id: 'stations', name: 'Khám phá ga', num: 2, desc: 'Khám phá nhà ga & Địa điểm', icon: '🚉' },
+  { id: 'tickets', name: 'Tích điểm vé xanh', num: 3, desc: 'Nhật ký tích điểm vé', icon: '🎫' },
+  { id: 'rewards', name: 'Đổi thưởng', num: 4, desc: 'Danh mục đổi thưởng', icon: '🎁' },
+  { id: 'xanhwrap', name: 'XanhWrap / Chia sẻ', num: 5, desc: 'Tạo thẻ chia sẻ XanhWrap', icon: '✨' },
+  { id: 'guides', name: 'Cẩm nang lướt xanh', num: 6, desc: 'Mẹo & Cẩm nang xanh', icon: '📖' },
 ];
 
 interface CampaignHubProps {
@@ -31,6 +31,7 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
   const [mounted, setMounted] = useState(false);
   const [selectedChar, setSelectedChar] = useState<string>('student');
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   // SSR hydration guard
   useEffect(() => {
@@ -38,6 +39,15 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
     const saved = localStorage.getItem('ecotransit_character');
     if (saved) {
       setSelectedChar(saved);
+    }
+
+    // Check prefers-reduced-motion
+    if (typeof window !== 'undefined') {
+      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      setPrefersReducedMotion(mediaQuery.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+      mediaQuery.addEventListener('change', handler);
+      return () => mediaQuery.removeEventListener('change', handler);
     }
   }, []);
 
@@ -54,6 +64,8 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
   const getCharName = (id: string) => {
     return CHARACTERS.find((c) => c.id === id)?.name || 'Hành khách xanh';
   };
+
+  const activeIndex = JOURNEY_STATIONS.findIndex((s) => s.id === activeSection);
 
   if (!mounted) {
     return (
@@ -191,6 +203,20 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
                   )}
                 </AnimatePresence>
 
+                {/* Visual train running on desktop rails */}
+                {isActive && !prefersReducedMotion && (
+                  <motion.div
+                    layoutId="desktop-train"
+                    className="absolute z-25 text-xl pointer-events-none select-none"
+                    style={{
+                      top: '10px', // aligned with railway track center
+                    }}
+                    transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                  >
+                    🚇
+                  </motion.div>
+                )}
+
                 {/* The station dot/node button */}
                 <button
                   onClick={() => onSectionSelect(station.id)}
@@ -225,25 +251,76 @@ export default function CampaignHub({ activeSection, onSectionSelect }: Campaign
         </div>
       </div>
 
-      {/* Mobile View (Width < 640px): Horizontal Scrollable Chip Rail */}
-      <div className="sm:hidden relative py-1 overflow-x-auto no-scrollbar scroll-smooth flex items-center space-x-2 px-1 border-t border-eco-primary/5 mt-2">
-        {JOURNEY_STATIONS.map((station) => {
-          const isActive = activeSection === station.id;
-          return (
-            <button
-              key={station.id}
-              onClick={() => onSectionSelect(station.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full border shrink-0 transition-all duration-200 focus:outline-none ${
-                isActive
-                  ? 'bg-eco-primary text-white border-eco-primary scale-105 shadow-sm shadow-eco-primary/10'
-                  : 'bg-white text-eco-ink border-gray-200'
-              }`}
-            >
-              <span className="text-xs">{station.icon}</span>
-              <span className="text-[9px] font-black uppercase tracking-wider">{station.name}</span>
-            </button>
-          );
-        })}
+      {/* Mobile View (Width < 640px): Vertical Metro Route Line */}
+      <div className="sm:hidden relative pl-8 pr-2 py-4">
+        {/* Steel Rail Line Background */}
+        <div className="absolute top-0 bottom-0 left-[18px] w-1 pointer-events-none z-0">
+          <div className="w-full h-full bg-gradient-to-b from-eco-primary/30 to-eco-accentGreen/30 rounded-full" />
+        </div>
+
+        {/* Vertical List of Stations */}
+        <div className="space-y-6 relative z-10">
+          {JOURNEY_STATIONS.map((station) => {
+            const isActive = activeSection === station.id;
+
+            return (
+              <div key={station.id} className="flex items-center space-x-4 relative">
+                {/* Active character floating to the left of active node */}
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      layoutId="journey-avatar-mobile"
+                      className="absolute -left-12 text-xl animate-pulse"
+                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    >
+                      {getCharEmoji(selectedChar)} 👉
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Visual train running on mobile vertical rails */}
+                {isActive && !prefersReducedMotion && (
+                  <motion.div
+                    layoutId="mobile-train"
+                    className="absolute left-[18px] -translate-x-1/2 z-25 text-base pointer-events-none select-none"
+                    transition={{ type: 'spring', stiffness: 220, damping: 22 }}
+                  >
+                    🚇
+                  </motion.div>
+                )}
+
+                {/* The station dot */}
+                <button
+                  onClick={() => onSectionSelect(station.id)}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 relative shadow-sm focus:outline-none ${
+                    isActive
+                      ? 'bg-eco-primary text-white border-eco-primary ring-4 ring-eco-mint scale-105'
+                      : 'bg-white text-eco-ink border-gray-200'
+                  }`}
+                >
+                  <span className="text-sm">{station.icon}</span>
+                  <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[7px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
+                    {station.num}
+                  </span>
+                </button>
+
+                {/* Text details */}
+                <div className="flex-grow">
+                  <button
+                    onClick={() => onSectionSelect(station.id)}
+                    className={`text-xs font-black uppercase tracking-wider block text-left hover:text-eco-primary transition-colors ${
+                      isActive ? 'text-eco-primary font-bold' : 'text-eco-ink'
+                    }`}
+                  >
+                    {station.name}
+                  </button>
+                  <span className="text-[9px] text-eco-muted block font-medium">Ga số {station.num}</span>
+                </div>
+
+              </div>
+            );
+          })}
+        </div>
       </div>
 
     </div>
