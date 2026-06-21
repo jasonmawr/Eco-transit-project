@@ -178,7 +178,7 @@ export default function XanhWrapSection() {
           </p>
         </div>
 
-        <form onSubmit={validateAndSubmit} className="space-y-4 bg-eco-soft/40 p-5 rounded-3xl border border-eco-primary/5">
+        <form onSubmit={validateAndSubmit} noValidate className="space-y-4 bg-eco-soft/40 p-5 rounded-3xl border border-eco-primary/5">
           
           {/* Nickname */}
           <div className="space-y-1">
