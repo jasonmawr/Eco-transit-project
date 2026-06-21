@@ -220,6 +220,59 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
         return { ticket: updatedTicket, pointsAwarded: awardPoints };
       } else {
         // Rejected flow
+        let wallet = await tx.userWallet.findUnique({ where: { userId: ticket.userId } });
+        if (!wallet) {
+          wallet = await tx.userWallet.create({
+            data: {
+              userId: ticket.userId,
+              balance: 0,
+              lifetimeEarned: 0,
+              lifetimeSpent: 0,
+            },
+          });
+        }
+
+        if (ticket.status === 'verified') {
+          // Revocation: was verified, now rejected
+          let pointsToDeduct = 10;
+          if (ticket.pointsLedgerId) {
+            const ledgerEntry = await tx.pointsLedger.findUnique({ where: { id: ticket.pointsLedgerId } });
+            if (ledgerEntry) {
+              pointsToDeduct = Math.abs(ledgerEntry.delta);
+            }
+          }
+
+          const nextBalance = Math.max(0, wallet.balance - pointsToDeduct);
+          const nextLifetime = Math.max(0, wallet.lifetimeEarned - pointsToDeduct);
+
+          const idempKey = `ticket_rejected:${ticket.id}`;
+          await tx.pointsLedger.create({
+            data: {
+              userId: ticket.userId,
+              delta: -pointsToDeduct,
+              balanceAfter: nextBalance,
+              sourceType: 'ticket',
+              sourceId: ticket.id,
+              idempotencyKey: idempKey,
+              status: 'success',
+              eventType: 'ticket_rejected',
+            },
+          });
+
+          await tx.userWallet.update({
+            where: { userId: ticket.userId },
+            data: {
+              balance: nextBalance,
+              lifetimeEarned: nextLifetime,
+            },
+          });
+
+          await tx.user.update({
+            where: { id: ticket.userId },
+            data: { pointsBalanceCache: nextBalance },
+          });
+        }
+
         const updatedTicket = await tx.ticket.update({
           where: { id: ticket.id },
           data: {

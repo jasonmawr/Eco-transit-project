@@ -122,7 +122,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
 
   // Moderation notes
   const [moderationNote, setModerationNote] = useState<string>('');
-  const [ticketPoints, setTicketPoints] = useState<number>(20);
+  const [ticketPoints, setTicketPoints] = useState<number>(10);
   const [ticketNote, setTicketNote] = useState<string>('');
 
   // Auto clean notifications
@@ -226,7 +226,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
       });
       setSuccessMsg(res.message || 'Duyệt vé di chuyển thành công.');
       setTicketNote('');
-      setTicketPoints(20);
+      setTicketPoints(10);
       fetchTabContent('tickets');
     } catch (err: any) {
       setErrorMsg(err.message || 'Kiểm duyệt vé thất bại.');

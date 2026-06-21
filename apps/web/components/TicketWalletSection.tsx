@@ -397,6 +397,20 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
             )}
           </div>
 
+          {/* POINTS RULE PANEL */}
+          <div className="bg-emerald-50/60 border border-emerald-200/50 p-5 rounded-3xl space-y-2">
+            <h4 className="text-xs font-black text-emerald-800 uppercase tracking-wide flex items-center space-x-1.5">
+              <span>💡 QUY ĐỊNH TÍCH ĐIỂM & ĐUA TOP</span>
+            </h4>
+            <ul className="text-[11px] text-emerald-900 leading-relaxed font-semibold space-y-1.5 list-disc pl-4">
+              <li>Vé hợp lệ phải được Ban tổ chức/Kiểm duyệt viên duyệt mới chính thức được cộng điểm xanh.</li>
+              <li>Đổi quà sử dụng <strong>Điểm khả dụng</strong>. Điểm khả dụng sẽ bị trừ tương ứng khi đổi quà thành công.</li>
+              <li>Thành tích đua top (bảng xếp hạng) dựa trên <strong>Tổng điểm tích lũy trọn đời</strong> và không bị giảm đi khi bạn thực hiện đổi quà.</li>
+              <li>Bảng xếp hạng (Leaderboard) chỉ hiển thị biệt danh và thứ hạng ẩn danh để bảo mật thông tin, không công khai số điểm cụ thể.</li>
+              <li>Ban tổ chức sẽ xác minh tính chính danh và đối soát thủ công trước khi trao giải chung cuộc vào cuối chiến dịch.</li>
+            </ul>
+          </div>
+
           {/* TICKET UPLOAD FORM */}
           <div className="bg-white rounded-3xl p-6 border border-eco-primary/10 shadow-sm">
             <h3 className="text-base font-black text-eco-ink mb-2 uppercase tracking-tight">
