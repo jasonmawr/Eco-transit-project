@@ -207,4 +207,118 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       expect(resMe.body.user.avatarConfig.characterId).toBe('student');
     });
   });
+
+  // 4. Hardened Mail Security & Migration Preservation
+  describe('Hardened Mail Security & Migration Preservation', () => {
+    it('should preserve existing seed/demo/admin users as verified', async () => {
+      const user = await prisma.user.findUnique({
+        where: { email: 'user@ecotransit.vn' },
+      });
+      expect(user).toBeDefined();
+      expect(user!.emailVerified).toBe(true);
+    });
+
+    it('should store verification token as hash in DB and never expose raw token in user DTO', async () => {
+      const res = await request(app).post('/api/auth/register').send({
+        email: 'test-hash-check@ecotransit.vn',
+        password: 'Password123',
+      });
+
+      expect(res.status).toBe(201);
+      // User DTO in response should NOT contain raw token or hash
+      expect(res.body.user.verificationTokenHash).toBeUndefined();
+      expect(res.body.user.verificationTokenExpires).toBeUndefined();
+
+      // Retrieve from DB to confirm it is hashed
+      const user = await prisma.user.findUnique({
+        where: { email: 'test-hash-check@ecotransit.vn' },
+      });
+      expect(user).toBeDefined();
+      expect(user!.verificationTokenHash).not.toBeNull();
+      // It should be a 64-char hex hash
+      expect(user!.verificationTokenHash!.length).toBe(64);
+      // Ensure it doesn't match rawToken
+      expect(user!.verificationTokenHash).not.toBe(res.body.mockToken);
+
+      // Clean up
+      await prisma.userWallet.deleteMany({ where: { userId: res.body.user.id } });
+      await prisma.user.delete({ where: { id: res.body.user.id } });
+    });
+
+    it('should reject registration with 503 when SMTP is not configured in production mode', async () => {
+      const origNodeEnv = process.env.NODE_ENV;
+      const origAppMode = process.env.APP_MODE;
+      process.env.NODE_ENV = 'production';
+      process.env.APP_MODE = 'production';
+
+      try {
+        const res = await request(app).post('/api/auth/register').send({
+          email: 'test-prod-no-smtp@ecotransit.vn',
+          password: 'Password123',
+        });
+        expect(res.status).toBe(503);
+        expect(res.body.message).toContain('chưa cấu hình dịch vụ gửi thư');
+        expect(res.body.mockToken).toBeUndefined();
+
+        // Verify user was NOT created in DB (cleaned up)
+        const user = await prisma.user.findUnique({
+          where: { email: 'test-prod-no-smtp@ecotransit.vn' },
+        });
+        expect(user).toBeNull();
+      } finally {
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.APP_MODE = origAppMode;
+      }
+    });
+  });
+
+  describe('Points Revocation Safety', () => {
+    it('should deduct points on revocation but prevent negative balance', async () => {
+      const user = await prisma.user.findUnique({ where: { email: 'user@ecotransit.vn' } });
+      const wallet = await prisma.userWallet.findUnique({ where: { userId: user!.id } });
+      const origBalance = wallet!.balance;
+      const origLifetime = wallet!.lifetimeEarned;
+
+      // Seed wallet balance to 5 points
+      await prisma.userWallet.update({
+        where: { id: wallet!.id },
+        data: { balance: 5, lifetimeEarned: 5 },
+      });
+
+      // Create a verified ticket
+      const ticket = await prisma.ticket.create({
+        data: {
+          userId: user!.id,
+          status: 'verified',
+          imageUrl: 'uploads/test.jpg',
+          routeLabel: 'Tuyến số 1',
+        },
+      });
+
+      // Revoke the ticket (set to rejected) via Admin
+      const adminAgent = request.agent(app);
+      await adminAgent.post('/api/auth/login').send({
+        email: 'admin@ecotransit.vn',
+        password: 'Admin@123456',
+      });
+
+      const res = await adminAgent.post(`/api/admin/tickets/${ticket.id}/review`).send({
+        decision: 'rejected',
+        note: 'Revoked for testing',
+      });
+      expect(res.status).toBe(200);
+
+      // Verify wallet balance is 0, not negative
+      const updatedWallet = await prisma.userWallet.findUnique({ where: { userId: user!.id } });
+      expect(updatedWallet!.balance).toBe(0);
+      expect(updatedWallet!.lifetimeEarned).toBe(0);
+
+      // Clean up and restore original wallet values
+      await prisma.ticket.delete({ where: { id: ticket.id } });
+      await prisma.userWallet.update({
+        where: { id: wallet!.id },
+        data: { balance: origBalance, lifetimeEarned: origLifetime },
+      });
+    });
+  });
 });

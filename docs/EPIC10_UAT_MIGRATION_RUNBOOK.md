@@ -13,6 +13,9 @@ Tài liệu này hướng dẫn chi tiết quy trình chạy UAT tích hợp loc
 # Thực hiện migrate/reset dữ liệu local an toàn
 npm run demo:reset
 ```
+> [!WARNING]
+> Lệnh `npm run demo:reset` là một lệnh phá hủy dữ liệu (destructive command) và chỉ được thực hiện trên môi trường phát triển local. Hệ thống đã được tích hợp chốt chặn an toàn (hard safety guard) trong `scripts/demo-reset.ts` để chặn và dừng thực thi ngay lập tức nếu phát hiện host/database/provider là Neon hoặc production.
+
 *Lưu ý:* Cơ chế seed mới sẽ tự động verify email cho các tài khoản Admin/Moderator và Demo để không khóa quyền truy cập của họ. Đồng thời tạo alias ngẫu nhiên không trùng lặp cho ví điểm xanh của họ.
 
 ### Bước 2: Khởi động các Dev Server trong chế độ song song
@@ -61,19 +64,41 @@ Hệ thống hoạt động ở chế độ mock email khi không cấu hình SM
 ## 3. Quy Trình Chạy Migration An Toàn & Tránh Khóa Tài Khoản Cũ
 
 ### Cơ Chế Bảo Vệ Dữ Liệu
-Để tránh việc thêm cột `emailVerified` có mặc định là `false` làm khóa toàn bộ tài khoản demo/existing đang hoạt động, quy trình migration và script triển khai được thực hiện như sau:
+Để tránh việc thêm cột `emailVerified` làm khóa toàn bộ tài khoản đang hoạt động, quy trình migration được thực hiện theo chiến lược an toàn 5 bước (Không sử dụng blanket update `false` -> `true` trong production):
 
-1. **Schema Prisma**: Trường `emailVerified` được định nghĩa với `@default(false)`.
-2. **Triển khai Database Local/Staging**:
-   - Khi chạy migration hoặc `db push`, Prisma tự động điền `false` cho các bản ghi cũ.
-   - Script Seed và logic ứng dụng lập tức backfill các tài khoản demo/admin hiện hữu thành `emailVerified: true` thông qua cơ chế seed hoặc công cụ vận hành.
-3. **Kịch bản Migration Production (Neon)**:
-   - *Không tự ý chạy migration lên Neon production khi chưa được Owner duyệt.*
-   - Kịch bản chạy trên Production sẽ đi kèm một SQL script để chạy đồng thời:
+1. **Thêm trường nullable tạm thời**:
+   - Thêm cột `emailVerified` là BOOLEAN không có ràng buộc NOT NULL hoặc DEFAULT.
+   - Script SQL tương ứng:
      ```sql
-     -- Cập nhật tất cả tài khoản cũ đã hoạt động trước đó thành verified
-     UPDATE "User" SET "emailVerified" = true WHERE "emailVerified" IS NULL OR "emailVerified" = false;
+     ALTER TABLE "User" ADD COLUMN "emailVerified" BOOLEAN;
      ```
+2. **Backfill tài khoản cũ**:
+   - Cập nhật tất cả các tài khoản đang tồn tại tại thời điểm chạy migration thành `true`.
+   - Script SQL tương ứng:
+     ```sql
+     UPDATE "User" SET "emailVerified" = true WHERE "emailVerified" IS NULL;
+     ```
+   - Điều này giúp bảo toàn trạng thái đăng nhập cho tài khoản Demo/Admin/Moderator và các người dùng hiện hữu.
+3. **Thiết lập Default cho tài khoản mới**:
+   - Cấu hình DEFAULT `false` cho các tài khoản đăng ký sau khi hoàn thành migration:
+     ```sql
+     ALTER TABLE "User" ALTER COLUMN "emailVerified" SET DEFAULT false;
+     ```
+4. **Áp dụng ràng buộc NOT NULL**:
+   - Thiết lập thuộc tính NOT NULL sau khi đã backfill dữ liệu trống:
+     ```sql
+     ALTER TABLE "User" ALTER COLUMN "emailVerified" SET NOT NULL;
+     ```
+5. **Cấu hình Token**:
+   - Các trường token xác thực (`verificationTokenHash`, `verificationTokenExpires`, `verificationSentAt`) được giữ ở trạng thái nullable.
+
+> [!CAUTION]
+> Tuyệt đối không sử dụng lệnh blanket update:
+> ```sql
+> -- CẤM SỬ DỤNG LỆNH NÀY TRONG PRODUCTION
+> UPDATE "User" SET "emailVerified" = true WHERE "emailVerified" = false;
+> ```
+> vì nó sẽ vô tình kích hoạt trạng thái xác thực cho các tài khoản mới đăng ký nhưng chưa thực sự hoàn thành việc xác thực qua email.
 
 ---
 
@@ -100,17 +125,20 @@ Chúng tôi cung cấp script vận hành độc lập, chạy một lần và c
 
 ---
 
-## 5. Kịch Bản Rollback (Phòng ngừa sự cố)
+## 5. Kịch Bản Rollback Môi Trường Production (Phòng ngừa sự cố)
 
-Trong trường hợp phát hiện lỗi blocker nghiêm trọng trên môi trường staging/production sau khi triển khai, thực hiện rollback theo các bước:
+Trong trường hợp phát hiện lỗi blocker nghiêm trọng trên môi trường staging/production sau khi triển khai, việc rollback phải tuân thủ quy trình an toàn nghiêm ngặt và phải được **Owner phê duyệt**:
 
-1. **Rollback Code**:
-   Revert nhánh về commit stable trước Epic 10 (ví dụ `develop` hoặc tag phát hành gần nhất).
-   ```bash
-   git checkout develop
-   ```
+1. **Vercel Rollback**:
+   - Truy cập Vercel Dashboard, chọn project `web`.
+   - Tìm bản build/deployment stable đã được phê duyệt gần nhất và thực hiện **Redeploy** hoặc **Promote to Production** bản build đó.
+   - Không thực hiện checkout code hay merge nóng trên production.
 
-2. **Rollback Database Schema**:
-   Do Sqlite/Postgres đã được thêm các cột mới dạng nullable hoặc default, việc rollback code chạy phiên bản cũ sẽ bỏ qua các cột này mà không gây crash ứng dụng. Nếu cần loại bỏ hoàn toàn các cột để dọn dẹp schema:
-   - Tạo một migration hạ cấp (Down migration) để drop các cột `emailVerified`, `verificationTokenHash`, `verificationTokenExpires`, `verificationSentAt` và `publicLeaderboardAlias`.
-   - Hoặc chạy migration phục hồi trạng thái database cũ từ bản backup gần nhất.
+2. **Render Rollback**:
+   - Truy cập Render Dashboard, chọn service `api`.
+   - Tiến hành redeploy commit stable đã được kiểm định trước đó.
+
+3. **Neon Rollback**:
+   - Khôi phục trạng thái database từ Restore Point đã được tạo trước khi bắt đầu deploy (hoặc từ bản sao lưu / branch backup của Neon).
+   - **Không chạy lệnh down migration hủy hoại dữ liệu (destructive down migration) trực tiếp** trên Neon production trong thời gian xảy ra sự cố.
+   - **Không thực hiện drop columns** ngay lập tức để phục vụ rollback trừ khi thực sự cần thiết và đã có sự phê duyệt/backup hoàn chỉnh.

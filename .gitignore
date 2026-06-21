@@ -37,3 +37,5 @@ Thumbs.db
 # testing
 test-results/
 playwright-report/
+last-mock-email.json
+apps/api/last-mock-email.json

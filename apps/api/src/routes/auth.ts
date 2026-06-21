@@ -94,8 +94,15 @@ router.post('/register', async (req: Request, res: Response) => {
         isMock = true;
         mockToken = rawToken;
       }
-    } catch (mailErr) {
+    } catch (mailErr: any) {
       console.error('Failed to send verification email:', mailErr);
+      if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
+        req.session.destroy(() => {});
+        await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
+        return res.status(503).json({
+          message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
+        });
+      }
     }
 
     return res.status(201).json({
@@ -312,8 +319,13 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
         isMock = true;
         mockToken = rawToken;
       }
-    } catch (mailErr) {
+    } catch (mailErr: any) {
       console.error('Failed to resend verification email:', mailErr);
+      if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
+        return res.status(503).json({
+          message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
+        });
+      }
     }
 
     return res.status(200).json({

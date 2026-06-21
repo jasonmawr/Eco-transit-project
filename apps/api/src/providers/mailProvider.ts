@@ -33,6 +33,10 @@ export class MailProvider {
 
   async sendMail(options: MailOptions): Promise<{ sent: boolean; isMock: boolean; info?: any }> {
     const from = process.env.SMTP_FROM || 'no-reply@ecotransit.vn';
+    const isProductionOrDemo =
+      process.env.NODE_ENV === 'production' ||
+      process.env.APP_MODE === 'production' ||
+      process.env.APP_MODE === 'demo';
     
     if (this.isConfigured && this.transporter) {
       try {
@@ -49,7 +53,12 @@ export class MailProvider {
         throw error;
       }
     } else {
-      // Mock mode
+      // If we are in production or demo and SMTP is not configured, throw a clear operational error
+      if (isProductionOrDemo) {
+        throw new Error('SMTP_NOT_CONFIGURED');
+      }
+
+      // Mock mode for local development/testing only
       console.log('--------------------------------------------------');
       console.log(`[MOCK EMAIL SENT]`);
       console.log(`To: ${options.to}`);
