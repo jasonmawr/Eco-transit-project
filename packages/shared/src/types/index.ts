@@ -13,6 +13,8 @@ export interface UserDTO {
   email: string;
   role: UserRole;
   pointsBalanceCache: number;
+  emailVerified?: boolean;
+  avatarConfig?: any | null;
   createdAt: Date;
 }
 

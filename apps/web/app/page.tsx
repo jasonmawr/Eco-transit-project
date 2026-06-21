@@ -217,6 +217,34 @@ export default function Home() {
       {/* Main Content Container */}
       <main className="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 overflow-hidden">
         
+        {/* Verification Alert Banner */}
+        {user && user.emailVerified === false && (
+          <div className="bg-amber-500/10 border border-amber-500/25 px-4 py-2.5 rounded-2xl flex items-center justify-between text-xs text-amber-900 mb-3 relative z-20 shrink-0">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">⚠️</span>
+              <span>
+                <strong>Tài khoản chưa xác thực:</strong> Vui lòng xác thực email <strong className="font-mono">{user.email}</strong> để tham gia đầy đủ chiến dịch và thiết lập Avatar.
+              </span>
+            </div>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await apiFetch('/api/auth/resend-verification', { method: 'POST' });
+                  alert(res.message || 'Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.');
+                  if (res.isMock && res.mockToken) {
+                    console.log(`[MOCK ONLY] Verification Link: ${window.location.origin}/verify-email?token=${res.mockToken}`);
+                  }
+                } catch (err: any) {
+                  alert(err.message || 'Yêu cầu gửi lại email xác thực thất bại.');
+                }
+              }}
+              className="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-xl transition-all shadow-sm shrink-0"
+            >
+              Gửi lại email xác thực
+            </button>
+          </div>
+        )}
+
         {/* Campaign Journey Map Hub */}
         <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} />
 
