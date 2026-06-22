@@ -2,15 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, User, Compass, HelpCircle, Check, Map } from 'lucide-react';
+import { Check, Edit2 } from 'lucide-react';
+import { AvatarSvg, AvatarConfig } from './ui/AvatarSvg';
+import AvatarCustomizerModal from './AvatarCustomizerModal';
+import { normalizeAvatarConfig } from '../lib/avatarNormalizer';
 
-// Avatars configurations
+// Illustrated presets
 export const CHARACTERS = [
-  { id: 'student', name: 'Học sinh/Sinh viên xanh', emoji: '🎒', desc: 'Đại diện cho thế hệ trẻ đi học bằng xe buýt điện và metro, tối ưu chi phí.' },
-  { id: 'office', name: 'Dân văn phòng lướt khói', emoji: '💼', desc: 'Tránh kẹt xe giờ cao điểm, rảnh tay lướt tin tức, đi làm thanh thản.' },
-  { id: 'explorer', name: 'Người khám phá thành phố', emoji: '🗺️', desc: 'Săn tìm các địa điểm ăn uống, cafe chill quanh các ga tàu điện.' },
-  { id: 'hunter', name: 'Bạn trẻ săn voucher', emoji: '🏷️', desc: 'Năng nổ tích lũy điểm xanh để đổi lấy quà tặng chất lượng từ đối tác.' },
-  { id: 'commuter', name: 'Người đi metro mỗi ngày', emoji: '🚆', desc: 'Thành viên trung thành của lối sống xanh, đi lại bền vững quanh năm.' },
+  { id: 'student', name: 'Bạn học xanh', desc: 'Đại diện thế hệ trẻ năng động đi học bằng xe buýt điện, VinBus và Metro.' },
+  { id: 'office', name: 'Dân văn phòng xanh', desc: 'Tránh kẹt xe giờ cao điểm, thảnh thơi lướt tin tức, đi làm xanh và thanh thản.' },
+  { id: 'explorer', name: 'Người khám phá thành phố', desc: 'Săn tìm các địa điểm ẩm thực, quán cafe chill xung quanh các ga tàu điện.' },
+  { id: 'commuter', name: 'Người đạp xe xanh', desc: 'Thành viên phong trào xe đạp, liên kết xe buýt điện bảo vệ môi trường.' },
+  { id: 'hunter', name: 'Người săn ưu đãi xanh', desc: 'Tích lũy điểm xanh hành trình để đổi lấy quà tặng voucher Highlands/Phúc Long.' },
 ];
 
 export const JOURNEY_STATIONS = [
@@ -33,18 +36,25 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   const [selectedChar, setSelectedChar] = useState<string>('student');
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(user);
+
+  useEffect(() => {
+    setCurrentUser(user);
+  }, [user]);
 
   // SSR hydration guard
   useEffect(() => {
     setMounted(true);
     
     // Set selected character from user config if present, else fallback to localStorage
-    if (user && user.avatarConfig && user.avatarConfig.characterId) {
-      setSelectedChar(user.avatarConfig.characterId);
+    if (user && user.avatarConfig) {
+      const normalized = normalizeAvatarConfig(user.avatarConfig);
+      setSelectedChar(normalized.characterId);
     } else {
       const saved = localStorage.getItem('ecotransit_character');
       if (saved) {
-        setSelectedChar(saved);
+        const normalized = normalizeAvatarConfig({ characterId: saved });
+        setSelectedChar(normalized.characterId);
       }
     }
 
@@ -66,33 +76,44 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
     }
   }, [user]);
 
-  const selectCharacter = async (id: string) => {
-    setSelectedChar(id);
-    localStorage.setItem('ecotransit_character', id);
-    setShowAvatarSelector(false);
-
-    if (user) {
-      try {
-        const { apiFetch } = await import('../lib/api');
-        await apiFetch('/api/auth/avatar', {
-          method: 'PATCH',
-          body: JSON.stringify({ characterId: id }),
+  const handleSaveAvatarSuccess = (updatedAvatarConfig: any) => {
+    // Update local state
+    if (updatedAvatarConfig && updatedAvatarConfig.characterId) {
+      setSelectedChar(updatedAvatarConfig.characterId);
+      if (currentUser) {
+        setCurrentUser({
+          ...currentUser,
+          avatarConfig: updatedAvatarConfig
         });
-      } catch (err) {
-        console.error('Failed to persist avatar server-side:', err);
       }
     }
-  };
-
-  const getCharEmoji = (id: string) => {
-    return CHARACTERS.find((c) => c.id === id)?.emoji || '👤';
+    setShowAvatarSelector(false);
+    // Reload state across components to synchronize
+    window.location.reload();
   };
 
   const getCharName = (id: string) => {
     return CHARACTERS.find((c) => c.id === id)?.name || 'Hành khách xanh';
   };
 
-  const activeIndex = JOURNEY_STATIONS.findIndex((s) => s.id === activeSection);
+  const getUserAvatarConfig = (charId: string): AvatarConfig => {
+    if (currentUser && currentUser.avatarConfig) {
+      const normalized = normalizeAvatarConfig(currentUser.avatarConfig);
+      if (normalized.characterId === charId) {
+        return normalized;
+      }
+    }
+    
+    // Default preset configs fallback
+    const presetsMap: Record<string, AvatarConfig> = {
+      student: { characterId: 'student', hairStyle: 'short', hairColor: 'default', outfitStyle: 'casual', outfitColor: 'electricBlue', accessory: 'backpack' },
+      office: { characterId: 'office', hairStyle: 'curly', hairColor: 'default', outfitStyle: 'formal', outfitColor: 'electricBlue', accessory: 'glasses' },
+      explorer: { characterId: 'explorer', hairStyle: 'long', hairColor: 'beige', outfitStyle: 'casual', outfitColor: 'urbanBeige', accessory: 'headphones' },
+      commuter: { characterId: 'commuter', hairStyle: 'cap', hairColor: 'default', outfitStyle: 'sporty', outfitColor: 'vibrantGreen', accessory: 'none' },
+      hunter: { characterId: 'hunter', hairStyle: 'curly', hairColor: 'green', outfitStyle: 'sporty', outfitColor: 'vibrantGreen', accessory: 'headphones' }
+    };
+    return presetsMap[charId] || { characterId: 'student' as any };
+  };
 
   if (!mounted) {
     return (
@@ -112,12 +133,12 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
       </div>
       
       {/* Header with Avatar Selection Button */}
-      <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4">
+      <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4 relative z-10">
         <div className="hidden sm:block">
           <span className="text-[10px] font-black text-eco-primary uppercase tracking-widest bg-eco-mint px-2.5 py-1 rounded-full border border-eco-primary/10">
             🗺️ BẢN ĐỒ HÀNH TRÌNH XANH
           </span>
-          <h2 className="text-sm sm:text-lg font-black text-eco-ink mt-1.5 tracking-tight font-display-campaign uppercase">
+          <h2 className="text-sm sm:text-lg font-black text-eco-ink mt-1.5 tracking-tight font-display-campaign uppercase font-bold">
             HÀNH TRÌNH LƯỚT KHÓI CHẠM XANH
           </h2>
         </div>
@@ -131,60 +152,27 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
         {/* Selected character badge & selector trigger */}
         <div className="relative">
           <button
-            onClick={() => setShowAvatarSelector(!showAvatarSelector)}
+            onClick={() => {
+              if (!currentUser) {
+                alert('Vui lòng đăng nhập để thiết lập và tùy biến nhân vật di chuyển xanh.');
+                return;
+              }
+              setShowAvatarSelector(true);
+            }}
             className="flex items-center space-x-1.5 sm:space-x-2.5 bg-eco-mint hover:bg-eco-primary hover:text-white border border-eco-primary/20 px-2 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-2xl shadow-sm transition-all duration-200 group text-left"
           >
-            <span className="text-xl sm:text-2xl group-hover:scale-110 transition-transform duration-200">
-              {getCharEmoji(selectedChar)}
-            </span>
+            <div className="w-7 h-7 sm:w-9 sm:h-9 group-hover:scale-110 transition-transform duration-200 shrink-0">
+              <AvatarSvg config={getUserAvatarConfig(selectedChar)} />
+            </div>
             <div className="leading-none">
-              <span className="hidden sm:block text-[9px] text-eco-muted group-hover:text-white/80 font-bold uppercase tracking-wider mb-0.5">
-                Nhân vật đồng hành
+              <span className="hidden sm:flex items-center gap-1 text-[9px] text-eco-muted group-hover:text-white/80 font-bold uppercase tracking-wider mb-0.5">
+                Nhân vật đồng hành <Edit2 className="w-2.5 h-2.5" />
               </span>
               <span className="text-[10px] sm:text-xs font-black text-eco-ink group-hover:text-white block">
                 {getCharName(selectedChar)}
               </span>
             </div>
           </button>
-
-          {/* Character selection overlay menu */}
-          <AnimatePresence>
-            {showAvatarSelector && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                className="absolute right-0 mt-3 w-72 sm:w-80 bg-white border border-eco-primary/15 rounded-3xl shadow-2xl p-4 z-40 space-y-3"
-              >
-                <div className="border-b border-gray-100 pb-2 flex justify-between items-center">
-                  <span className="text-xs font-black text-eco-ink uppercase">Chọn nhân vật của bạn</span>
-                  <span className="text-[9px] text-eco-muted font-bold">Lưu tự động</span>
-                </div>
-                <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                  {CHARACTERS.map((char) => (
-                    <button
-                      key={char.id}
-                      onClick={() => selectCharacter(char.id)}
-                      className={`w-full flex items-start space-x-3 p-2.5 rounded-2xl text-left border transition-all ${
-                        selectedChar === char.id
-                          ? 'border-eco-primary bg-eco-mint/50'
-                          : 'border-transparent hover:bg-eco-soft'
-                      }`}
-                    >
-                      <span className="text-3xl shrink-0">{char.emoji}</span>
-                      <div className="space-y-0.5">
-                        <div className="flex items-center space-x-1">
-                          <span className="text-xs font-black text-eco-ink">{char.name}</span>
-                          {selectedChar === char.id && <Check className="w-3.5 h-3.5 text-eco-primary shrink-0" />}
-                        </div>
-                        <p className="text-[10px] text-eco-muted leading-snug">{char.desc}</p>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
 
@@ -222,10 +210,10 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
                   {isActive && (
                     <motion.div
                       layoutId="journey-avatar"
-                      className="absolute -top-11 z-20 text-2xl drop-shadow-md filter select-none pointer-events-none animate-bounce"
+                      className="absolute -top-11 z-20 w-8 h-8 drop-shadow-md filter select-none pointer-events-none animate-bounce"
                       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                     >
-                      {getCharEmoji(selectedChar)}
+                      <AvatarSvg config={getUserAvatarConfig(selectedChar)} />
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -279,9 +267,9 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
       </div>
 
       {/* Mobile View (Width < 640px): Vertical Metro Route Line */}
-      <div className="sm:hidden relative pl-8 pr-2 py-4">
+      <div className="sm:hidden relative pl-10 pr-2 py-4">
         {/* Steel Rail Line Background */}
-        <div className="absolute top-0 bottom-0 left-[18px] w-1 pointer-events-none z-0">
+        <div className="absolute top-0 bottom-0 left-[22px] w-1 pointer-events-none z-0">
           <div className="w-full h-full bg-gradient-to-b from-eco-primary/30 to-eco-accentGreen/30 rounded-full" />
         </div>
 
@@ -297,10 +285,11 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
                   {isActive && (
                     <motion.div
                       layoutId="journey-avatar-mobile"
-                      className="absolute -left-12 text-xl animate-pulse"
+                      className="absolute -left-10 w-7 h-7 flex items-center justify-center space-x-1"
                       transition={{ type: 'spring', stiffness: 350, damping: 25 }}
                     >
-                      {getCharEmoji(selectedChar)} 👉
+                      <AvatarSvg config={getUserAvatarConfig(selectedChar)} />
+                      <span className="text-eco-ink text-[10px] shrink-0">👉</span>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -309,7 +298,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
                 {isActive && !prefersReducedMotion && (
                   <motion.div
                     layoutId="mobile-train"
-                    className="absolute left-[18px] -translate-x-1/2 z-25 text-base pointer-events-none select-none"
+                    className="absolute left-[22px] -translate-x-1/2 z-25 text-base pointer-events-none select-none"
                     transition={{ type: 'spring', stiffness: 220, damping: 22 }}
                   >
                     🚇
@@ -332,7 +321,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
                 </button>
 
                 {/* Text details */}
-                <div className="flex-grow">
+                <div className="flex-grow pl-1">
                   <button
                     onClick={() => onSectionSelect(station.id)}
                     className={`text-xs font-black uppercase tracking-wider block text-left hover:text-eco-primary transition-colors ${
@@ -350,6 +339,15 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
         </div>
       </div>
 
+      {/* Full customizer modal integration */}
+      <AvatarCustomizerModal
+        isOpen={showAvatarSelector}
+        onClose={() => setShowAvatarSelector(false)}
+        user={currentUser}
+        onSaveSuccess={handleSaveAvatarSuccess}
+      />
+
     </div>
   );
 }
+

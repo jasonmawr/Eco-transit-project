@@ -343,7 +343,12 @@ const AvatarSchema = z.object({
   characterId: z.enum(['student', 'office', 'explorer', 'hunter', 'commuter'], {
     errorMap: () => ({ message: 'Nhân vật đồng hành không hợp lệ.' }),
   }),
-});
+  hairStyle: z.enum(['short', 'long', 'curly', 'cap']).optional(),
+  hairColor: z.enum(['default', 'blue', 'green', 'beige']).optional(),
+  outfitStyle: z.enum(['casual', 'formal', 'sporty']).optional(),
+  outfitColor: z.enum(['electricBlue', 'vibrantGreen', 'urbanBeige']).optional(),
+  accessory: z.enum(['none', 'glasses', 'headphones', 'backpack']).optional(),
+}).strict();
 
 // 7. PATCH /auth/avatar
 router.patch('/avatar', requireAuth, async (req: Request, res: Response) => {
@@ -353,18 +358,27 @@ router.patch('/avatar', requireAuth, async (req: Request, res: Response) => {
       return res.status(400).json({ message: parseResult.error.errors[0].message });
     }
 
-    const { characterId } = parseResult.data;
+    const { characterId, hairStyle, hairColor, outfitStyle, outfitColor, accessory } = parseResult.data;
+
+    const newAvatarConfig = {
+      characterId,
+      hairStyle: hairStyle || 'short',
+      hairColor: hairColor || 'default',
+      outfitStyle: outfitStyle || 'casual',
+      outfitColor: outfitColor || 'electricBlue',
+      accessory: accessory || 'none',
+    };
 
     // Update user in DB
     const updatedUser = await prisma.user.update({
       where: { id: req.session.user!.id },
       data: {
-        avatarConfig: { characterId },
+        avatarConfig: newAvatarConfig,
       },
     });
 
     // Update session
-    req.session.user!.avatarConfig = { characterId };
+    req.session.user!.avatarConfig = newAvatarConfig;
 
     return res.status(200).json({
       message: 'Cập nhật nhân vật đồng hành thành công.',

@@ -200,7 +200,7 @@ export default function RewardsSection({ user, onLoginClick }: RewardsSectionPro
       {/* Campaign Copywriting Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-eco-primary/10 pb-4 mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-eco-ink tracking-tight font-display-campaign uppercase">
+          <h2 className="sr-only">
             Đổi Điểm Xanh Nhận Ưu Đãi
           </h2>
           <p className="text-xs text-eco-muted mt-0.5">Tích lũy vé di chuyển xanh, quy đổi đặc quyền lướt phố thông minh</p>

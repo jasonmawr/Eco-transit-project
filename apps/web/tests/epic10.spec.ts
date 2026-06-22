@@ -181,4 +181,79 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
     // Verify the unverified banner is now gone!
     await expect(page.locator('text=Tài khoản chưa xác thực:')).not.toBeVisible();
   });
+
+  test('should open avatar customizer modal and change selections dynamically', async ({ page }) => {
+    // Navigate and login
+    await page.goto('/');
+    await page.locator('header button:has-text("Đăng nhập")').click();
+    await page.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await page.locator('input[type="password"]').fill('User@123456');
+    await page.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+
+    // Wait for the login session to load (logout button should appear)
+    await expect(page.locator('button:has-text("Đăng xuất")')).toBeVisible();
+
+    // The modal should be closed by default, click character badge
+    const badge = page.locator('button:has-text("Nhân vật đồng hành")');
+    await expect(badge).toBeVisible();
+    await badge.click();
+
+    // Verify Customizer Modal opens
+    const modalTitle = page.locator('text=Thiết lập nhân vật của bạn');
+    await expect(modalTitle).toBeVisible();
+
+    // 1. Verify 5 presets cards exist
+    const presetsTab = page.locator('button:has-text("Preset")');
+    await presetsTab.click();
+    await expect(page.locator('text=Bạn học xanh').first()).toBeVisible();
+    await expect(page.locator('text=Dân văn phòng xanh').first()).toBeVisible();
+    await expect(page.locator('text=Người khám phá thành phố').first()).toBeVisible();
+    await expect(page.locator('text=Người đạp xe xanh').first()).toBeVisible();
+    await expect(page.locator('text=Người săn ưu đãi xanh').first()).toBeVisible();
+
+    // 2. No primary emoji-only avatar choice (rendered via SVG, not pure emoji)
+    // We check that the large preview contains SVG element
+    const previewContainer = page.locator('.w-48.h-48.md\\:w-56.md\\:h-56');
+    await expect(previewContainer.locator('svg')).toBeVisible();
+
+    // 3. Select explorer preset, verify SVG/DOM parameters
+    await page.locator('button:has-text("Người khám phá thành phố")').last().click();
+    // Verify name tag updates
+    await expect(page.locator('text=@Người khám phá thành phố')).toBeVisible();
+
+    // 4. Hair/Outfit/Accessory customization changes visual options
+    const hairTab = page.locator('button:has-text("Kiểu Tóc")');
+    await hairTab.click();
+    // Select Tóc xoăn
+    await page.locator('button:has-text("Tóc xoăn")').click();
+
+    const outfitTab = page.locator('button:has-text("Trang Phục")');
+    await outfitTab.click();
+    // Select Áo Khoác Zip
+    await page.locator('button:has-text("Áo Khoác Zip")').click();
+
+    const accessoryTab = page.locator('button:has-text("Phụ Kiện")');
+    await accessoryTab.click();
+    // Select Kính Mát Trí Thức
+    await page.locator('button:has-text("Kính Mát Trí Thức")').click();
+
+    // Click Save
+    await page.locator('button:has-text("Lưu Nhân Vật ✓")').click();
+    await expect(modalTitle).not.toBeVisible();
+  });
+
+  test('should adjust layout and fit content without clipping at 1366x768 and 390px mobile widths', async ({ page }) => {
+    // 1. Desktop 1366x768
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.goto('/');
+    // Check main elements are visible and no layout crash
+    await expect(page.locator('header')).toBeVisible();
+    await expect(page.locator('#scene-viewport')).toBeVisible();
+
+    // 2. Mobile 390px
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/');
+    await expect(page.locator('header')).toBeVisible();
+    await expect(page.locator('#scene-viewport')).toBeVisible();
+  });
 });

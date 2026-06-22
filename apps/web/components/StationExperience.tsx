@@ -148,8 +148,7 @@ export default function StationExperience({
       {/* Exploration Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-eco-primary/10 pb-6 mb-8 gap-4">
         <div>
-          <h2 className="text-2xl font-black text-eco-primary uppercase font-display-campaign flex items-center gap-2 tracking-tight">
-            <Compass className="w-6 h-6 text-eco-accentGreen animate-pulse" />
+          <h2 className="sr-only">
             Khám Phá Ga Đô Thị
           </h2>
           <p className="text-xs text-eco-muted font-medium mt-1">

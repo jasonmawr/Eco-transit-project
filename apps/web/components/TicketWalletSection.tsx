@@ -308,7 +308,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
       {/* Title & Refresh */}
       <div className="flex items-center justify-between border-b border-eco-primary/10 pb-4 mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-black text-eco-ink tracking-tight font-display-campaign">
+          <h2 className="sr-only">
             TÍCH ĐIỂM & VÉ XANH CỦA TÔI
           </h2>
           <p className="text-xs text-eco-muted mt-0.5">Tải lên chứng từ di chuyển xanh của bạn để tích lũy Green Points</p>

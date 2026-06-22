@@ -28,17 +28,28 @@ async function main() {
 
   // 1. Seed Users
   console.log('Seeding Users...');
+  const defaultAvatarConfig = {
+    characterId: 'student',
+    hairStyle: 'short',
+    hairColor: 'default',
+    outfitStyle: 'casual',
+    outfitColor: 'electricBlue',
+    accessory: 'backpack'
+  };
+
   const user = await prisma.user.upsert({
     where: { email: 'user@ecotransit.vn' },
     update: {
       emailVerified: true,
+      avatarConfig: defaultAvatarConfig,
     },
     create: {
       email: 'user@ecotransit.vn',
       passwordHash,
       role: 'USER',
-      pointsBalanceCache: 150, // 100 (ticket) + 50 (quiz) + 200 (bonus) - 200 (redeem) = 150
+      pointsBalanceCache: 150,
       emailVerified: true,
+      avatarConfig: defaultAvatarConfig,
     },
   });
 
