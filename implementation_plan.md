@@ -1,116 +1,144 @@
-# Implementation Plan — EcoTransit RC2 Complete Customer Feedback Acceptance
+# EcoTransit RC2 — P0-D Metro Glide & P0-E Workspace Height Remediation
 
-## Release Status Check
-```txt
-PLAN APPROVED WITH REQUIRED AMENDMENTS
-IMPLEMENTATION AUTHORIZED
-OWNER FINAL UAT: NOT YET AUTHORIZED
-MERGE / DEPLOY / TAG: FORBIDDEN
-```
+## Background
 
----
+Owner re-tested P0 items and found two remaining failures:
+- **P0-D**: Metro appears to teleport instead of gliding continuously between stations
+- **P0-E**: Route workspace is too cramped at 1366×768 with Hub open (needs ≥380px clientHeight)
 
-## 1. SMTP Release Status & Safety Gates
-
-SMTP configurations and safety logic for production deployments are verified:
-* **Local/RC Fake Mail Transport**:
-  - only local/test trust boundary;
-  - raw token exists only in gitignored mock email artifact;
-  - API response never returns token.
-* **Production & Demo (enforcing NODE_ENV=production or APP_MODE=demo)**:
-  - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM are required;
-  - missing/failed SMTP returns 503 SMTP_NOT_CONFIGURED;
-  - no mock file;
-  - no token log;
-  - registration rolls back;
-  - resend preserves existing user/session/token state.
+All other P0 items PASSED and are regression guards.
 
 ---
 
-## 2. Traceability & Audit Matrix
+## Forensic Root Cause Analysis
 
-Audited the code and database schema against the customer feedback matrix. Below is the exact state of the campaign requirements:
+### P0-D — Why Metro Still Teleports
 
-| Customer requirement | Current real state | Gap | Changed file(s) | API/data impact | Tests | Visual evidence | Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Bỏ/VN hóa sub-label tiếng Anh** | Implemented. `LIVE PREVIEW ⚡` in modal is localized to `XEM TRƯỚC NHÂN VẬT`. | None | apps/web/components/AvatarCustomizerModal.tsx | None | E2E and visual tests | evidence/epic10/01-avatar-picker-desktop.png | IMPLEMENTED AND ACCEPTABLE |
-| **Usable scene area dưới Hub** | Full-screen app deck. Correctly scaled maps, panels, and forms. | None | None | None | Playwright layout responsiveness checks | evidence/epic10/11-header-responsive-1366.png | IMPLEMENTED AND ACCEPTABLE |
-| **Tàu Metro chạy/retarget giữa trạm** | Implemented. Real-time spring animations without queueing or debouncing. | None | None | None | E2E reduced motion and rapid navigation checks | evidence/epic10/05-hub-train-before-switch.png | IMPLEMENTED AND ACCEPTABLE |
-| **Không lặp title scene vô ích** | Implemented. Duplicate headers are hidden visually with `sr-only` class. | None | None | None | Existing structural DOM tests | General page layout | IMPLEMENTED AND ACCEPTABLE |
-| **Header rail không bị cắt** | Implemented. Interactive drag-to-scroll navigation rail inside `NavHeader.tsx`. | None | None | None | Viewport responsiveness checks | evidence/epic10/11-header-responsive-1366.png | IMPLEMENTED AND ACCEPTABLE |
-| **Email verification** | Implemented. Token hashing, verification banner, and local fake mail transport. | None | None | None | E2E verification test case | Console outputs and user banner state | IMPLEMENTED AND ACCEPTABLE |
-| **Avatar character builder** | Implemented. Customizable vector SVG layers with live previews and whitelist schema. | None. Legacy data normalizer maps emojis or invalid formats to `'student'` default. | apps/web/components/CampaignHub.tsx, apps/web/components/ui/AvatarSvg.tsx, apps/web/components/AvatarCustomizerModal.tsx | None | Whitelist and live customizer tests | evidence/epic10/03-avatar-preview-hair-outfit-accessory.png | IMPLEMENTED AND ACCEPTABLE |
-| **Avatar theo tàu Metro** | Implemented. Custom avatar follows the Metro train node on the rails. | None | None | None | E2E and visual checks | evidence/epic10/04-avatar-on-metro-hub.png | IMPLEMENTED AND ACCEPTABLE |
-| **XanhWrap nhập thời gian tự do** | Implemented. Validation supports free numeric duration (1-1440 mins) and lucky number (1-999). | None | None | None | Validation validation/privacy E2E tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
-| **Lucky number 1–999** | Implemented. Column structured inside the DB and validated via backend schema. | None | None | None | E2E and Vitest verification tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
-| **Thể lệ minigame XanhWrap** | Implemented. Minigame rules panel clearly specifies rules, hashtag requirements, and no-social-API warnings. | None | None | None | Existing rendering checks | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
-| **Public share privacy** | Implemented. DTO mapping scrubs emails, user IDs, and raw database keys. | None | None | None | E2E privacy check tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
-| **Vé duyệt +10 điểm** | Implemented. Wallet balance and lifetimeEarned increment on approval (+10 points). | None | None | None | Vitest integration tests | Admin review status screenshot | IMPLEMENTED AND ACCEPTABLE |
-| **Đổi voucher trừ balance** | Implemented. Redemption decrements the usable balance Cache inside transaction. | None | None | None | Vitest integration tests | Rewards section purchase flow | IMPLEMENTED AND ACCEPTABLE |
-| **Ranking point không giảm khi redeem** | Implemented. Usable balance is decremented while lifetimeEarned remains unchanged. | None | None | None | E2E and integration tests | Leaderboard position integrity | IMPLEMENTED AND ACCEPTABLE |
-| **Reversal/reject không âm/không partial mutation** | Implemented. Reversing ticket with spent points throws `REVOCATION_INSUFFICIENT_BALANCE` and rolls back. | None | None | None | Rollback safety integration tests | evidence/epic10/15-ticket-reversal-blocked-message.png | IMPLEMENTED AND ACCEPTABLE |
-| **Leaderboard không lộ điểm/email/ID** | Implemented. Leaderboard payload is strictly scrubbed, returning only `{ rank, nickname, isMe }`. | None | None | None | Privacy-safe payload tests | evidence/epic10/09-leaderboard-privacy-ui.png | IMPLEMENTED AND ACCEPTABLE |
-| **Thể lệ đua top** | Implemented. Points and leaderboard rules are displayed clearly in the wallet dashboard. | None | None | None | UI rendering tests | Wallet rules panel display | IMPLEMENTED AND ACCEPTABLE |
+Five root causes identified by code inspection of [CampaignHub.tsx](apps/web/components/CampaignHub.tsx):
+
+| # | Root Cause | Location | Effect |
+|---|-----------|----------|--------|
+| 1 | **Duration too short** | [L259-260](apps/web/components/CampaignHub.tsx#L259-L260) | `Math.max(450, distance * 1.2)` — adjacent stations at ~150px = 450ms. Owner spec requires **≥650ms**. Motion appears instant. |
+| 2 | **ResizeObserver snaps train** | [L343-345](apps/web/components/CampaignHub.tsx#L343-L345) | Observer calls `updateTrainPosition(true)` which cancels RAF and snaps to target instantly, **killing any running animation**. |
+| 3 | **Scene change triggers layout reflow** | [page.tsx L262-326](apps/web/app/page.tsx#L262-L326) | When `activeSection` changes → AnimatePresence re-renders scene content → track container dimensions shift → ResizeObserver fires → **snap** |
+| 4 | **useEffect re-registration** | [L334-356](apps/web/components/CampaignHub.tsx#L334-L356) | Effect on `[mounted, isCollapsed]` re-creates observer and calls `setTimeout(() => updateTrainPosition(true), 50)` — this fires an immediate snap 50ms after mount/collapse change. |
+| 5 | **setState on every frame** | [L272](apps/web/components/CampaignHub.tsx#L272) | `setCurrentTrainPos()` triggers React re-render every animation frame. React batching/reconciliation overhead causes frame drops that look like teleport. |
 
 ---
 
-## 3. Avatar Visual Truth Checkpoint
+## Proposed Changes
 
-Prior to executing the validation, the current avatar implementation state is verified as follows:
-* **Current Visual Format**: The primary avatar is structured as a custom vector inline SVG (`<svg>` component) composed of shapes (circles, paths, rects) rather than images or plain emojis/objects.
-* **Character Card Presets**: Exactly 5 customizable illustrated character presets are defined (Bạn học xanh, Dân văn phòng xanh, Người khám phá thành phố, Người đạp xe xanh, Người săn ưu đãi xanh). Emojis (`💼`, `🎒`, `🚴`, `🏃`, `🌲`) are not used as primary characters.
-* **Customization Render**: Changing the selection (hairStyle, hairColor, outfitStyle, outfitColor, accessory) in the customizer interface dynamically updates the visual layers of the inline SVG preview in real-time.
-* **Preview Locations**: Placed in the customizer modal (`AvatarCustomizerModal.tsx`) as a large central preview, in the main character badge at the header of `CampaignHub.tsx`, and floating above the active train dot on the Metro railway map track.
-* **Server-side Persistence**: visual configs are saved server-side in the PostgreSQL `User` table JSON column `avatarConfig` via the `PATCH /api/auth/avatar` route.
-* **Legacy Config Rendering**: Old emoji/string formats in user data currently fall back to the default `student` preset configuration. Implemented legacy normalization mapping to ensure no stale emojis or invalid configs are set.
+### Component 1: Metro Animation Engine
 
----
-
-## 4. Implemented Changes
-
-Implemented the visual and behavioral gap closures:
-
-### 4.1. Client Customizer UI Label Localization
-#### [MODIFY] [AvatarCustomizerModal.tsx](apps/web/components/AvatarCustomizerModal.tsx)
-- Localized the label `"LIVE PREVIEW ⚡"` to `"XEM TRƯỚC NHÂN VẬT"` to meet specifications.
-
-### 4.2. Pure Normalizer Utility for Legacy Onboarding configurations
-#### [NEW] [avatarNormalizer.ts](apps/web/lib/avatarNormalizer.ts)
-- Created a pure config normalizer function `normalizeAvatarConfig(rawConfig: any): AvatarConfig` validating that all options (characterId, styles, colors, accessories) strictly match closed whitelists, mapping legacy emojis (`💼`, `🎒`, `🚴`, `🏃`, `🌲`) to validPresets, and defaulting to `student`.
-
-### 4.3. Integrating Normalizer in Frontend Components
 #### [MODIFY] [CampaignHub.tsx](apps/web/components/CampaignHub.tsx)
-- Applied the normalization utility when reading user config and localStorage configurations.
-#### [MODIFY] [AvatarCustomizerModal.tsx](apps/web/components/AvatarCustomizerModal.tsx)
-- Utilized the normalizer to initialize form config state safely.
+
+**1. Replace `setState`-driven animation with direct DOM manipulation via ref:**
+- Add a `trainElRef = useRef<HTMLDivElement>(null)` for direct transform updates
+- In the RAF loop, write `trainElRef.current.style.transform = translate3d(...)` directly instead of `setCurrentTrainPos()`
+- Only call `setCurrentTrainPos()` at animation **end** (single React render) for final state sync
+- This eliminates per-frame React re-renders
+
+**2. Fix motion profile to meet Owner spec:**
+- min duration: 650ms (adjacent station)
+- max duration: 1150ms (farthest station)  
+- easing: cubic-bezier ease-in-out, no overshoot
+- formula: Math.min(1150, Math.max(650, distance * 2.5))
+
+**3. Guard against ResizeObserver killing animation:**
+- Add an `isAnimatingRef = useRef(false)` flag
+- ResizeObserver callback: if `isAnimatingRef.current === true`, **skip** the immediate snap; only adjust `targetBerth` if layout changed, and let the running animation naturally converge to the new target
+- On animation end: set `isAnimatingRef.current = false`
+- Window resize (while NOT animating): snap immediately as before
+
+**4. Rapid-retarget behavior:**
+- On new station click while animation is running: cancel current RAF, read `currentPosRef.current` (which has the real intermediate position), start new animation from there
+- No queue — always retarget from current actual position
 
 ---
 
-## 5. Verification Plan
+### Component 2: Workspace Height Budget
 
-### 5.1. Automated Test Suites
-Executed on final HEAD and verified by automated tests:
-- Vitest integration suite: `111/111 automated tests passed` via `npm run test`.
-- Playwright route planner E2E suite (5x repetitions for stability): `npx playwright test apps/web/tests/route-planner.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --repeat-each=5 --retries=0 --workers=1` - passed with 0 failures.
-- Playwright epic10 E2E suite: `npx playwright test apps/web/tests/epic10.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1` - passed with 0 failures.
+#### [MODIFY] [CampaignHub.tsx](apps/web/components/CampaignHub.tsx)
 
-### 5.2. Manual Visual Verification
-Verified responsive scaling of headers, text grids, and buttons at viewports (1366x768, 1440x900, 1920x1080, and 390px).
+- Reduce desktop Hub compact height from `h-28` (112px) to `h-20` (80px)
+- Reduce Hub header padding from `pb-1.5 sm:pb-2 mb-1.5 sm:mb-2` to `pb-1 sm:pb-1.5 mb-1 sm:mb-1`
+- Reduce Hub outer padding from `p-2 sm:p-3` to `p-1.5 sm:p-2`
+- Station button size from `w-8 h-8` to `w-7 h-7`
+- Train SVG positioning adjusted to match the reduced lane height
+- Total Hub saving: ~40-50px
 
-### 5.3. Visual UAT Evidence Package
-Evidence captured locally:
-- [evidence/epic10/01-avatar-picker-desktop.png](evidence/epic10/01-avatar-picker-desktop.png) (Character Customizer)
-- [evidence/epic10/02-avatar-picker-mobile-390.png](evidence/epic10/02-avatar-picker-mobile-390.png) (Customizer Mobile)
-- [evidence/epic10/03-avatar-preview-hair-outfit-accessory.png](evidence/epic10/03-avatar-preview-hair-outfit-accessory.png) (Preview changes)
-- [evidence/epic10/04-avatar-on-metro-hub.png](evidence/epic10/04-avatar-on-metro-hub.png) (Avatar following train)
-- [evidence/epic10/05-hub-train-before-switch.png](evidence/epic10/05-hub-train-before-switch.png) (Before station transition)
-- [evidence/epic10/06-hub-train-after-switch.png](evidence/epic10/06-hub-train-after-switch.png) (After station transition)
-- [evidence/epic10/07-train-rapid-switch.webm](evidence/epic10/07-train-rapid-switch.webm) (Evidence captured of rapid train switching)
-- [evidence/epic10/08-xanhwrap-rules-preview.png](evidence/epic10/08-xanhwrap-rules-preview.png) (XanhWrap minigame rules & preview)
-- [evidence/epic10/09-leaderboard-privacy-ui.png](evidence/epic10/09-leaderboard-privacy-ui.png) (Privacy-safe Leaderboard)
-- [evidence/epic10/10-map-first-click-route.png](evidence/epic10/10-map-first-click-route.png) (Dijkstra Map Routing)
-- [evidence/epic10/11-header-responsive-1366.png](evidence/epic10/11-header-responsive-1366.png) (Header rail Desktop 1366x768)
-- [evidence/epic10/12-header-responsive-1440.png](evidence/epic10/12-header-responsive-1440.png) (Header rail Desktop 1440x900)
-- [evidence/epic10/13-header-responsive-1920.png](evidence/epic10/13-header-responsive-1920.png) (Header rail Desktop 1920x1080)
-- [evidence/epic10/14-header-responsive-390.png](evidence/epic10/14-header-responsive-390.png) (Header rail Mobile 390px)
-- [evidence/epic10/15-ticket-reversal-blocked-message.png](evidence/epic10/15-ticket-reversal-blocked-message.png) (Points Reversal Insufficient Balance)
+#### [MODIFY] [page.tsx](apps/web/app/page.tsx)
+
+- Reduce main padding from `py-2 sm:py-3` to `py-1 sm:py-1.5`
+- Reduce scene viewport padding from `p-4 sm:p-6` to `p-3 sm:p-4`
+- Reduce `my-2` gap between Hub and scene to `my-1`
+- Total saving: ~20px
+
+#### [MODIFY] [HeroSection.tsx](apps/web/components/HeroSection.tsx)
+
+- Remove the mandatory `min-h-[280px] lg:min-h-[320px]` — let it size naturally
+- Reduce padding from `p-4 sm:p-8 lg:p-10` to `p-3 sm:p-5 lg:p-6`
+- Reduce the right-side graphic max-width from `350px` to `240px` and hide on smaller desktop viewports where height is constrained
+- Reduce `mb-4` to `mb-2`
+- Reduce inner spacing `space-y-6` to `space-y-3`
+- Total saving: ~120-160px
+
+#### [MODIFY] [RoutePlannerShell.tsx](apps/web/components/RoutePlannerShell.tsx)
+
+- Reduce `space-y-6` to `space-y-4` between form sections
+- Reduce grid gap from `gap-6` to `gap-4`
+- Marginal height savings
+
+---
+
+### Component 3: Tests
+
+#### [MODIFY] [epic10.spec.ts](apps/web/tests/epic10.spec.ts)
+
+Add/update tests:
+1. **Metro continuous glide proof test**: Click station A→B, capture transform at start, ~200ms, ~400ms (mid), and end. Assert each intermediate differs from start and end.
+2. **Duration assertion**: Measure actual wall-clock time from first position change to final rest. Assert ≥650ms for adjacent station.
+3. **Rapid 4-station retarget**: Click 4 stations in 100ms intervals, verify final position matches last station, no queue.
+4. **Workspace height test**: Assert `scene-viewport clientHeight ≥ 380` at 1366×768
+5. **Scroll/wheel/thumb**: Assert scrollHeight > clientHeight after route results, wheel increases scrollTop
+
+#### [MODIFY] [capture_evidence.spec.ts](apps/web/tests/capture_evidence.spec.ts)
+
+Capture new evidence:
+- `06-real-metro-mid-transition-no-overlap.png`
+- `07-real-metro-rapid-switch.webm`
+- `07a-real-metro-single-click-glide.webm`
+- `16-route-workspace-1366-top.png`
+- `17-route-workspace-1366-result-scrolled-bottom.png`
+- `17a-route-workspace-1366-height-proof.png`
+
+---
+
+## Regression Guards
+
+All changes will be verified against:
+
+| Guard | What to check |
+|-------|--------------|
+| Two-car Metro | SVG still has 2 carriage bodies + coupler |
+| No icon/label overlap | Collision test at start/mid/end positions |
+| Avatar attachment | Avatar div still inside train container |
+| Footer safety | Footer rect.y ≥ viewport rect.y + viewport height |
+| Wheel scroll + thumb | scrollHeight > clientHeight, scrollTop increases |
+| Desktop 1366/1440/1920 | Layout doesn't clip |
+| Mobile 390×800 | Mobile train visible, no overflow |
+| Other scenes (XanhWrap, Rewards) | No regression from Hub/workspace CSS changes |
+
+---
+
+## Verification Plan
+
+### Automated Tests
+
+```bash
+npm run build
+npm run test
+npx playwright test apps/web/tests/route-planner.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --repeat-each=5 --retries=0 --workers=1
+npx playwright test apps/web/tests/epic10.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1
+npx playwright test apps/web/tests/capture_evidence.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1
+```

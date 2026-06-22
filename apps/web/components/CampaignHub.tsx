@@ -34,7 +34,7 @@ interface CampaignHubProps {
 // Sleek Desktop Metro carriage SVG (width 96, height 40)
 const DesktopTrain = ({ avatarConfig, direction }: { avatarConfig: AvatarConfig; direction: 'right' | 'left' }) => {
   return (
-    <div className="relative w-24 h-16 flex flex-col items-center justify-end pointer-events-none" style={{ pointerEvents: 'none' }}>
+    <div className="relative w-24 h-10 pointer-events-none" style={{ pointerEvents: 'none' }}>
       <svg
         width="96"
         height="40"
@@ -90,7 +90,7 @@ const DesktopTrain = ({ avatarConfig, direction }: { avatarConfig: AvatarConfig;
       <div
         className="absolute w-5 h-5 overflow-hidden rounded-full z-20 border border-eco-ink bg-slate-900"
         style={{
-          top: '35px',
+          top: '11px',
           left: direction === 'left' ? '30px' : '66px',
           transform: 'translate(-50%, -50%)',
         }}
@@ -577,7 +577,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
           style={{ position: 'relative', height: '72px' }}
         >
           {/* SVG Railway Track Background */}
-          <div className="absolute top-[12px] left-0 right-0 h-3 -translate-y-1/2 pointer-events-none z-0 px-12">
+          <div className="absolute top-[21px] left-0 right-0 h-3 -translate-y-1/2 pointer-events-none z-0 px-12">
             <svg className="w-full h-full overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path
                 d="M 10,6 L 10,-6 M 40,6 L 40,-6 M 70,6 L 70,-6 M 100,6 L 100,-6 M 130,6 L 130,-6 M 160,6 L 160,-6 M 190,6 L 190,-6 M 220,6 L 220,-6 M 250,6 L 250,-6 M 280,6 L 280,-6 M 310,6 L 310,-6 M 340,6 L 340,-6 M 370,6 L 370,-6 M 400,6 L 400,-6 M 430,6 L 430,-6 M 460,6 L 460,-6 M 490,6 L 490,-6 M 520,6 L 520,-6 M 550,6 L 550,-6 M 580,6 L 580,-6 M 610,6 L 610,-6 M 640,6 L 640,-6 M 670,6 L 670,-6 M 700,6 L 700,-6 M 730,6 L 730,-6 M 760,6 L 760,-6 M 790,6 L 790,-6 M 820,6 L 820,-6 M 850,6 L 850,-6 M 880,6 L 880,-6 M 910,6 L 910,-6 M 940,6 L 940,-6 M 970,6 L 970,-6 M 1000,6 L 1000,-6 M 1030,6 L 1030,-6 M 1060,6 L 1060,-6 M 1090,6 L 1090,-6 M 1120,6 L 1120,-6"
@@ -602,7 +602,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
               top: 0,
               transform: 'translate3d(0px, 0px, 0)',
               width: '96px',
-              height: '64px',
+              height: '40px',
               pointerEvents: 'none',
               willChange: 'transform',
             }}

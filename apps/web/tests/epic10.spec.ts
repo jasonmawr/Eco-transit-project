@@ -119,6 +119,40 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
           }
         }
       }
+
+      // Check all station icon buttons themselves in the grid (including active station)
+      const stationButtons = await page.locator('.relative.z-10.grid.grid-cols-6.gap-1 button').all();
+      for (const btn of stationButtons) {
+        if (await btn.isVisible()) {
+          const btnBox = await btn.boundingBox();
+          if (btnBox) {
+            const overlap = getIntersection(trainVisualBox, btnBox);
+            expect(overlap).toBe(0); // Active and non-active station icons must not be obscured
+          }
+        }
+      }
+
+      // Check navigation header and items
+      const header = page.locator('header').first();
+      if (await header.isVisible()) {
+        const headerBox = await header.boundingBox();
+        if (headerBox) {
+          const overlap = getIntersection(trainVisualBox, headerBox);
+          expect(overlap).toBe(0); // Header must not overlap with train
+        }
+      }
+
+      // Check CTA buttons on page
+      const ctas = await page.locator('button:has-text("LƯỚT LỘ TRÌNH NGAY"), button:has-text("BẢN ĐỒ & GA TÀU")').all();
+      for (const cta of ctas) {
+        if (await cta.isVisible()) {
+          const ctaBox = await cta.boundingBox();
+          if (ctaBox) {
+            const overlap = getIntersection(trainVisualBox, ctaBox);
+            expect(overlap).toBe(0); // CTA must not overlap with train
+          }
+        }
+      }
     };
 
     // Get initial position bounding box (Start state)

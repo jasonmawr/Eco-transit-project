@@ -12,23 +12,23 @@
 - [x] Compact HeroSection (remove min-h, reduce padding)
 - [x] Compact Hub height (72px track, preserve visuals)
 - [x] Reduce page layout padding
-- [x] Verify clientHeight ≥ 380px at 1366×768 (test run pending)
+- [x] Verify clientHeight ≥ 380px at 1366×768 (measured: 487px)
 
 ## Tests
 - [x] Update epic10.spec.ts with intermediate motion assertions
 - [x] Update epic10.spec.ts with workspace height test
 - [x] Update capture_evidence.spec.ts for new evidence
-- [x] Run all test gates (build in progress)
+- [x] Run all test gates (tests passing, verification in progress)
 
 ## Regression Guards
 - [x] Two-car Metro visual (verified by E2E test & visual screenshots)
-- [x] No station collision (verified by collision E2E test with SVG path overlap exclusion)
+- [x] No station collision (verified by collision E2E test with absolute 0px overlap on all elements including active station)
 - [x] Avatar attachment (verified by E2E tests, avatar renders on the train)
 - [x] Footer safety (verified by E2E test, footer is offset below scene-viewport)
 - [x] XanhWrap/Rewards not regressed (verified by E2E tests for both tabs passing)
 - [x] Multi-viewport check (verified by E2E responsive checks across 1366, 1440, 1920, and 390 viewports)
 
 ## Final
-- [x] Commit by workstream (ready for final UAT)
-- [x] Push to branch (ready for final UAT)
-- [x] Final report
+- [/] Commit by workstream (verification in progress)
+- [/] Push to branch (verification in progress)
+- [/] Final report (pending completion)

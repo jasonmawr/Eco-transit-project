@@ -267,6 +267,7 @@ export default function Home() {
               initial="initial"
               animate="animate"
               exit="exit"
+              data-testid={activeSection === 'route' ? "route-workspace" : undefined}
               className="w-full flex-grow flex-1 min-h-0 relative overflow-y-auto pr-2 flex flex-col"
               style={{
                 backfaceVisibility: 'hidden',
@@ -275,7 +276,7 @@ export default function Home() {
               }}
             >
               {activeSection === 'route' && (
-                <div data-testid="route-workspace" className="space-y-3 flex-grow flex flex-col">
+                <div className="space-y-3 flex-grow flex flex-col">
                   {/* Hero Section embedded inside Route Scene */}
                   <HeroSection onSectionSelect={handleSectionSelect} />
                   <RoutePlannerShell onStationSelect={setSelectedStationId} />
