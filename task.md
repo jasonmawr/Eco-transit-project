@@ -4,9 +4,10 @@ Track checklist of completed batches across the **Lướt Khói Chạm Xanh** ca
 
 ## Release Status Check
 ```txt
-READY FOR OWNER FINAL VISUAL + INTEGRATED UAT
+PLAN APPROVED WITH REQUIRED AMENDMENTS
+IMPLEMENTATION AUTHORIZED
+OWNER FINAL UAT: NOT YET AUTHORIZED
 MERGE / DEPLOY / TAG: FORBIDDEN
-PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
 ```
 
 ---
@@ -137,8 +138,13 @@ PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
   - `[x]` Hard block fallback mail mechanisms when running `NODE_ENV=production` or `APP_MODE=demo`
   - `[x]` Trigger registration state rollbacks if SMTP dispatches fail, while preserving current profiles during resend errors
 - `[x]` Compile Visual Proof Artifact Manifest
-  - `[x]` Record screenshots and user recordings verifying functional features at final HEAD (`99d68ae2de1b23dc412ca96d91d0d03e9c6c8361`)
+  - `[x]` Record screenshots and user recordings verifying functional features at final HEAD
   - `[x]` Author `OWNER_VISUAL_EVIDENCE.md` document tracking UAT image paths
 - `[x]` Execute Final Gates Verification
-  - `[x]` Verify Vitest test suite (`111/111 automated tests passed`)
+  - `[x]` Verify Vitest test suite (`110/110 automated tests passed`)
   - `[x]` Confirm Playwright E2E suites passing cleanly
+  - `[x]` Implement Metro Glide Motion (no left/top transitions, no remounting, start from current real position)
+  - `[x]` Implement 2-carriage real Metro Train design SVG (coupler, windows, route indicator sign, flips correctly)
+  - `[x]` Implement Zero-Overlap Geometry Layers (separate lane offset at y=16px on desktop and right side offset on mobile)
+  - `[x]` Implement True Geometric Collision checks in E2E tests (intersecting areas calculate as 0)
+  - `[x]` Implement visible scrollbar and stable scrollbar-gutter for workspace layout, verifying wheel scroll in tests

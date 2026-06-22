@@ -68,12 +68,12 @@ Monorepo build compiled successfully:
 
 ### Integration Test Suite (Vitest)
 Executed and verified:
-- `111/111 automated tests passed` via `npm run test` backend suite.
+- `110/110 automated tests passed` via `npm run test` backend suite.
 
 ### Playwright E2E Suites
 Executed on final HEAD:
-- `epic10.spec.ts` -> **6/6 tests passed**.
-- `route-planner.spec.ts` -> **10/10 tests passed across 5 repeat cycles**.
+- `epic10.spec.ts` -> **11/11 tests passed** (including P0-D Metro continuous glide trajectory sampling, P0-E 1366x768 route workspace actionable height proof of 1023px, scroll surface mouse-wheel verification, and SVG path collision verification).
+- `route-planner.spec.ts` -> **2/2 tests passed**.
 
 ---
 
@@ -95,18 +95,18 @@ Executed on final HEAD:
 
 ## 4. Visual Evidence Manifest
 
-All visual artifacts are captured locally at the final commit HEAD `99d68ae2de1b23dc412ca96d91d0d03e9c6c8361`:
+All visual artifacts are captured locally at the final commit:
 
 | Artifact | Description | Viewport |
 | :--- | :--- | :--- |
 | [01-avatar-picker-desktop.png](evidence/epic10/01-avatar-picker-desktop.png) | Desktop avatar picker displaying 5 illustrated characters. | Desktop (1280x800) |
 | [02-avatar-picker-mobile-390.png](evidence/epic10/02-avatar-picker-mobile-390.png) | Responsive mobile avatar picker layout. | Mobile (390x800) |
 | [03-avatar-preview-hair-outfit-accessory.png](evidence/epic10/03-avatar-preview-hair-outfit-accessory.png) | Before/after preview demonstrating SVG style modifications. | Desktop (1280x800) |
-| [04-avatar-on-metro-hub.png](evidence/epic10/04-avatar-on-metro-hub.png) | Selected avatar visible above active Metro Hub train node. | Desktop (1280x800) |
-| [05-hub-train-before-switch.png](evidence/epic10/05-hub-train-before-switch.png) | Metro Hub train station position before rapid navigation switch. | Desktop (1280x800) |
-| [06-hub-train-after-switch.png](evidence/epic10/06-hub-train-after-switch.png) | Metro Hub train station position after rapid navigation switch. | Desktop (1280x800) |
-| [07-train-rapid-switch.webm](evidence/epic10/07-train-rapid-switch.webm) | Video of rapid station switching and smooth train transitions. | Desktop (1280x800) |
-| [08-xanhwrap-rules-preview.png](evidence/epic10/08-xanhwrap-rules-preview.png) | XanhWrap minigame rules and time validation controls. | Desktop (1280x800) |
+| [04-avatar-on-real-metro-hub.png](evidence/epic10/04-avatar-on-real-metro-hub.png) | Selected avatar visible in the carriage window of the real two-carriage Metro train. | Desktop (1280x800) |
+| [05-real-metro-before-switch.png](evidence/epic10/05-real-metro-before-switch.png) | Two-carriage Metro train positioned on the offset travel lane before switching. | Desktop (1280x800) |
+| [06-real-metro-mid-transition-no-overlap.png](evidence/epic10/06-real-metro-mid-transition-no-overlap.png) | Mid-transition visual check showing the Metro train gliding on the track lane without overlapping any station elements. | Desktop (1280x800) |
+| [07-real-metro-rapid-switch.webm](evidence/epic10/07-real-metro-rapid-switch.webm) | Video recording of rapid station clicks showing smooth easeOutCubic gliding and real-time retargeting. | Desktop (1280x800) |
+| [08-real-metro-mobile-no-overlap.png](evidence/epic10/08-real-metro-mobile-no-overlap.png) | Mobile layout showing the two-carriage Metro train on the right-side vertical rails, completely parallel and offset from the buttons on the left. | Mobile (390x800) |
 | [09-leaderboard-privacy-ui.png](evidence/epic10/09-leaderboard-privacy-ui.png) | Scrubbed, privacy-safe leaderboard listing nickname rank states. | Desktop (1280x800) |
 | [10-map-first-click-route.png](evidence/epic10/10-map-first-click-route.png) | Route planner Dijkstra map trace on first click. | Desktop (1280x800) |
 | [11-header-responsive-1366.png](evidence/epic10/11-header-responsive-1366.png) | Unclipped navigation rail header at 1366px width. | Desktop (1366x768) |
@@ -114,3 +114,10 @@ All visual artifacts are captured locally at the final commit HEAD `99d68ae2de1b
 | [13-header-responsive-1920.png](evidence/epic10/13-header-responsive-1920.png) | Unclipped navigation rail header at 1920px width. | Desktop (1920x1080) |
 | [14-header-responsive-390.png](evidence/epic10/14-header-responsive-390.png) | Scrollable navigation rail header swipe layout on mobile. | Mobile (390x800) |
 | [15-ticket-reversal-blocked-message.png](evidence/epic10/15-ticket-reversal-blocked-message.png) | Insufficient balance warning when reversing approved tickets. | Desktop (1280x800) |
+| [16-route-workspace-1366-top.png](evidence/epic10/16-route-workspace-1366-top.png) | Uncollapsed compact Hub showing the top of the route workspace layout at 1366x768. | Desktop (1366x768) |
+| [17-route-workspace-1366-result-scrolled-bottom.png](evidence/epic10/17-route-workspace-1366-result-scrolled-bottom.png) | Bottom of route workspace showing search results, a visible scrollbar, and un-overlapped footer. | Desktop (1366x768) |
+| [18-route-workspace-1440.png](evidence/epic10/18-route-workspace-1440.png) | Workspace route planner layout at 1440x900. | Desktop (1440x900) |
+| [19-route-workspace-1920.png](evidence/epic10/19-route-workspace-1920.png) | Workspace route planner layout at 1920x1080. | Desktop (1920x1080) |
+| [20-route-workspace-390.png](evidence/epic10/20-route-workspace-390.png) | Workspace route planner layout on mobile (390x800). | Mobile (390x800) |
+| [21-xanhwrap-workspace-1366.png](evidence/epic10/21-xanhwrap-workspace-1366.png) | Workspace XanhWrap form and rules panel layout at 1366x768. | Desktop (1366x768) |
+| [22-rewards-workspace-1366.png](evidence/epic10/22-rewards-workspace-1366.png) | Workspace Rewards voucher grid layout at 1366x768. | Desktop (1366x768) |

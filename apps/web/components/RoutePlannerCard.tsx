@@ -50,7 +50,7 @@ export default function RoutePlannerCard({
     <form
       id="planner-form"
       onSubmit={onSubmit}
-      className="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-eco-mint shadow-lg space-y-6 tilt-card-hover"
+      className="relative z-20 bg-white/90 backdrop-blur-md p-4 rounded-3xl border border-eco-mint shadow-lg space-y-4 tilt-card-hover"
     >
       {/* Form Title */}
       <div className="border-b border-eco-mint pb-3.5 flex justify-between items-center">

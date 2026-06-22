@@ -215,7 +215,7 @@ export default function Home() {
       <EcoTransitHeader activeSection={activeSection} onSectionSelect={handleSectionSelect} />
 
       {/* Main Content Container */}
-      <main className="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 overflow-hidden">
+      <main className="flex-grow flex flex-col min-h-0 w-full max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-1 sm:py-1.5 relative z-10 overflow-hidden">
 
         {/* Verification Alert Banner */}
         {user && user.emailVerified === false && (
@@ -248,14 +248,14 @@ export default function Home() {
         {/* Scene viewport container (perspective boundary) */}
         <div
           id="scene-viewport"
-          className="flex-1 min-h-0 my-2 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-3xl shadow-lg p-4 sm:p-6 overflow-hidden flex flex-col"
+          className="flex-1 min-h-0 my-1 relative bg-white/80 backdrop-blur-md border border-eco-mint rounded-2xl shadow-lg p-3 sm:p-4 overflow-hidden flex flex-col"
           style={{ perspective: '1400px', transformStyle: 'preserve-3d' }}
         >
           {/* Subtle page creases overlay */}
           {!isMobile && !prefersReducedMotion && (
             <>
-              <div className="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-black/[0.02] to-transparent pointer-events-none z-30 rounded-l-3xl" />
-              <div className="absolute top-0 bottom-0 right-0 w-8 bg-gradient-to-l from-black/[0.02] to-transparent pointer-events-none z-30 rounded-r-3xl" />
+              <div className="absolute top-0 bottom-0 left-0 w-8 bg-gradient-to-r from-black/[0.02] to-transparent pointer-events-none z-30 rounded-l-2xl" />
+              <div className="absolute top-0 bottom-0 right-0 w-8 bg-gradient-to-l from-black/[0.02] to-transparent pointer-events-none z-30 rounded-r-2xl" />
             </>
           )}
 
@@ -267,14 +267,15 @@ export default function Home() {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="w-full h-full relative overflow-y-auto pr-1 no-scrollbar flex flex-col"
+              className="w-full flex-grow flex-1 min-h-0 relative overflow-y-auto pr-2 flex flex-col"
               style={{
                 backfaceVisibility: 'hidden',
                 transformStyle: 'preserve-3d',
+                scrollbarGutter: 'stable',
               }}
             >
               {activeSection === 'route' && (
-                <div className="space-y-6 flex-grow flex flex-col">
+                <div data-testid="route-workspace" className="space-y-3 flex-grow flex flex-col">
                   {/* Hero Section embedded inside Route Scene */}
                   <HeroSection onSectionSelect={handleSectionSelect} />
                   <RoutePlannerShell onStationSelect={setSelectedStationId} />
@@ -327,7 +328,7 @@ export default function Home() {
       </main>
 
       {/* Mini status bar footer */}
-      <footer className="bg-eco-ink text-white py-1.5 border-t border-eco-primary/10 relative z-10 shrink-0 text-center text-[10px] text-eco-muted">
+      <footer className="bg-eco-ink text-white py-1 border-t border-eco-primary/10 relative z-10 shrink-0 text-center text-[10px] text-eco-muted">
         &copy; 2026 Lướt Khói Chạm Xanh. Vận hành bởi EcoTransit.
       </footer>
 

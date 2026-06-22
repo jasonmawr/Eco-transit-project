@@ -75,6 +75,7 @@ export default function RoutePlannerShell({ onStationSelect }: { onStationSelect
   // Trigger search
   const handleSearchRoutes = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('handleSearchRoutes called! Origin:', originId, 'Destination:', destinationId);
     setErrorMsg(null);
     setRoutes([]);
     setSelectedRoute(null);
@@ -130,7 +131,7 @@ export default function RoutePlannerShell({ onStationSelect }: { onStationSelect
   );
 
   return (
-    <div id="route" className="w-full flex flex-col space-y-6">
+    <div id="route" className="w-full flex flex-col space-y-4">
       <div className="flex items-center space-x-3 mb-1">
         <div className="w-1.5 h-6 bg-eco-primary rounded-full" />
         <h2 className="text-2xl font-black text-eco-ink tracking-tight">
@@ -138,9 +139,9 @@ export default function RoutePlannerShell({ onStationSelect }: { onStationSelect
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Side: Search Form & Results panel (Mobile first bottom-sheet card) */}
-        <div className="lg:col-span-5 space-y-5">
+        <div className="lg:col-span-5 space-y-4">
           <RoutePlannerCard
             stations={stations}
             originId={originId}

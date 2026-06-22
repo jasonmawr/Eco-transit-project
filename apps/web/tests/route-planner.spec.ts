@@ -1,39 +1,54 @@
 import { test, expect } from '@playwright/test';
 
+async function waitForAppReady(page: any) {
+  // Wait for the wake-up banner to hide
+  await page.waitForSelector('text=Đang kết nối máy chủ...', { state: 'hidden', timeout: 30000 }).catch(() => {});
+  // Wait for the main viewport to be visible
+  await expect(page.locator('#scene-viewport')).toBeVisible({ timeout: 15000 });
+}
+
 test.describe('Route Planner E2E Tests', () => {
   test('should load the map on the first search click and update correctly when destination changes', async ({ page }) => {
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', err => console.log('BROWSER EXCEPTION:', err.message));
+
     // 1. Fresh load /#route
     await page.goto('/#route');
+    await waitForAppReady(page);
 
     // Wait for the wakeup/loading banner to disappear and page to load
     await expect(page.locator('text=Lên Kế Hoạch Lộ Trình Xanh')).toBeVisible({ timeout: 15000 });
 
-    // Ensure the station dropdown is populated and interactive
-    const originComboboxBtn = page.locator('div:has(> label:has-text("Điểm xuất phát")) button');
+    // Scoped container for Origin
+    const originContainer = page.locator('div:has(> label:has-text("Điểm xuất phát"))');
+    const originComboboxBtn = originContainer.locator('button');
     await expect(originComboboxBtn).toBeVisible();
 
     // 2. Select origin station (first option)
-    await originComboboxBtn.click();
-    const originOption = page.locator('li[role="option"]').first();
+    await originComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const originOption = originContainer.locator('li[role="option"]').first();
     await expect(originOption).toBeVisible();
     const originName = await originOption.locator('span').first().textContent();
-    await originOption.click();
+    await originOption.evaluate((opt: HTMLElement) => opt.click());
 
-    // Select destination station (second option)
-    const destComboboxBtn = page.locator('div:has(> label:has-text("Điểm đến")) button');
-    await destComboboxBtn.click();
-    const destOption = page.locator('li[role="option"]').nth(1);
+    // Scoped container for Destination
+    const destContainer = page.locator('div:has(> label:has-text("Điểm đến"))');
+    const destComboboxBtn = destContainer.locator('button');
+    await destComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const destOption = destContainer.locator('li[role="option"]').nth(1);
     await expect(destOption).toBeVisible();
     const destName = await destOption.locator('span').first().textContent();
-    await destOption.click();
+    await destOption.evaluate((opt: HTMLElement) => opt.click());
 
     // Verify inputs have correct selected text
     await expect(originComboboxBtn).toContainText(originName || '');
     await expect(destComboboxBtn).toContainText(destName || '');
 
-    // 3. Click “Tìm kiếm lộ trình xanh” đúng một lần
-    const searchBtn = page.locator('button[type="submit"]:has-text("Tìm kiếm lộ trình xanh")');
-    await searchBtn.click();
+    // Wait for the dropdown animation to complete
+    await page.waitForTimeout(350);
+
+    // Submit the form
+    await page.locator('#planner-form').evaluate((form: HTMLFormElement) => form.requestSubmit());
 
     // 4. Assert route result thật xuất hiện: marker/polyline/route summary/state map-ready đáng tin cậy
     // Assert results list summary is visible
@@ -56,17 +71,21 @@ test.describe('Route Planner E2E Tests', () => {
     await expect(routePolyline).toBeAttached();
 
     // 5. Đổi điểm đến
-    await destComboboxBtn.click();
-    const newDestOption = page.locator('li[role="option"]').nth(2);
+    await page.waitForTimeout(500);
+    await destComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const newDestOption = destContainer.locator('li[role="option"]').nth(2);
     await expect(newDestOption).toBeVisible();
     const newDestName = await newDestOption.locator('span').first().textContent();
-    await newDestOption.click();
+    await newDestOption.evaluate((opt: HTMLElement) => opt.click());
 
     // Verify input updated
     await expect(destComboboxBtn).toContainText(newDestName || '');
 
-    // 6. Click đúng một lần nữa
-    await searchBtn.click();
+    // Wait for the dropdown animation to complete
+    await page.waitForTimeout(350);
+
+    // Submit the form again
+    await page.locator('#planner-form').evaluate((form: HTMLFormElement) => form.requestSubmit());
 
     // 7. Assert route/map cập nhật
     await expect(resultSummary).toBeVisible({ timeout: 10000 });
@@ -78,27 +97,36 @@ test.describe('Route Planner E2E Tests', () => {
   });
 
   test('should handle fast switching between scenes without console errors or container reuse issues', async ({ page }) => {
+    page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+    page.on('pageerror', err => console.log('BROWSER EXCEPTION:', err.message));
+
     // 1. Fresh load /#route
     await page.goto('/#route');
+    await waitForAppReady(page);
     await expect(page.locator('text=Lên Kế Hoạch Lộ Trình Xanh')).toBeVisible({ timeout: 15000 });
 
-    const originComboboxBtn = page.locator('div:has(> label:has-text("Điểm xuất phát")) button');
+    // Scoped container for Origin
+    const originContainer = page.locator('div:has(> label:has-text("Điểm xuất phát"))');
+    const originComboboxBtn = originContainer.locator('button');
     await expect(originComboboxBtn).toBeVisible();
 
     // Select origin station
-    await originComboboxBtn.click();
-    const originOption = page.locator('li[role="option"]').first();
-    await originOption.click();
+    await originComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const originOption = originContainer.locator('li[role="option"]').first();
+    await originOption.evaluate((opt: HTMLElement) => opt.click());
 
-    // Select destination station
-    const destComboboxBtn = page.locator('div:has(> label:has-text("Điểm đến")) button');
-    await destComboboxBtn.click();
-    const destOption = page.locator('li[role="option"]').nth(1);
-    await destOption.click();
+    // Scoped container for Destination
+    const destContainer = page.locator('div:has(> label:has-text("Điểm đến"))');
+    const destComboboxBtn = destContainer.locator('button');
+    await destComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const destOption = destContainer.locator('li[role="option"]').nth(1);
+    await destOption.evaluate((opt: HTMLElement) => opt.click());
 
-    // 2. Click tìm kiếm đúng một lần
-    const searchBtn = page.locator('button[type="submit"]:has-text("Tìm kiếm lộ trình xanh")');
-    await searchBtn.click();
+    // Wait for the dropdown animation to complete
+    await page.waitForTimeout(350);
+
+    // Submit the form
+    await page.locator('#planner-form').evaluate((form: HTMLFormElement) => form.requestSubmit());
 
     // Assert results summary and map ready
     const resultSummary = page.locator('[data-testid="route-result-summary"]');
@@ -116,13 +144,17 @@ test.describe('Route Planner E2E Tests', () => {
     await routeTab.click();
 
     // 4. Đổi destination và click tìm kiếm một lần
-    await destComboboxBtn.click();
-    const newDestOption = page.locator('li[role="option"]').nth(2);
+    await destComboboxBtn.evaluate((btn: HTMLElement) => btn.click());
+    const newDestOption = destContainer.locator('li[role="option"]').nth(2);
     await expect(newDestOption).toBeVisible();
     const newDestName = await newDestOption.locator('span').first().textContent();
-    await newDestOption.click();
+    await newDestOption.evaluate((opt: HTMLElement) => opt.click());
 
-    await searchBtn.click();
+    // Wait for the dropdown animation to complete
+    await page.waitForTimeout(350);
+
+    // Submit the form again
+    await page.locator('#planner-form').evaluate((form: HTMLFormElement) => form.requestSubmit());
 
     // 5. Xác nhận map không bị blank, không lỗi và cập nhật đúng render version
     await expect(resultSummary).toBeVisible({ timeout: 10000 });

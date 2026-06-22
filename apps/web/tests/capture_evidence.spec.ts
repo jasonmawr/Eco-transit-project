@@ -5,17 +5,23 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+async function waitForAppReady(page: any) {
+  // Wait for the wake-up banner to hide
+  await page.locator('text=Đang kết nối máy chủ...').waitFor({ state: 'hidden', timeout: 30000 }).catch(() => {});
+  // Wait for the main viewport to be visible
+  await expect(page.locator('#scene-viewport')).toBeVisible({ timeout: 20000 });
+}
+
 test.describe('Evidence Generation Suite', () => {
 
   test('Capture all evidence screenshots', async ({ page }) => {
-    test.setTimeout(90000);
+    test.setTimeout(120000);
     const outDir = path.resolve(process.cwd(), 'evidence', 'epic10');
     if (!fs.existsSync(outDir)) {
       fs.mkdirSync(outDir, { recursive: true });
     }
 
     // --- SETUP STATE ---
-    // Ensure the seed user is set up correctly
     const userInDb = await prisma.user.findUnique({
       where: { email: 'user@ecotransit.vn' },
     });
@@ -30,7 +36,7 @@ test.describe('Evidence Generation Suite', () => {
       create: { userId: userInDb.id, balance: 150, lifetimeEarned: 350, publicLeaderboardAlias: 'Hành khách xanh 151' },
     });
 
-    // Reset avatarConfig to default config (not prompted onboarding)
+    // Reset avatarConfig to default config
     await prisma.user.update({
       where: { id: userInDb.id },
       data: {
@@ -45,7 +51,7 @@ test.describe('Evidence Generation Suite', () => {
       }
     });
 
-    // Reset avatarConfig for admin to prevent onboarding modal popping up on login
+    // Reset avatarConfig for admin
     const adminInDb = await prisma.user.findUnique({ where: { email: 'admin@ecotransit.vn' } });
     if (adminInDb) {
       await prisma.user.update({
@@ -63,31 +69,76 @@ test.describe('Evidence Generation Suite', () => {
       });
     }
 
-    // 11. Header responsive 1366
+    // 11. Header responsive 1366 + Route Workspace Top
     await page.setViewportSize({ width: 1366, height: 768 });
     await page.goto('/');
-    await page.waitForTimeout(2000);
+    await waitForAppReady(page);
     await page.screenshot({ path: path.join(outDir, '11-header-responsive-1366.png') });
+    await page.screenshot({ path: path.join(outDir, '16-route-workspace-1366-top.png') });
 
-    // 12. Header responsive 1440
+    // 17a. Route workspace actionable height proof at 1366x768
+    const routeWorkspace = page.locator('[data-testid="route-workspace"]');
+    if (await routeWorkspace.isVisible()) {
+      const wsHeight = await routeWorkspace.evaluate((el: HTMLElement) => el.clientHeight);
+      console.log(`EVIDENCE: route-workspace clientHeight at 1366x768 = ${wsHeight}px`);
+      // Annotate the workspace area with a visible overlay for evidence
+      await page.evaluate((h: number) => {
+        const ws = document.querySelector('[data-testid="route-workspace"]') as HTMLElement;
+        if (ws) {
+          const overlay = document.createElement('div');
+          overlay.style.cssText = 'position:fixed;top:8px;right:8px;background:rgba(0,102,255,0.9);color:white;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:bold;z-index:9999;font-family:monospace;';
+          overlay.textContent = `route-workspace clientHeight: ${h}px | Hub: OPEN`;
+          document.body.appendChild(overlay);
+          // Also highlight the workspace boundary
+          ws.style.outline = '2px solid #0066FF';
+          ws.style.outlineOffset = '-2px';
+        }
+      }, wsHeight);
+      await page.screenshot({ path: path.join(outDir, '17a-route-workspace-1366-actionable-height-proof.png') });
+      // Clean up overlay
+      await page.evaluate(() => {
+        const ws = document.querySelector('[data-testid="route-workspace"]') as HTMLElement;
+        if (ws) {
+          ws.style.outline = '';
+          ws.style.outlineOffset = '';
+        }
+        document.querySelectorAll('div[style*="z-index:9999"]').forEach(el => el.remove());
+      });
+    }
+
+    // Scroll Route Workspace to bottom
+    const scrollSurface = page.locator('#scene-viewport > div.overflow-y-auto');
+    if (await scrollSurface.isVisible()) {
+      await scrollSurface.evaluate((el: HTMLElement) => { el.scrollTop = el.scrollHeight; });
+      await page.waitForTimeout(1000);
+      await page.screenshot({ path: path.join(outDir, '17-route-workspace-1366-result-scrolled-bottom.png') });
+      // Reset scroll to top
+      await scrollSurface.evaluate((el: HTMLElement) => { el.scrollTop = 0; });
+      await page.waitForTimeout(500);
+    }
+
+    // 12. Header responsive 1440 + Route Workspace 1440
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outDir, '12-header-responsive-1440.png') });
+    await page.screenshot({ path: path.join(outDir, '18-route-workspace-1440.png') });
 
-    // 13. Header responsive 1920
+    // 13. Header responsive 1920 + Route Workspace 1920
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outDir, '13-header-responsive-1920.png') });
+    await page.screenshot({ path: path.join(outDir, '19-route-workspace-1920.png') });
 
-    // 14. Header responsive 390
+    // 14. Header responsive 390 + Route Workspace 390
     await page.setViewportSize({ width: 390, height: 800 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outDir, '14-header-responsive-390.png') });
+    await page.screenshot({ path: path.join(outDir, '20-route-workspace-390.png') });
 
-    // Back to desktop viewport
+    // Back to desktop viewport for remaining captures
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.goto('/');
-    await page.waitForTimeout(1000);
+    await waitForAppReady(page);
 
     // 10. Dijkstra Map Routing (10-map-first-click-route.png)
     const originBtn = page.locator('button:has-text("Chọn ga/trạm khởi hành...")');
@@ -115,20 +166,30 @@ test.describe('Evidence Generation Suite', () => {
     await expect(page.locator('button:has-text("Đăng xuất")')).toBeVisible();
     await page.waitForTimeout(1000);
 
-    // 04. Avatar on Metro Hub (04-avatar-on-metro-hub.png)
-    await page.screenshot({ path: path.join(outDir, '04-avatar-on-metro-hub.png') });
+    // 04. Avatar on Metro Hub (04-avatar-on-real-metro-hub.png)
+    await page.screenshot({ path: path.join(outDir, '04-avatar-on-real-metro-hub.png') });
 
-    // 05. Hub train before switch (05-hub-train-before-switch.png)
-    await page.screenshot({ path: path.join(outDir, '05-hub-train-before-switch.png') });
+    // 05. Hub train before switch (05-real-metro-before-switch.png)
+    await page.screenshot({ path: path.join(outDir, '05-real-metro-before-switch.png') });
 
     // Switch train node (click station 2 - Khám phá ga)
     await page.locator('a[href="#stations"]').click();
-    await page.waitForTimeout(1500);
-    // 06. Hub train after switch (06-hub-train-after-switch.png)
-    await page.screenshot({ path: path.join(outDir, '06-hub-train-after-switch.png') });
+    await page.waitForTimeout(300); // wait for mid-transition
+    // 06. Hub train mid transition (06-real-metro-mid-transition-no-overlap.png)
+    await page.screenshot({ path: path.join(outDir, '06-real-metro-mid-transition-no-overlap.png') });
+    await page.waitForTimeout(1200); // let transition finish
+
+    // 08. Real metro mobile no overlap (08-real-metro-mobile-no-overlap.png)
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(outDir, '08-real-metro-mobile-no-overlap.png') });
+
+    // Restore desktop viewport
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForTimeout(1000);
 
     // --- CUSTOMIZER ---
-    await page.locator('button:has-text("Nhân vật đồng hành")').click();
+    await page.locator('button:has-text("Đồng hành")').click();
     await expect(page.locator('text=Thiết lập nhân vật của bạn')).toBeVisible();
     await page.waitForTimeout(500);
 
@@ -144,7 +205,7 @@ test.describe('Evidence Generation Suite', () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForTimeout(1000);
 
-    // Select styling choices to preview customization changes
+    // Select styling choices
     await page.locator('button:has-text("Kiểu Tóc")').click();
     await page.locator('button:has-text("Tóc xoăn")').click();
     await page.locator('button:has-text("Trang Phục")').click();
@@ -160,10 +221,22 @@ test.describe('Evidence Generation Suite', () => {
     await page.locator('button:has-text("Lưu Nhân Vật ✓")').click();
     await page.waitForTimeout(1500);
 
-    // 08. XanhWrap rules preview (08-xanhwrap-rules-preview.png)
+    // 08. XanhWrap rules preview (08-xanhwrap-rules-preview.png) + XanhWrap Workspace 1366
     await page.locator('a[href="#xanhwrap"]').click();
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outDir, '08-xanhwrap-rules-preview.png') });
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await page.waitForTimeout(1000);
+    await page.screenshot({ path: path.join(outDir, '21-xanhwrap-workspace-1366.png') });
+
+    // 22. Rewards Workspace 1366
+    await page.locator('a[href="#rewards"]').click();
+    await page.waitForTimeout(1500);
+    await page.screenshot({ path: path.join(outDir, '22-rewards-workspace-1366.png') });
+
+    // Restore viewport for remaining steps
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.waitForTimeout(500);
 
     // 09. Leaderboard privacy (09-leaderboard-privacy-ui.png)
     await page.locator('a[href="#tickets"]').click();
@@ -171,7 +244,6 @@ test.describe('Evidence Generation Suite', () => {
     await page.screenshot({ path: path.join(outDir, '09-leaderboard-privacy-ui.png') });
 
     // --- REVERSAL BLOCK ---
-    // Zero out user wallet points in DB so ticket rejection throws REVOCATION_INSUFFICIENT_BALANCE
     await prisma.userWallet.update({
       where: { userId: userInDb.id },
       data: { balance: 0 }
@@ -206,7 +278,9 @@ test.describe('Evidence Generation Suite', () => {
     // 15. Ticket reversal blocked error (15-ticket-reversal-blocked-message.png)
     await page.screenshot({ path: path.join(outDir, '15-ticket-reversal-blocked-message.png') });
 
-    // Record a video for rapid switching
+    // ====================================================================
+    // VIDEO EVIDENCE: 07-real-metro-rapid-switch.webm
+    // ====================================================================
     const browser = page.context().browser()!;
     const videoContext = await browser.newContext({
       recordVideo: {
@@ -217,6 +291,7 @@ test.describe('Evidence Generation Suite', () => {
     });
     const videoPage = await videoContext.newPage();
     await videoPage.goto('/');
+    await waitForAppReady(videoPage);
 
     // Log in
     await videoPage.locator('header button:has-text("Đăng nhập")').click();
@@ -228,28 +303,76 @@ test.describe('Evidence Generation Suite', () => {
 
     // Click rapid station switching
     await videoPage.locator('a[href="#stations"]').click();
-    await videoPage.waitForTimeout(400);
-    await videoPage.locator('a[href="#points"]').click();
-    await videoPage.waitForTimeout(400);
+    await videoPage.waitForTimeout(800);
+    await videoPage.locator('a[href="#tickets"]').click();
+    await videoPage.waitForTimeout(800);
     await videoPage.locator('a[href="#rewards"]').click();
-    await videoPage.waitForTimeout(400);
+    await videoPage.waitForTimeout(800);
     await videoPage.locator('a[href="#xanhwrap"]').click();
-    await videoPage.waitForTimeout(400);
+    await videoPage.waitForTimeout(800);
     await videoPage.locator('a[href="#route"]').click();
-    await videoPage.waitForTimeout(1500);
+    await videoPage.waitForTimeout(2000);
 
     const video = videoPage.video();
     await videoContext.close();
     if (video) {
-      const targetWebmPath = path.join(outDir, '07-train-rapid-switch.webm');
+      const targetWebmPath = path.join(outDir, '07-real-metro-rapid-switch.webm');
       if (fs.existsSync(targetWebmPath)) {
         fs.unlinkSync(targetWebmPath);
       }
       await video.saveAs(targetWebmPath);
-      // Delete temporary video file if generated
       const videoPath = await video.path().catch(() => null);
       if (videoPath && fs.existsSync(videoPath)) {
-        fs.unlinkSync(videoPath).catch(() => {});
+        try {
+          fs.unlinkSync(videoPath);
+        } catch (e) {}
+      }
+    }
+
+    // ====================================================================
+    // VIDEO EVIDENCE: 07a-real-metro-single-click-glide.webm
+    // Single click from Ga 1 (route) to Ga 2 (stations) — continuous glide
+    // ====================================================================
+    const glideContext = await browser.newContext({
+      recordVideo: {
+        dir: outDir,
+        size: { width: 1366, height: 768 }
+      },
+      viewport: { width: 1366, height: 768 }
+    });
+    const glidePage = await glideContext.newPage();
+    await glidePage.goto('/');
+    await waitForAppReady(glidePage);
+
+    // Log in
+    await glidePage.locator('header button:has-text("Đăng nhập")').click();
+    await glidePage.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await glidePage.locator('input[type="password"]').fill('User@123456');
+    await glidePage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+    await expect(glidePage.locator('button:has-text("Đăng xuất")')).toBeVisible();
+    await glidePage.waitForTimeout(1000);
+
+    // Single click from Ga 1 to Ga 2 — let full animation play
+    await glidePage.locator('a[href="#stations"]').click();
+    await glidePage.waitForTimeout(2000); // enough for 650-1150ms animation + visual buffer
+
+    // Then click back to route (Ga 1) to show return glide
+    await glidePage.locator('a[href="#route"]').click();
+    await glidePage.waitForTimeout(2000);
+
+    const glideVideo = glidePage.video();
+    await glideContext.close();
+    if (glideVideo) {
+      const targetGlidePath = path.join(outDir, '07a-real-metro-single-click-glide.webm');
+      if (fs.existsSync(targetGlidePath)) {
+        fs.unlinkSync(targetGlidePath);
+      }
+      await glideVideo.saveAs(targetGlidePath);
+      const glidePath = await glideVideo.path().catch(() => null);
+      if (glidePath && fs.existsSync(glidePath)) {
+        try {
+          fs.unlinkSync(glidePath);
+        } catch (e) {}
       }
     }
   });

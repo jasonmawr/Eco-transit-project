@@ -43,11 +43,12 @@ app.use(
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
       
-      const isAllowed = allowedOrigins.some(allowed => allowed === origin || allowed === origin + '/');
+      const isAllowed = allowedOrigins.some(allowed => allowed === origin || allowed === origin + '/') ||
+                        (config.APP_MODE === 'local' && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')));
       if (isAllowed) {
         return callback(null, true);
       }
-      return callback(new Error('CORS not allowed for this origin'), false);
+      return callback(new Error(`CORS not allowed for this origin: ${origin}`), false);
     },
     credentials: true,
   })

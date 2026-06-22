@@ -11,15 +11,8 @@ export function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL.trim();
   }
 
-  // 2. Fallback for local development when running in the browser as a safeguard
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    // If NEXT_PUBLIC_API_BASE_URL is missing but we are on localhost, still default to local Express port 3001
-    // to guarantee backend communication if next.config rewrites are not loaded.
-    return 'http://localhost:3001';
-  }
-
-  // 3. Relative URL fallback for production deploy (e.g., Vercel rewrites proxying /api/*)
-  return '';
+  // 2. Default fallback for local development (both client and SSR)
+  return 'http://localhost:3001';
 }
 
 /**
@@ -43,20 +36,26 @@ export async function apiFetch(path: string, options?: RequestInit) {
   const res = await fetch(url, defaultOptions);
   
   if (!res.ok) {
-    let errorMessage = `API error: ${res.status}`;
+    let errorMessage = res.status === 429
+      ? 'Vui lòng đợi 60 giây trước khi yêu cầu gửi lại email xác thực.'
+      : `API error: ${res.status}`;
     try {
       const text = await res.text();
+      console.log(`[apiFetch Debug] status=${res.status} body="${text}"`);
       try {
         const errorBody = JSON.parse(text);
         if (errorBody && errorBody.message) {
           errorMessage = errorBody.message;
         }
-      } catch (e) {
+      } catch (e: any) {
+        console.log(`[apiFetch Debug] JSON parse error:`, e.message);
         if (text) {
           errorMessage = text;
         }
       }
-    } catch (err) {}
+    } catch (err: any) {
+      console.log(`[apiFetch Debug] text read error:`, err.message);
+    }
     throw new Error(errorMessage);
   }
 
