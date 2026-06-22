@@ -231,10 +231,19 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
             }
           }
 
-          const nextBalance = Math.max(0, wallet.balance - pointsToDeduct);
-          const nextLifetime = Math.max(0, wallet.lifetimeEarned - pointsToDeduct);
+          if (wallet.balance < pointsToDeduct) {
+            throw new Error('REVOCATION_INSUFFICIENT_BALANCE');
+          }
+
+          const nextBalance = wallet.balance - pointsToDeduct;
+          const nextLifetime = wallet.lifetimeEarned - pointsToDeduct;
 
           const idempKey = `ticket_rejected:${ticket.id}`;
+          const existingLedger = await tx.pointsLedger.findUnique({ where: { idempotencyKey: idempKey } });
+          if (existingLedger) {
+            return { ticket, pointsAwarded: 0, skipped: true };
+          }
+
           await tx.pointsLedger.create({
             data: {
               userId: ticket.userId,
@@ -289,6 +298,11 @@ router.post('/tickets/:id/review', requireAuth, requireRole(['ADMIN', 'MODERATOR
     });
   } catch (err: any) {
     console.error('Review ticket error:', err);
+    if (err.message === 'REVOCATION_INSUFFICIENT_BALANCE') {
+      return res.status(400).json({
+        message: 'Không thể thu hồi vé này tự động vì điểm thưởng đã được sử dụng để đổi quà. Vui lòng xử lý điều chỉnh thủ công theo quy trình quản trị.'
+      });
+    }
     if (
       err.message === 'TICKET_ALREADY_VERIFIED' ||
       err.message === 'TICKET_ALREADY_CREDITED'
