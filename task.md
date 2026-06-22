@@ -2,12 +2,19 @@
 
 Track checklist of completed batches across the **Lướt Khói Chạm Xanh** campaign.
 
+## Release Status Check
+```txt
+READY FOR OWNER FINAL VISUAL + INTEGRATED UAT
+MERGE / DEPLOY / TAG: FORBIDDEN
+PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
+```
+
 ---
 
 ## Batch 01 — Core Route Planner & Station Map
 
 - `[x]` Backend Routing API & Dijkstra Engine
-  - `[x]` Implement `GET /api/stations` with accent-insensitive search and Zod validation
+  - `[x]` Implement `GET /api/stations` with Zod validation
   - `[x]` Implement `GET /api/stations/:id` with Zod validation and POI mapping
   - `[x]` Implement `GET /api/weather/presets` returning standard static presets
   - `[x]` Implement `POST /api/routes/search` with request parameters validation
@@ -58,7 +65,7 @@ Track checklist of completed batches across the **Lướt Khói Chạm Xanh** ca
 ## Batch 03 — Ticket Upload & Green Points Ledger
 
 - `[x]` Database Schema Expansion & Seed
-  - `[x]` Extend Prisma schema: Add `UserWallet` (1-to-1 relationship with `User`) and `eventType` to `PointsLedger`
+  - `[x]` Extend Prisma schema: Add `UserWallet` and `eventType` to `PointsLedger`
   - `[x]` Expand `Ticket` model with file metadata, original filename, upload path, and mock OCR text
   - `[x]` Configure seed files with users, wallets, sample tickets, and points ledgers
 - `[x]` Secure Upload & Jimp Processing
@@ -84,20 +91,54 @@ Track checklist of completed batches across the **Lướt Khói Chạm Xanh** ca
 - `[x]` Database Schema Expansion & Seed
   - `[x]` Add nullable `slug` column to `Voucher` to ensure safe migration without default conflicts
   - `[x]` Extend `Voucher` and `VoucherRedemption` models in `schema.prisma` with status, limit, validity, and metadata
-  - `[x]` Run database schema sync (`npx prisma db push --accept-data-loss`)
+  - `[x]` Run database schema sync
   - `[x]` Update seed scripts to populate 10 diverse reward vouchers and initial redemptions/points logs
 - `[x]` Backend API Implementation
-  - `[x]` Create `/api/rewards` endpoint with query parameters (category, q, availableOnly) and DTO mapping
+  - `[x]` Create `/api/rewards` endpoint with query parameters and DTO mapping
   - `[x]` Create detail `/api/rewards/:slug` endpoint checking user limits and eligibility
   - `[x]` Implement transaction-safe redemption endpoint `/api/rewards/:slug/redeem` handling balance/stock updates and ledger inserts
   - `[x]` Implement `/api/rewards/mine` returning privacy-scrubbed user voucher portfolio
-  - `[x]` Enforce security rules (limit checks, points clamping, idempotency, role guards)
 - `[x]` Frontend Component & Dashboard
   - `[x]` Create `RewardsSection.tsx` with category filters, voucher grid, confirmation modal, and owned vouchers tab
   - `[x]` Mount `RewardsSection` on the main page underneath the wallet panel
-  - `[x]` Hook wallet balance refresh and Vietnamese event status description logic
-- `[x]` Integration Tests & Verification
-  - `[x]` Create `rewards.test.ts` validating all constraints (unauthenticated 401, insufficient points, out of stock, user limit, idempotency)
-  - `[x]` Run all regression test suites (Vitest 46/46 passed)
-  - `[x]` Verify health probes resolved cleanly
 
+---
+
+## Batch 05 to Batch 09 — App Shell & Polishing
+
+- `[x]` Moderator/Admin Console
+  - `[x]` Build audit logs history tracking
+  - `[x]` Implement voucher, review, and ticket moderation screens for administrators
+- `[x]` Time Bill Generator & Social Share
+  - `[x]` Implement shareable public pages scrubbing sensitive data
+- `[x]` Deployment & Production Configs
+  - `[x]` Enable CORS secure sameSite cookie attributes and database connection limits
+- `[x]` Gamified Campaign Hub Redesign
+  - `[x]` Layout 6-station interactive Metro map
+  - `[x]` Set up collapsible navigation blocks
+- `[x]` Navigation Rail & Responsive Layouts
+  - `[x]` Build drag-to-scroll horizontal header menu displaying active/hover indicator styles
+  - `[x]` Ensure responsive layouts scaling perfectly at 1920px, 1440px, 1366px, and 390px mobile viewports
+
+---
+
+## Epic 10 — Customer Feedback Acceptance & Security Hardening
+
+- `[x]` Reconcile Avatar Character Builder
+  - `[x]` Implement vector inline SVG avatar graphics builder
+  - `[x]` Configure 5 illustrated presets, completely removing raw emojis from selections
+- `[x]` Implement Pure Config Normalizer
+  - `[x]` Write `normalizeAvatarConfig` converting legacy database values/emojis into default `'student'` preset configuration
+- `[x]` Harden Verification Token Security
+  - `[x]` Clean HTTP API responses to prevent token leakage (`mockToken`, `isMock`)
+  - `[x]` Clear browser console logs from rendering token values
+- `[x]` Enforce Production SMTP Safety Gates
+  - `[x]` Restrict fake transport mocks creation only under local development mode
+  - `[x]` Hard block fallback mail mechanisms when running `NODE_ENV=production` or `APP_MODE=demo`
+  - `[x]` Trigger registration state rollbacks if SMTP dispatches fail, while preserving current profiles during resend errors
+- `[x]` Compile Visual Proof Artifact Manifest
+  - `[x]` Record screenshots and user recordings verifying functional features at final HEAD (`99d68ae2de1b23dc412ca96d91d0d03e9c6c8361`)
+  - `[x]` Author `OWNER_VISUAL_EVIDENCE.md` document tracking UAT image paths
+- `[x]` Execute Final Gates Verification
+  - `[x]` Verify Vitest test suite (`111/111 automated tests passed`)
+  - `[x]` Confirm Playwright E2E suites passing cleanly

@@ -26,9 +26,21 @@ npm run dev
 
 ---
 
-## 2. Kịch Bản UAT Tích Hợp (Integrated UAT Flow)
+Trong môi trường phát triển local hoặc testing (nơi `NODE_ENV` hoặc `APP_MODE` không phải là `production` hay `demo`), hệ thống hoạt động ở chế độ mock email khi không cấu hình SMTP trong biến môi trường `.env`.
 
-Trong môi trường phát triển local hoặc testing, hệ thống hoạt động ở chế độ mock email khi không cấu hình SMTP trong biến môi trường `.env`. Tuy nhiên, trong môi trường Production (`NODE_ENV=production`), nếu thiếu bất kỳ biến cấu hình SMTP nào (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), hệ thống sẽ chặn và trả về lỗi HTTP `503` (`SMTP_NOT_CONFIGURED`) khi người dùng đăng ký hoặc yêu cầu gửi lại email xác thực, đồng thời xóa sạch dữ liệu đăng ký dư thừa để đảm bảo an toàn tuyệt đối.
+### SMTP / Mail Trust Boundary:
+* **Local/RC Fake Mail Transport**:
+  - Chỉ áp dụng trong phạm vi tin cậy local/testing.
+  - Raw verification token chỉ tồn tại duy nhất trong tệp tin `last-mock-email.json` đã được đưa vào `.gitignore` (nằm ngoài thư mục public).
+  - API HTTP Response và browser console tuyệt đối không trả về hoặc ghi log token này.
+* **Production & Demo (enforcing NODE_ENV=production hoặc APP_MODE=demo)**:
+  - Bắt buộc phải cấu hình đầy đủ 5 biến môi trường SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+  - Thiếu hoặc lỗi cấu hình SMTP sẽ trả về HTTP `503` với mã lỗi `SMTP_NOT_CONFIGURED`.
+  - Không sinh ra bất kỳ tệp tin mock (`last-mock-email.json`), không ghi log token.
+  - Luồng đăng ký mới sẽ rollback hoàn toàn (xóa user khỏi DB và hủy session).
+  - Luồng gửi lại (resend) sẽ bảo toàn nguyên vẹn bản ghi user, session hiện tại và token state cũ trong database (không mutate state nửa chừng).
+  - **Lưu ý đặc biệt về APP_MODE=demo**: Chế độ `demo` được đối xử như một môi trường production-grade thực thụ về mặt an toàn SMTP. Mọi hành vi fallback mock email đều bị chặn cứng để tránh rò rỉ mã token trên các môi trường staging/public.
+
 
 ### Luồng A: Xác thực tài khoản mới & Onboarding Avatar
 1. Truy cập trang chủ [http://localhost:3000](http://localhost:3000).

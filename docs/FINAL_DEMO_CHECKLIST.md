@@ -54,7 +54,7 @@ Chạy thử máy chủ cục bộ và gửi truy cập liveness/readiness probe
 Đảm bảo các điều kiện an toàn thông tin sau được đáp ứng tại giao diện người dùng công khai (Public UI):
 
 - [ ] **Không lộ thông tin nhạy cảm của người dùng**: Không hiển thị địa chỉ Email, mật khẩu, userId, hay UUID thô trên màn hình công khai cho khách hoặc người dùng khác.
-- [ ] **Không lộ đường dẫn thư mục vật lý máy chủ**: Không hiển thị các chuỗi đường dẫn tệp tin (ví dụ: `f:\HAILEO\My Project\...` hoặc `/usr/src/app/...`) trên bất kỳ màn hình công khai nào.
+- [ ] **Không lộ đường dẫn thư mục vật lý máy chủ**: Không hiển thị các chuỗi đường dẫn tệp tin (ví dụ: `D:\Projects\...` hoặc `/usr/src/app/...`) trên bất kỳ màn hình công khai nào.
 - [ ] **Nhận dạng ẩn danh thân thiện**: Khi nhận xét ga không có tên hiển thị, tên mặc định hiển thị là **"Hành khách xanh"** thay vì các giá trị `null`, `undefined` hoặc chuỗi rỗng.
 - [ ] **Không lộ mã Voucher công khai**: Voucher khi chưa được đổi chỉ hiển thị nút "Đổi ngay", không để lộ mã code (VD: `LX-ABCD-1234`) ra ngoài danh mục public. Chỉ khi người dùng bấm đổi và bị trừ điểm thành công thì mã code tương ứng mới hiển thị trong Ví voucher cá nhân của họ.
 - [ ] **Không hiển thị stack trace lỗi**: Khi xảy ra lỗi API (ví dụ: lỗi 500), giao diện chỉ hiện thông báo lỗi tiếng Việt thân thiện, không in toàn bộ stack trace kỹ thuật của Node.js/Express.

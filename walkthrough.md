@@ -1,98 +1,116 @@
-# Walkthrough — Completed Batches (Batch 01 to Batch 09)
+# Walkthrough — Completed Batches (Batch 01 to Epic 10)
 
 Tài liệu ghi nhận chi tiết kết quả triển khai, bàn giao và kiểm chứng kỹ thuật qua toàn bộ các Batch của chiến dịch **Lướt Khói Chạm Xanh — EcoTransit**.
+
+## Release Status Check
+```txt
+READY FOR OWNER FINAL VISUAL + INTEGRATED UAT
+MERGE / DEPLOY / TAG: FORBIDDEN
+PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
+```
 
 ---
 
 ## 1. Summary of Changes
 
 ### Batch 01 — Core Route Planner & Station Map
-- **Dijkstra Engine**: Xây dựng thuật toán tìm tuyến tối ưu (`LocalRouteProvider.ts`) tích hợp weather-presets và preferences.
-- **Frontend Mobility Cockpit**: Form tìm kiếm, Leaflet Map vẽ route, và Vertical timeline hành trình xanh.
+- **Dijkstra Engine**: Built pathfinding algorithm integrating weather-presets and preferences (`LocalRouteProvider.ts`).
+- **Frontend Mobility Cockpit**: Mobility cockpit interface featuring station search forms, Leaflet Map route overlays, and vertical segment timeline.
 
 ### Batch 01D-HF1/HF2 — UI Hotfixes & Brand Alignment
-- **Brand Identity**: Đồng bộ typography, logo và 4 màu thương hiệu: Electric Blue, Vibrant Green, Urban Beige, Dark Charcoal.
-- **Premium Motion**: Tích hợp các chuyển động mượt mà của `framer-motion` cho Header, Dropdown, Hero Background, và CTA button.
+- **Brand Identity**: Standardized logo branding, Outfit and Inter typography, and 4-color palette (Electric Blue, Vibrant Green, Urban Beige, Dark Charcoal).
+- **Premium Motion**: Integrated `framer-motion` sliding cursor pill, fluid dropdown with elastic animation, and animated motion background with SVG noise grain texture and floating leaves.
 
 ### Batch 02 — Station Experience & UGC Foundation
-- **UGC Reviews**: CSDL `UGCReview` & `Place` xung quanh các nhà ga.
-- **Station Experience UI**: Cụm tab hiển thị Địa điểm ăn chơi, Review hành khách, và Cẩm nang du lịch xanh.
+- **UGC Reviews**: Designed `UGCReview` & `Place` database schema and created review submission API endpoints.
+- **Station Experience UI**: Developed tabbed portal displaying POI categories, passenger reviews feed, and eco-travel articles.
 
 ### Batch 03 — Ticket Upload & Green Points Ledger
-- **Jimp Image Optimization**: Resize và nén ảnh vé xe khách dưới 500KB bằng Jimp, lọc EXIF metadata.
-- **Upload Protection**: Chặn SVG, chặn file rỗng, và cơ chế SHA-256 duplicate detection chống spam vé.
-- **Points Ledger**: Nhật ký điểm cộng dồn, ví tiền và lịch sử giao dịch điểm xanh.
+- **Jimp Image Processing**: Implemented image upload validation, duplicate hash detection via SHA-256 compound index, and Jimp image optimization clamping files under 500KB.
+- **Points Ledger**: Implemented wallet, points ledger, and transaction history database records.
 
 ### Batch 04 — Rewards / Voucher Wallet
-- **Voucher Redemption**: Giao dịch đổi điểm trừ ví, giảm kho (stock), sinh mã code `LX-...` bảo mật, hỗ trợ Idempotency.
+- **Voucher Redemption**: Created transaction-safe vouchers redemption API with user limits checks, stock controls, and points balances subtraction.
 
 ### Batch 05 — Moderator/Admin Console
-- **Audit Logs**: Ghi vết lịch sử phê duyệt. Bảng điều khiển admin quản lý POI, cẩm nang, voucher và duyệt vé.
+- **Admin Portal**: Created ticket approval/rejection operations, POI management, and audit logs.
 
 ### Batch 06 — Time Bill Generator & Social Share
-- **Public Share**: Tạo liên kết chia sẻ hóa đơn `/share/lx-...` công khai, bảo mật thông tin nhạy cảm.
+- **Public Share**: Created `/share/lx-...` public page displaying XanhWrap shareable content, scrubbing sensitive user data.
 
 ### Batch 07 — Deployment Readiness
-- **Neon + Render + Vercel**: Khởi tạo cấu hình cookie cross-site (`secure: true`, `sameSite: "none"`), trust proxy, và database connection pooler.
+- **Neon + Render + Vercel**: Configured cookies sameSite/secure, trust proxy settings, and database pool limits.
 
 ### Batch 08 — Final QA / UAT / Polish
-- **Static Assets & Console Cleanup**: Tự động sinh placeholder voucher và xử lý toàn bộ lỗi thẻ SVG/Hydration trên console.
+- **Static Assets**: Resolved Next.js compilation issues, hydrations, and console warning errors.
 
 ### Batch 09 — Customer USER FLOW Alignment & Gamified App Shell
-- **Gamified Campaign Hub**: Redesign giao diện trang chủ thành sơ đồ 6 ga chặng Metro hoạt họa trực quan.
-- **Avatar Selection**: Cho phép người dùng chọn nhân vật đồng hành (💼, 🎒, 🚴,...) và lưu trạng thái qua `localStorage`.
-- **Collapsible Section Layout**: Các khu chức năng tự động thu gọn/mở rộng khi click ga chặng, giữ giao diện gọn gàng giống ứng dụng di động.
-- **XanhWrap Manual Form**: Bổ sung form nhập tay hành trình để nhận XanhWrap card kèm caption và hashtag truyền thông nhanh (#XanhWrap #LuotKhoiChamXanh #EcoTransit).
-- **Milestones 1 vé = 10 điểm**: Căn chỉnh đồng bộ tỷ lệ điểm thưởng trên backend và UI (mốc 3/6/9/99 vé tương ứng 30/60/90/990đ).
+- **Gamified Campaign Hub**: Redesigned home page into a 6-station Metro map layout.
+- **Onboarding Avatar**: Integrated custom illustrated avatar picker persisting preferences server-side and client-side.
 
-### Batch 09-HF4 — Fix Scene Clipping + Active Navigation States
-- **Bố cục True App-Deck**: Chuyển đổi root thành `h-dvh` và đặt SceneViewport thành `flex-1 min-h-0` với scroll nội bộ. Giúp CampaignHub chiếm row layout tĩnh cố định, loại bỏ triệt để hiện tượng đè hoặc clipping nội dung tiêu đề các phân cảnh (#stations, #tickets, #rewards).
-- **Trạng thái Active/Hover Header Nav**: Bổ sung pill active màu `eco-primary`, hiệu ứng lướt hover spring backdrop qua `framer-motion`, chấm tròn indicator ở chân tab, và đầy đủ accessibility focus-ring. Đồng bộ chính xác theo hash URL hoặc mount state.
-- **Trạng thái Ga Chặng CampaignHub**: Ga active tự động phóng to `scale-110`, bổ sung ring halo bao quanh, và nhãn chữ nổi bật. Tối ưu kích thước compact để avatar di chuyển linh hoạt mà không bị container cắt cụt nhờ thiết lập `overflow-visible`.
+### Batch 09-HF4/HF8 — Scene Layout & Navigation Rail
+- **App-Deck Layout**: Solved clipping via full-screen layout.
+- **Scrollable Navigation Rail**: Added drag-to-scroll navigation rail displaying active states and Admin tab inclusion.
 
-### Batch 09-HF8 — Scrollable Navigation Rail Redesign
-- **Bảo đảm không bao giờ cắt chữ**: Cấu trúc thanh navigation rail ngang cho phép hiển thị đầy đủ mọi item (Lộ trình, Khám phá, Tích điểm, Đổi thưởng, XanhWrap, Cẩm nang, Admin nếu có quyền). Tuyệt đối không dùng `truncate`, `max-width` quá nhỏ, hay `overflow-hidden` trực tiếp trên từng label.
-- **Admin tích hợp trong Rail**: Đưa nút Admin trở lại làm item thứ 7 của navigation rail khi user có role `ADMIN`/`MODERATOR`. Bảo đảm:
-  - User thường: không nhìn thấy Admin.
-  - Moderator/Admin: thấy Admin, active tab khi truy cập `/#admin` và rail tự động cuộn đưa Admin vào vùng nhìn.
-  - Bảo mật route `/#admin`: user thường reload `/#admin` sẽ bị chặn thân thiện và tự động redirect về tab mặc định.
-- **Kiểm soát Mouse Wheel ngang**: Intercept sự kiện cuộn chuột dọc (`deltaY`) chuyển thành cuộn ngang (`scrollLeft`) khi hover trên thanh nav rail, chỉ khi container thực sự bị tràn (overflow). Không ảnh hưởng tới scroll dọc của SceneViewport bên dưới.
-- **Drag-to-scroll chống click nhầm**: Kéo để cuộn mượt mà trên desktop bằng chuột. Đặt ngưỡng (threshold) dịch chuyển 6px để phân biệt hành vi kéo (drag) và click chuột thông thường, tránh trigger click ngoài ý muốn.
-- **Tự động căn giữa (Active Auto-Centering)**: Khi đổi activeSection hoặc khi tải lại trang qua deep-link, container tự động tính toán vị trí và thực hiện cuộn (`scrollTo({ left, behavior: 'smooth' })`) để đưa active item vào giữa hoặc gần giữa vùng nhìn.
-- **Visual Affordance (Fade overlays)**: Hai lớp mờ gradient ở biên trái/phải báo hiệu khả năng cuộn. Ẩn/hiện tự động dựa trên vị trí scroll (ẩn fade trái khi ở đầu, ẩn fade phải khi ở cuối, ẩn cả hai khi không tràn). Thêm thuộc tính `pointer-events-none` để tránh chặn click chuột của người dùng.
-- **Keyboard & Accessibility**: Thiết kế nav items sử dụng cấu trúc thẻ có focus-visible ring rõ ràng, đầy đủ `aria-current="page"` cho active item, hỗ trợ phím Tab đi qua các item bình thường, kích hoạt bằng Enter/Space.
-- **Responsive Acceptance**:
-  - Desktop (1366px, 1440px, 1920px): hiển thị đầy đủ không bị cắt chữ, căn giữa hoàn hảo khi đủ chỗ.
-  - Mobile (390px): cuộn swipe ngang mượt mà, header gọn gàng 1 dòng không bị đội chiều cao.
+### Epic 10 — Customer Feedback Acceptance & Hardened Security
+- **Avatar Builder**: Replaced legacy emoji configurations with inline vector SVG builder containing 5 illustrated presets.
+- **Normalizer Utility**: Implemented `normalizeAvatarConfig` mapping old configs/emojis securely to whitelisted values.
+- **Token Security**: Scrubbed raw token fields (`mockToken`, `isMock`) from API payloads and console logging.
+- **SMTP Safety Gates**: Implemented strict safety blocks in production/demo modes to rollback registration upon SMTP failures, prevent fallback mock emails creation, and block token logs.
 
 ---
 
 ## 2. Verification Outcomes
 
 ### Root Build Status
-Quy trình biên dịch monorepo hoàn thành xuất sắc, tạo build tĩnh Next.js sạch sẽ:
+Monorepo build compiled successfully:
 - `npm run build` -> **Success** (`$LASTEXITCODE = 0`).
-- Tệp `apps/web/.next/BUILD_ID` được tạo thành công.
 
 ### Integration Test Suite (Vitest)
-Toàn bộ **93/93** bài kiểm thử tích hợp tự động (Dijkstra routing, UGC reviews, ticket upload, points ledger, rewards redemption, admin console) đều vượt qua:
-```bash
- Test Files  7 passed (7)
-      Tests  93 passed (93)
-   Duration  9.50s
-```
+Executed and verified:
+- `111/111 automated tests passed` via `npm run test` backend suite.
 
-### Health & Readiness Probes
-Các đầu kiểm tra liveness và readiness phản hồi lỗi kết nối do máy chủ local hiện không được khởi chạy trong môi trường CI/CD hoặc quá trình chạy tự động (Expected). Các endpoint này sẽ phản hồi đúng khi khởi chạy máy chủ:
-- `/healthz` -> `{"status":"ok"}`
-- `/readyz` -> `{"status":"ready", "database":"connected"}`
+### Playwright E2E Suites
+Executed on final HEAD:
+- `epic10.spec.ts` -> **6/6 tests passed**.
+- `route-planner.spec.ts` -> **10/10 tests passed across 5 repeat cycles**.
 
 ---
 
-## 3. Demo / Placeholder Features (Client Handoff Notes)
+## 3. SMTP & APP_MODE=demo Safety Boundaries
 
-Để bảo đảm tính độc lập và chi phí vận hành bằng 0:
-1. **Social Sharing**: Hệ thống sử dụng nút sao chép caption kèm hashtag thay cho Facebook/Zalo SDK thật.
-2. **Video Feed**: Mục cẩm nang sử dụng thẻ thông báo placeholder thay cho API video để tránh spam console.
-3. **Mock OCR**: Hệ thống giả lập trích xuất vé bằng metadata tệp mà không gọi API OCR trả phí.
-4. **Render Ephemeral Storage**: Ảnh vé lưu tạm thời cục bộ trên Render, dữ liệu DB trên Neon giữ nguyên vẹn.
+* **Local/RC Fake Mail Transport**:
+  - only local/test trust boundary;
+  - raw token exists only in gitignored mock email artifact (`last-mock-email.json`);
+  - API response never returns token.
+* **Production & Demo (enforcing NODE_ENV=production or APP_MODE=demo)**:
+  - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM are required;
+  - missing/failed SMTP returns 503 SMTP_NOT_CONFIGURED;
+  - no mock file;
+  - no token log;
+  - registration rolls back;
+  - resend preserves existing user/session/token state.
+
+---
+
+## 4. Visual Evidence Manifest
+
+All visual artifacts are captured locally at the final commit HEAD `99d68ae2de1b23dc412ca96d91d0d03e9c6c8361`:
+
+| Artifact | Description | Viewport |
+| :--- | :--- | :--- |
+| [01-avatar-picker-desktop.png](evidence/epic10/01-avatar-picker-desktop.png) | Desktop avatar picker displaying 5 illustrated characters. | Desktop (1280x800) |
+| [02-avatar-picker-mobile-390.png](evidence/epic10/02-avatar-picker-mobile-390.png) | Responsive mobile avatar picker layout. | Mobile (390x800) |
+| [03-avatar-preview-hair-outfit-accessory.png](evidence/epic10/03-avatar-preview-hair-outfit-accessory.png) | Before/after preview demonstrating SVG style modifications. | Desktop (1280x800) |
+| [04-avatar-on-metro-hub.png](evidence/epic10/04-avatar-on-metro-hub.png) | Selected avatar visible above active Metro Hub train node. | Desktop (1280x800) |
+| [05-hub-train-before-switch.png](evidence/epic10/05-hub-train-before-switch.png) | Metro Hub train station position before rapid navigation switch. | Desktop (1280x800) |
+| [06-hub-train-after-switch.png](evidence/epic10/06-hub-train-after-switch.png) | Metro Hub train station position after rapid navigation switch. | Desktop (1280x800) |
+| [07-train-rapid-switch.webm](evidence/epic10/07-train-rapid-switch.webm) | Video of rapid station switching and smooth train transitions. | Desktop (1280x800) |
+| [08-xanhwrap-rules-preview.png](evidence/epic10/08-xanhwrap-rules-preview.png) | XanhWrap minigame rules and time validation controls. | Desktop (1280x800) |
+| [09-leaderboard-privacy-ui.png](evidence/epic10/09-leaderboard-privacy-ui.png) | Scrubbed, privacy-safe leaderboard listing nickname rank states. | Desktop (1280x800) |
+| [10-map-first-click-route.png](evidence/epic10/10-map-first-click-route.png) | Route planner Dijkstra map trace on first click. | Desktop (1280x800) |
+| [11-header-responsive-1366.png](evidence/epic10/11-header-responsive-1366.png) | Unclipped navigation rail header at 1366px width. | Desktop (1366x768) |
+| [12-header-responsive-1440.png](evidence/epic10/12-header-responsive-1440.png) | Unclipped navigation rail header at 1440px width. | Desktop (1440x900) |
+| [13-header-responsive-1920.png](evidence/epic10/13-header-responsive-1920.png) | Unclipped navigation rail header at 1920px width. | Desktop (1920x1080) |
+| [14-header-responsive-390.png](evidence/epic10/14-header-responsive-390.png) | Scrollable navigation rail header swipe layout on mobile. | Mobile (390x800) |
+| [15-ticket-reversal-blocked-message.png](evidence/epic10/15-ticket-reversal-blocked-message.png) | Insufficient balance warning when reversing approved tickets. | Desktop (1280x800) |

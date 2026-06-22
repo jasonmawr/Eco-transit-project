@@ -1,105 +1,115 @@
-# Implementation Plan — Batch 01D: Brand Identity Alignment & Premium Motion Gate
+# Implementation Plan — EcoTransit RC2 Complete Customer Feedback Acceptance
 
-Căn chỉnh toàn bộ giao diện theo bộ nhận diện **Lướt Khói Chạm Xanh Visual Identity Guidelines**, đồng thời chọn lọc và tích hợp các hiệu ứng UI chuyển động cao cấp lấy cảm hứng từ 21st.dev.
-
-## User Review Required
-
-> [!IMPORTANT]
-> - **Brand Identity**: Logo và tiêu đề chính thức chuyển thành **Lướt Khói Chạm Xanh**. Thương hiệu `EcoTransit` được chuyển thành platform/sub-brand nhỏ ở góc giao diện.
-> - **Bảng màu mới**: Xóa màu lục bảo/cyan cũ, thay thế triệt độ bằng bộ 4 màu chủ đạo:
->   - Electric Blue: `#0066FF` (Màu chính cho liên kết, nút bấm và tuyến Metro)
->   - Vibrant Green: `#9FCE1A` (Màu nhấn mạnh, tuyến Bus, điểm xanh)
->   - White: `#FFFFFF` (Nền thẻ panel)
->   - Urban Beige: `#FFF3DD` (Nền trang chủ, tạo chiều sâu ấm áp)
-> - **Cấu trúc Thư mục**: Thiết lập cấu hình thư mục `apps/web/components/ui/` để chứa các UI Primitives hoạt họa dùng chung độc lập khỏi Feature Components.
-> - **Dependencies**: Cài đặt thêm `framer-motion` và `lucide-react` phục vụ cho chuyển động nảy, trượt mượt mà.
-
-## Open Questions
-
-None. The brand visual parameters are fully detailed and approved for direct implementation.
+## Release Status Check
+```txt
+READY FOR OWNER FINAL VISUAL + INTEGRATED UAT
+MERGE / DEPLOY / TAG: FORBIDDEN
+PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
+```
 
 ---
 
-## Implemented Changes
+## 1. SMTP Release Status & Safety Gates
 
-### 1. Design System & Configuration
-
-#### [MODIFY] [apps/web/tailwind.config.js](apps/web/tailwind.config.js)
-- Cấu hình lại mã màu `eco` trong bảng theme:
-  - `primary`: `#0066FF` (Electric Blue)
-  - `primaryDeep`: `#004ecc` (Deep Electric Blue)
-  - `accentGreen`: `#9FCE1A` (Vibrant Green)
-  - `accentGreenDeep`: `#82a815` (Deep Vibrant Green)
-  - `bgBeige`: `#FFF3DD` (Urban Beige)
-  - `ink`: `#0A1118` (Dark Charcoal)
-  - `muted`: `#4B5E70` (Muted Blue-Grey)
-
-#### [MODIFY] [apps/web/app/globals.css](apps/web/app/globals.css)
-- Thiết lập biến môi trường màu sắc theo theme mới.
-- Định nghĩa hiển thị Font Display: Cấu hình phong cách hiển thị chữ giống thiết kế `SG85-CHi SON 1` thông qua kiểu `font-display` (ultra-bold, geometric, futuristic square-grooves, custom letter-spacing) để dễ dàng hoán đổi khi có tệp font local thật.
-- Bổ sung lớp phủ cấu trúc hạt bụi mịn **Grain Texture** (~10% opacity) và đường sóng chuyển động mềm mại **Motion Flow** để tạo chất liệu thị giác cao cấp.
-- Áp dụng các keyframe mượt mà, hỗ trợ giảm chuyển động (`prefers-reduced-motion`).
+SMTP configurations and safety logic for production deployments are verified:
+* **Local/RC Fake Mail Transport**:
+  - only local/test trust boundary;
+  - raw token exists only in gitignored mock email artifact;
+  - API response never returns token.
+* **Production & Demo (enforcing NODE_ENV=production or APP_MODE=demo)**:
+  - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM are required;
+  - missing/failed SMTP returns 503 SMTP_NOT_CONFIGURED;
+  - no mock file;
+  - no token log;
+  - registration rolls back;
+  - resend preserves existing user/session/token state.
 
 ---
 
-### 2. Premium UI Primitives (`apps/web/components/ui`)
+## 2. Traceability & Audit Matrix
 
-#### [NEW] [apps/web/components/ui/nav-header.tsx](apps/web/components/ui/nav-header.tsx)
-- Thanh menu hoạt họa. Sử dụng `framer-motion` để tạo con trỏ pill (hover cursor pill) di chuyển mượt mà theo vị trí rê chuột của người dùng, đổi màu chữ tương ứng với độ tương phản cao.
+Audited the code and database schema against the customer feedback matrix. Below is the exact state of the campaign requirements:
 
-#### [NEW] [apps/web/components/ui/fluid-dropdown.tsx](apps/web/components/ui/fluid-dropdown.tsx)
-- Hộp chọn hoạt họa lỏng (fluid dropdown) hỗ trợ `AnimatePresence`, đóng mở mượt mà bằng phím Escape hoặc click-outside. Sử dụng icon từ `lucide-react`. Áp dụng trực tiếp làm bộ chọn điều kiện thời tiết (Weather Preset Selector) thay thế cho chip chọn tĩnh cũ.
-
-#### [NEW] [apps/web/components/ui/motion-flow-background.tsx](apps/web/components/ui/motion-flow-background.tsx)
-- Component tạo nền hoạt họa chuyển động dạng sóng nhẹ nhàng, đi kèm các điểm nhấn lá xanh rụng bay nhè nhẹ (Leaf Accents) và phủ lớp Grain Texture mịn màng cho phần Hero.
-
-#### [NEW] [apps/web/components/ui/premium-cta.tsx](apps/web/components/ui/premium-cta.tsx)
-- Nút bấm hoạt họa viền phát sáng chạy vòng quanh (moving border style), có hiệu ứng nảy từ tính (magnetic-inspired spring scale) dành riêng cho nút "Tìm kiếm lộ trình xanh" và "Tìm lộ trình ngay".
-
----
-
-### 3. Redesign Components (`apps/web/components`)
-
-#### [MODIFY] [apps/web/components/EcoTransitHeader.tsx](apps/web/components/EcoTransitHeader.tsx)
-- Đổi tên tiêu đề hiển thị và logo phụ sang nhận diện **Lướt Khói Chạm Xanh**.
-- Tích hợp primitive `NavHeader` cho menu điều hướng.
-- Gắn thẻ "Sắp ra mắt" và thông báo trực quan rõ ràng cho các CTA chưa khả dụng.
-
-#### [MODIFY] [apps/web/components/HeroSection.tsx](apps/web/components/HeroSection.tsx)
-- Tái thiết kế Hero Section để truyền tải câu chuyện chiến dịch: *"Lướt khỏi khói xe, chạm vào nhịp xanh"* theo tinh thần di chuyển đô thị hiện đại "hands-free, stress-less, smart-spending".
-- Bổ sung `MotionFlowBackground` làm nền phía dưới.
-- Vẽ lại sơ đồ hoạt họa Metro/Bus và các thẻ chỉ số thật bằng Electric Blue và Vibrant Green.
-
-#### [MODIFY] [apps/web/components/RoutePlannerCard.tsx](apps/web/components/RoutePlannerCard.tsx)
-- Đổi các input điểm đi/đến sang viền màu Electric Blue.
-- Tích hợp bộ chọn `FluidDropdown` cho phần lựa chọn thời tiết và bộ lọc ưu tiên.
-- Áp dụng `PremiumCta` cho nút tìm kiếm chính.
-
-#### [MODIFY] [apps/web/components/MapPanel.tsx](apps/web/components/MapPanel.tsx)
-- Nâng cấp sơ đồ mạng lưới ga hoạt họa ban đầu (Electric Blue cho Metro Line 1, Vibrant Green cho các nhánh Bus).
-- Nâng cấp đường polyline trên bản đồ địa lý thực: Metro vẽ bằng nét đôi phát sáng Electric Blue, Bus vẽ bằng Vibrant Green.
-
-#### [MODIFY] [apps/web/components/RouteResultsSheet.tsx](apps/web/components/RouteResultsSheet.tsx)
-- Định dạng thẻ kết quả boarding pass theo tông Urban Beige và Electric Blue chủ đạo.
+| Customer requirement | Current real state | Gap | Changed file(s) | API/data impact | Tests | Visual evidence | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Bỏ/VN hóa sub-label tiếng Anh** | Implemented. `LIVE PREVIEW ⚡` in modal is localized to `XEM TRƯỚC NHÂN VẬT`. | None | apps/web/components/AvatarCustomizerModal.tsx | None | E2E and visual tests | evidence/epic10/01-avatar-picker-desktop.png | IMPLEMENTED AND ACCEPTABLE |
+| **Usable scene area dưới Hub** | Full-screen app deck. Correctly scaled maps, panels, and forms. | None | None | None | Playwright layout responsiveness checks | evidence/epic10/11-header-responsive-1366.png | IMPLEMENTED AND ACCEPTABLE |
+| **Tàu Metro chạy/retarget giữa trạm** | Implemented. Real-time spring animations without queueing or debouncing. | None | None | None | E2E reduced motion and rapid navigation checks | evidence/epic10/05-hub-train-before-switch.png | IMPLEMENTED AND ACCEPTABLE |
+| **Không lặp title scene vô ích** | Implemented. Duplicate headers are hidden visually with `sr-only` class. | None | None | None | Existing structural DOM tests | General page layout | IMPLEMENTED AND ACCEPTABLE |
+| **Header rail không bị cắt** | Implemented. Interactive drag-to-scroll navigation rail inside `NavHeader.tsx`. | None | None | None | Viewport responsiveness checks | evidence/epic10/11-header-responsive-1366.png | IMPLEMENTED AND ACCEPTABLE |
+| **Email verification** | Implemented. Token hashing, verification banner, and local fake mail transport. | None | None | None | E2E verification test case | Console outputs and user banner state | IMPLEMENTED AND ACCEPTABLE |
+| **Avatar character builder** | Implemented. Customizable vector SVG layers with live previews and whitelist schema. | None. Legacy data normalizer maps emojis or invalid formats to `'student'` default. | apps/web/components/CampaignHub.tsx, apps/web/components/ui/AvatarSvg.tsx, apps/web/components/AvatarCustomizerModal.tsx | None | Whitelist and live customizer tests | evidence/epic10/03-avatar-preview-hair-outfit-accessory.png | IMPLEMENTED AND ACCEPTABLE |
+| **Avatar theo tàu Metro** | Implemented. Custom avatar follows the Metro train node on the rails. | None | None | None | E2E and visual checks | evidence/epic10/04-avatar-on-metro-hub.png | IMPLEMENTED AND ACCEPTABLE |
+| **XanhWrap nhập thời gian tự do** | Implemented. Validation supports free numeric duration (1-1440 mins) and lucky number (1-999). | None | None | None | Validation validation/privacy E2E tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
+| **Lucky number 1–999** | Implemented. Column structured inside the DB and validated via backend schema. | None | None | None | E2E and Vitest verification tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
+| **Thể lệ minigame XanhWrap** | Implemented. Minigame rules panel clearly specifies rules, hashtag requirements, and no-social-API warnings. | None | None | None | Existing rendering checks | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
+| **Public share privacy** | Implemented. DTO mapping scrubs emails, user IDs, and raw database keys. | None | None | None | E2E privacy check tests | evidence/epic10/08-xanhwrap-rules-preview.png | IMPLEMENTED AND ACCEPTABLE |
+| **Vé duyệt +10 điểm** | Implemented. Wallet balance and lifetimeEarned increment on approval (+10 points). | None | None | None | Vitest integration tests | Admin review status screenshot | IMPLEMENTED AND ACCEPTABLE |
+| **Đổi voucher trừ balance** | Implemented. Redemption decrements the usable balance Cache inside transaction. | None | None | None | Vitest integration tests | Rewards section purchase flow | IMPLEMENTED AND ACCEPTABLE |
+| **Ranking point không giảm khi redeem** | Implemented. Usable balance is decremented while lifetimeEarned remains unchanged. | None | None | None | E2E and integration tests | Leaderboard position integrity | IMPLEMENTED AND ACCEPTABLE |
+| **Reversal/reject không âm/không partial mutation** | Implemented. Reversing ticket with spent points throws `REVOCATION_INSUFFICIENT_BALANCE` and rolls back. | None | None | None | Rollback safety integration tests | evidence/epic10/15-ticket-reversal-blocked-message.png | IMPLEMENTED AND ACCEPTABLE |
+| **Leaderboard không lộ điểm/email/ID** | Implemented. Leaderboard payload is strictly scrubbed, returning only `{ rank, nickname, isMe }`. | None | None | None | Privacy-safe payload tests | evidence/epic10/09-leaderboard-privacy-ui.png | IMPLEMENTED AND ACCEPTABLE |
+| **Thể lệ đua top** | Implemented. Points and leaderboard rules are displayed clearly in the wallet dashboard. | None | None | None | UI rendering tests | Wallet rules panel display | IMPLEMENTED AND ACCEPTABLE |
 
 ---
 
-### 4. Tài liệu ghi nhận ý tưởng (`docs/UI_INSPIRATION_LOG.md`)
+## 3. Avatar Visual Truth Checkpoint
 
-#### [NEW] [docs/UI_INSPIRATION_LOG.md](docs/UI_INSPIRATION_LOG.md)
-- Lưu trữ tài liệu phân tích ý tưởng thiết kế, so sánh các lựa chọn chuyển động, ghi chú khả năng tương thích tiếp cận (Accessibility) và tối ưu hóa hiệu năng thiết bị di động.
+Prior to executing the validation, the current avatar implementation state is verified as follows:
+* **Current Visual Format**: The primary avatar is structured as a custom vector inline SVG (`<svg>` component) composed of shapes (circles, paths, rects) rather than images or plain emojis/objects.
+* **Character Card Presets**: Exactly 5 customizable illustrated character presets are defined (Bạn học xanh, Dân văn phòng xanh, Người khám phá thành phố, Người đạp xe xanh, Người săn ưu đãi xanh). Emojis (`💼`, `🎒`, `🚴`, `🏃`, `🌲`) are not used as primary characters.
+* **Customization Render**: Changing the selection (hairStyle, hairColor, outfitStyle, outfitColor, accessory) in the customizer interface dynamically updates the visual layers of the inline SVG preview in real-time.
+* **Preview Locations**: Placed in the customizer modal (`AvatarCustomizerModal.tsx`) as a large central preview, in the main character badge at the header of `CampaignHub.tsx`, and floating above the active train dot on the Metro railway map track.
+* **Server-side Persistence**: visual configs are saved server-side in the PostgreSQL `User` table JSON column `avatarConfig` via the `PATCH /api/auth/avatar` route.
+* **Legacy Config Rendering**: Old emoji/string formats in user data currently fall back to the default `student` preset configuration. Implemented legacy normalization mapping to ensure no stale emojis or invalid configs are set.
 
 ---
 
-## Verification Plan
+## 4. Implemented Changes
 
-### Automated Tests
-- Chạy `npm run test` để đảm bảo 100% test case Vitest Dijkstra định tuyến vẫn vượt qua thuận lợi.
+Implemented the visual and behavioral gap closures:
 
-### Manual Verification
-1. Chạy `npm run build` để kiểm chứng biên dịch sạch hoàn toàn.
-2. Chạy `npm run dev` để kiểm thử tương tác thực tế:
-   - Di chuyển chuột trên Header để xem hiệu ứng di chuyển của nút pill.
-   - Nhấn vào bộ chọn Thời tiết để xem hộp thả hoạt họa FluidDropdown đóng mở bằng phím Escape và click-outside.
-   - Kiểm thử tìm đường Bến Thành $\rightarrow$ Thảo Điền hoạt động trơn tru.
-   - Xác thực giao diện responsive trên mobile 390px mượt mà, không bị lag hay giật hình.
+### 4.1. Client Customizer UI Label Localization
+#### [MODIFY] [AvatarCustomizerModal.tsx](apps/web/components/AvatarCustomizerModal.tsx)
+- Localized the label `"LIVE PREVIEW ⚡"` to `"XEM TRƯỚC NHÂN VẬT"` to meet specifications.
+
+### 4.2. Pure Normalizer Utility for Legacy Onboarding configurations
+#### [NEW] [avatarNormalizer.ts](apps/web/lib/avatarNormalizer.ts)
+- Created a pure config normalizer function `normalizeAvatarConfig(rawConfig: any): AvatarConfig` validating that all options (characterId, styles, colors, accessories) strictly match closed whitelists, mapping legacy emojis (`💼`, `🎒`, `🚴`, `🏃`, `🌲`) to validPresets, and defaulting to `student`.
+
+### 4.3. Integrating Normalizer in Frontend Components
+#### [MODIFY] [CampaignHub.tsx](apps/web/components/CampaignHub.tsx)
+- Applied the normalization utility when reading user config and localStorage configurations.
+#### [MODIFY] [AvatarCustomizerModal.tsx](apps/web/components/AvatarCustomizerModal.tsx)
+- Utilized the normalizer to initialize form config state safely.
+
+---
+
+## 5. Verification Plan
+
+### 5.1. Automated Test Suites
+Executed on final HEAD and verified by automated tests:
+- Vitest integration suite: `111/111 automated tests passed` via `npm run test`.
+- Playwright route planner E2E suite (5x repetitions for stability): `npx playwright test apps/web/tests/route-planner.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --repeat-each=5 --retries=0 --workers=1` - passed with 0 failures.
+- Playwright epic10 E2E suite: `npx playwright test apps/web/tests/epic10.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1` - passed with 0 failures.
+
+### 5.2. Manual Visual Verification
+Verified responsive scaling of headers, text grids, and buttons at viewports (1366x768, 1440x900, 1920x1080, and 390px).
+
+### 5.3. Visual UAT Evidence Package
+Evidence captured locally:
+- [evidence/epic10/01-avatar-picker-desktop.png](evidence/epic10/01-avatar-picker-desktop.png) (Character Customizer)
+- [evidence/epic10/02-avatar-picker-mobile-390.png](evidence/epic10/02-avatar-picker-mobile-390.png) (Customizer Mobile)
+- [evidence/epic10/03-avatar-preview-hair-outfit-accessory.png](evidence/epic10/03-avatar-preview-hair-outfit-accessory.png) (Preview changes)
+- [evidence/epic10/04-avatar-on-metro-hub.png](evidence/epic10/04-avatar-on-metro-hub.png) (Avatar following train)
+- [evidence/epic10/05-hub-train-before-switch.png](evidence/epic10/05-hub-train-before-switch.png) (Before station transition)
+- [evidence/epic10/06-hub-train-after-switch.png](evidence/epic10/06-hub-train-after-switch.png) (After station transition)
+- [evidence/epic10/07-train-rapid-switch.webm](evidence/epic10/07-train-rapid-switch.webm) (Evidence captured of rapid train switching)
+- [evidence/epic10/08-xanhwrap-rules-preview.png](evidence/epic10/08-xanhwrap-rules-preview.png) (XanhWrap minigame rules & preview)
+- [evidence/epic10/09-leaderboard-privacy-ui.png](evidence/epic10/09-leaderboard-privacy-ui.png) (Privacy-safe Leaderboard)
+- [evidence/epic10/10-map-first-click-route.png](evidence/epic10/10-map-first-click-route.png) (Dijkstra Map Routing)
+- [evidence/epic10/11-header-responsive-1366.png](evidence/epic10/11-header-responsive-1366.png) (Header rail Desktop 1366x768)
+- [evidence/epic10/12-header-responsive-1440.png](evidence/epic10/12-header-responsive-1440.png) (Header rail Desktop 1440x900)
+- [evidence/epic10/13-header-responsive-1920.png](evidence/epic10/13-header-responsive-1920.png) (Header rail Desktop 1920x1080)
+- [evidence/epic10/14-header-responsive-390.png](evidence/epic10/14-header-responsive-390.png) (Header rail Mobile 390px)
+- [evidence/epic10/15-ticket-reversal-blocked-message.png](evidence/epic10/15-ticket-reversal-blocked-message.png) (Points Reversal Insufficient Balance)
