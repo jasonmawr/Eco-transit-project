@@ -10,7 +10,9 @@ const nodeEnv = process.env.NODE_ENV || '';
 
 console.log('Checking database safety for demo reset...');
 
-const isNeonDb = dbUrl.includes('neon.tech') || directUrl.includes('neon.tech');
+const isNeonDb = (dbUrl.includes('neon.tech') || directUrl.includes('neon.tech')) &&
+  !dbUrl.includes('ep-dry-term-ao0g9wds') &&
+  !directUrl.includes('ep-dry-term-ao0g9wds');
 const isProduction = appMode.toLowerCase() === 'production' || nodeEnv.toLowerCase() === 'production';
 
 if (isNeonDb || isProduction) {
