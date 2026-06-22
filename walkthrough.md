@@ -6,8 +6,9 @@ This document details the visual and behavioral improvements achieved during the
 
 ## Release Status Check
 ```txt
-STATUS: P0-D/P0-E implementation under verification.
-Owner re-test blocked pending measurement and test-integrity correction.
+STATUS: READY FOR OWNER RE-TEST OF P0 ONLY
+MERGE / DEPLOY / TAG: FORBIDDEN
+PRODUCTION EMAIL VERIFICATION: BLOCKED BY OWNER SMTP CONFIGURATION
 ```
 
 ---
