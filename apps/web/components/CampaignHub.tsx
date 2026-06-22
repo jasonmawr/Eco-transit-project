@@ -45,7 +45,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   // SSR hydration guard
   useEffect(() => {
     setMounted(true);
-    
+
     // Set selected character from user config if present, else fallback to localStorage
     if (user && user.avatarConfig) {
       const normalized = normalizeAvatarConfig(user.avatarConfig);
@@ -62,7 +62,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
     if (typeof window !== 'undefined') {
       const isHashOnboarding = window.location.hash === '#onboarding';
       const needsOnboarding = user && user.emailVerified === true && (!user.avatarConfig || !user.avatarConfig.characterId);
-      
+
       if (isHashOnboarding || needsOnboarding) {
         setShowAvatarSelector(true);
       }
@@ -103,7 +103,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
         return normalized;
       }
     }
-    
+
     // Default preset configs fallback
     const presetsMap: Record<string, AvatarConfig> = {
       student: { characterId: 'student', hairStyle: 'short', hairColor: 'default', outfitStyle: 'casual', outfitColor: 'electricBlue', accessory: 'backpack' },
@@ -125,13 +125,13 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
 
   return (
     <div className="relative z-40 bg-white/95 border border-eco-mint p-3 sm:p-4 rounded-3xl shadow-md mb-2 flex-shrink-0">
-      
+
       {/* Decorative ambient lights wrapper with overflow-hidden */}
       <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none z-0">
         <div className="absolute -top-12 -right-12 w-48 h-48 bg-eco-accentGreen/10 blur-3xl rounded-full" />
         <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-eco-primary/10 blur-3xl rounded-full" />
       </div>
-      
+
       {/* Header with Avatar Selection Button */}
       <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-3 sm:pb-4 mb-3 sm:mb-6 gap-4 relative z-10">
         <div className="hidden sm:block">
@@ -178,7 +178,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
 
       {/* Desktop View: Horizontal Journey Map with SVG Tracks */}
       <div className="hidden sm:block relative py-4 px-2">
-        
+
         {/* SVG Railway Track Background */}
         <div className="absolute top-1/2 left-0 right-0 h-4 -translate-y-1/2 pointer-events-none z-0 px-12">
           <svg className="w-full h-full overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -204,7 +204,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
 
             return (
               <div key={station.id} className="flex flex-col items-center text-center relative">
-                
+
                 {/* Floating Avatar representation on the active node */}
                 <AnimatePresence>
                   {isActive && (

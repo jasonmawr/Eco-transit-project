@@ -117,7 +117,7 @@ function VerifyEmailContent() {
               {message}
             </p>
           </div>
-          
+
           <div className="border-t border-white/5 pt-4 space-y-3">
             <p className="text-[10px] text-white/50 leading-relaxed font-medium">
               Bạn có thể yêu cầu gửi lại email xác thực mới nếu link đã hết hạn (15 phút).

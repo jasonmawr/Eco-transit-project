@@ -13,12 +13,13 @@ export class MailProvider {
 
   constructor() {
     const host = process.env.SMTP_HOST;
-    const port = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
+    const portStr = process.env.SMTP_PORT;
     const user = process.env.SMTP_USER;
     const pass = process.env.SMTP_PASS;
     const from = process.env.SMTP_FROM;
 
-    if (host && user && pass && from) {
+    if (host && portStr && user && pass && from) {
+      const port = parseInt(portStr, 10);
       this.transporter = nodemailer.createTransport({
         host,
         port,
@@ -27,7 +28,15 @@ export class MailProvider {
       });
       this.isConfigured = true;
     } else {
-      console.warn('SMTP configuration is missing. MailProvider will run in MOCK mode.');
+      const isProductionOrDemo =
+        process.env.NODE_ENV === 'production' ||
+        process.env.APP_MODE === 'production' ||
+        process.env.APP_MODE === 'demo';
+      if (isProductionOrDemo) {
+        console.warn('SMTP configuration is missing. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
+      } else {
+        console.warn('SMTP configuration is missing. MailProvider will run in MOCK mode.');
+      }
     }
   }
 
@@ -37,7 +46,7 @@ export class MailProvider {
       process.env.NODE_ENV === 'production' ||
       process.env.APP_MODE === 'production' ||
       process.env.APP_MODE === 'demo';
-    
+
     if (this.isConfigured && this.transporter) {
       try {
         const info = await this.transporter.sendMail({

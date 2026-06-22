@@ -135,15 +135,15 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
         method: 'PATCH',
         body: JSON.stringify(config)
       });
-      
+
       // Update localStorage fallback
       localStorage.setItem('ecotransit_character', config.characterId);
-      
+
       if (onSaveSuccess) {
         // Trigger parent state update
         onSaveSuccess(res.avatarConfig);
       }
-      
+
       onClose();
     } catch (err: any) {
       console.error(err);
@@ -158,7 +158,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-4xl w-full border border-eco-primary/10 overflow-hidden shadow-2xl flex flex-col md:grid md:grid-cols-12 min-h-[500px] max-h-[90vh]">
-        
+
         {/* LEFT PANEL: Live Preview Card (Grid Span 5) */}
         <div className="md:col-span-5 bg-gradient-to-b from-eco-soft via-white to-eco-bgBeige/40 p-6 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-gray-100 shrink-0">
           <div className="text-center mb-4">
@@ -185,7 +185,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
 
         {/* RIGHT PANEL: Customizer Options & Tabs (Grid Span 7) */}
         <div className="md:col-span-7 p-6 flex flex-col justify-between overflow-hidden">
-          
+
           {/* Customizer Header */}
           <div className="flex justify-between items-start border-b border-gray-100 pb-3 mb-4 shrink-0">
             <div>
@@ -226,7 +226,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
 
           {/* Tab Options Content Scroll View */}
           <div className="flex-grow overflow-y-auto pr-1 space-y-4 mb-4">
-            
+
             {/* Presets Tab content */}
             {activeTab === 'preset' && (
               <div className="space-y-3">
@@ -409,7 +409,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
                 <span>{errorMsg}</span>
               </div>
             )}
-            
+
             <div className="flex space-x-3 ml-auto">
               <button
                 type="button"
@@ -418,7 +418,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
               >
                 Đóng
               </button>
-              
+
               <button
                 onClick={handleSave}
                 disabled={loading}

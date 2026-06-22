@@ -28,7 +28,7 @@ npm run dev
 
 ## 2. Kịch Bản UAT Tích Hợp (Integrated UAT Flow)
 
-Hệ thống hoạt động ở chế độ mock email khi không cấu hình SMTP trong biến môi trường `.env`.
+Trong môi trường phát triển local hoặc testing, hệ thống hoạt động ở chế độ mock email khi không cấu hình SMTP trong biến môi trường `.env`. Tuy nhiên, trong môi trường Production (`NODE_ENV=production`), nếu thiếu bất kỳ biến cấu hình SMTP nào (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`), hệ thống sẽ chặn và trả về lỗi HTTP `503` (`SMTP_NOT_CONFIGURED`) khi người dùng đăng ký hoặc yêu cầu gửi lại email xác thực, đồng thời xóa sạch dữ liệu đăng ký dư thừa để đảm bảo an toàn tuyệt đối.
 
 ### Luồng A: Xác thực tài khoản mới & Onboarding Avatar
 1. Truy cập trang chủ [http://localhost:3000](http://localhost:3000).

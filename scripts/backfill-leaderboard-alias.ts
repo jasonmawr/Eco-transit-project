@@ -25,7 +25,7 @@ async function run() {
 
     for (let i = 0; i < wallets.length; i += batchSize) {
       const batch = wallets.slice(i, i + batchSize);
-      
+
       for (const wallet of batch) {
         let alias = '';
         let success = false;

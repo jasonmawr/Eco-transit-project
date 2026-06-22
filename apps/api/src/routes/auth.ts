@@ -79,7 +79,7 @@ router.post('/register', async (req: Request, res: Response) => {
     // Send email
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
-    
+
     let isMock = false;
     let mockToken = undefined;
 
@@ -96,10 +96,16 @@ router.post('/register', async (req: Request, res: Response) => {
       }
     } catch (mailErr: any) {
       console.error('Failed to send verification email:', mailErr);
-      if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
+      const isProductionOrDemo =
+        process.env.NODE_ENV === 'production' ||
+        process.env.APP_MODE === 'production' ||
+        process.env.APP_MODE === 'demo';
+
+      if (isProductionOrDemo || mailErr.message === 'SMTP_NOT_CONFIGURED') {
         req.session.destroy(() => {});
         await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
         return res.status(503).json({
+          code: 'SMTP_NOT_CONFIGURED',
           message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
         });
       }
@@ -321,8 +327,14 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       }
     } catch (mailErr: any) {
       console.error('Failed to resend verification email:', mailErr);
-      if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
+      const isProductionOrDemo =
+        process.env.NODE_ENV === 'production' ||
+        process.env.APP_MODE === 'production' ||
+        process.env.APP_MODE === 'demo';
+
+      if (isProductionOrDemo || mailErr.message === 'SMTP_NOT_CONFIGURED') {
         return res.status(503).json({
+          code: 'SMTP_NOT_CONFIGURED',
           message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
         });
       }

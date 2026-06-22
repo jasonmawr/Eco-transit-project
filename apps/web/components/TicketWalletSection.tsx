@@ -3,21 +3,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiFetch, getApiBaseUrl } from '../lib/api';
 import AuthModal from './AuthModal';
-import { 
-  Wallet, 
-  Upload, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  AlertCircle, 
-  FileText, 
-  ArrowUpRight, 
-  ArrowDownLeft, 
-  RefreshCw, 
-  Train, 
-  Bus, 
-  Zap, 
-  ChevronDown 
+import {
+  Wallet,
+  Upload,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertCircle,
+  FileText,
+  ArrowUpRight,
+  ArrowDownLeft,
+  RefreshCw,
+  Train,
+  Bus,
+  Zap,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -30,7 +30,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
   // Authentication local fallback
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [stations, setStations] = useState<any[]>([]);
-  
+
   // Wallet / Tickets / Ledger states
   const [walletStats, setWalletStats] = useState<any>(null);
   const [tickets, setTickets] = useState<any[]>([]);
@@ -47,15 +47,15 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
   const [amount, setAmount] = useState<string>('');
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+
   // Upload status states
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
-  
+
   // Drag and drop visual state
   const [dragActive, setDragActive] = useState(false);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch all necessary data
@@ -336,16 +336,16 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
+
         {/* LEFT COLUMN: Wallet Card & Upload Form */}
         <div className="lg:col-span-5 space-y-6">
-          
+
           {/* PREMIUM GREEN WALLET CARD */}
           <div className="relative bg-gradient-to-br from-eco-ink via-[#0d1c2b] to-eco-primary rounded-3xl p-6 text-white overflow-hidden shadow-xl border border-white/5">
             {/* Visual background rings */}
             <div className="absolute right-0 bottom-0 w-32 h-32 bg-eco-accentGreen/10 rounded-full blur-2xl pointer-events-none" />
             <div className="absolute left-1/3 top-0 w-24 h-24 bg-eco-primary/20 rounded-full blur-2xl pointer-events-none" />
-            
+
             <div className="flex justify-between items-start mb-6">
               <div>
                 <p className="text-[10px] text-eco-accentGreen font-black uppercase tracking-widest font-mono">
@@ -369,7 +369,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                   </span>
                   <span className="text-xs font-bold text-white/80">điểm</span>
                 </div>
-                
+
                 <p className="text-[10px] text-white/50 font-mono mt-1">
                   Mã thẻ: {user.id.slice(0, 8).toUpperCase()}-XXXX
                 </p>
@@ -424,13 +424,13 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
             <h3 className="text-base font-black text-eco-ink mb-2 uppercase tracking-tight">
               Tải Lên Vé Di Chuyển Xanh
             </h3>
-            
+
             <div className="mb-4 p-3.5 bg-eco-bgBeige/60 border border-eco-primary/10 rounded-2xl text-[10px] sm:text-[11px] text-eco-muted leading-relaxed font-semibold">
               ℹ️ <strong>Thông tin kiểm duyệt:</strong> Ảnh vé tải lên sẽ ở trạng thái <strong>Chờ kiểm duyệt</strong>. Đội ngũ vận hành (Kiểm duyệt viên hoặc Quản trị viên) sẽ kiểm tra tính hợp lệ trong bảng điều khiển. Vé sau khi được duyệt thành công sẽ cộng <strong>+10 điểm xanh</strong> cho tài khoản của bạn.
             </div>
 
             <form onSubmit={handleUploadSubmit} className="space-y-4">
-              
+
               {/* Vehicle Type Selector Chips */}
               <div>
                 <label className="block text-xs font-bold text-eco-muted mb-2 uppercase tracking-wide">
@@ -532,7 +532,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                 <label className="block text-xs font-bold text-eco-muted mb-2 uppercase tracking-wide">
                   4. Chọn tệp ảnh vé di chuyển
                 </label>
-                
+
                 <div
                   onDragOver={onDragOver}
                   onDragLeave={onDragLeave}
@@ -641,7 +641,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
 
         {/* RIGHT COLUMN: Ticket List & Ledger History */}
         <div className="lg:col-span-7 space-y-6">
-          
+
           {/* TICKET SUBMISSION LIST */}
           <div className="bg-white rounded-3xl p-6 border border-eco-primary/10 shadow-sm">
             <h3 className="text-base font-black text-eco-ink mb-4 uppercase tracking-tight">
@@ -661,7 +661,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
             ) : (
               <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
                 {tickets.map((t) => (
-                  <div 
+                  <div
                     key={t.id}
                     className="p-3.5 bg-eco-soft border border-eco-primary/5 hover:border-eco-primary/10 rounded-2xl flex space-x-3 items-center justify-between transition-all duration-200"
                   >
@@ -671,9 +671,9 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                         {brokenTickets[t.id] ? (
                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" className="w-6 h-6"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                         ) : (
-                          <img 
-                            src={t.imageUrl || '/images/ticket-placeholder.png'} 
-                            alt="Thumbnail" 
+                          <img
+                            src={t.imageUrl || '/images/ticket-placeholder.png'}
+                            alt="Thumbnail"
                             className="w-full h-full object-cover"
                             onError={() => {
                               setBrokenTickets(prev => ({ ...prev, [t.id]: true }));
@@ -681,7 +681,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                           />
                         )}
                       </div>
-                      
+
                       {/* Info details */}
                       <div className="min-w-0 leading-tight">
                         <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
@@ -705,7 +705,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                         <p className="text-[9px] text-eco-muted/70 mt-0.5">
                           Tải lên: {new Date(t.createdAt).toLocaleDateString('vi-VN')} {new Date(t.createdAt).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
                         </p>
-                        
+
                         {/* OCR text display toggle or preview */}
                         {t.ocrText && (
                           <div className="text-[9px] text-eco-muted bg-white/60 px-2 py-0.5 rounded border border-gray-100 mt-1.5 italic overflow-hidden text-ellipsis whitespace-nowrap max-w-[280px]">
@@ -811,7 +811,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
               🏆 Bảng xếp hạng chiến dịch xanh
             </h3>
             <p className="text-[10px] text-eco-muted mb-4 leading-normal font-semibold">
-              Bảng xếp hạng hiển thị thứ tự di chuyển xanh của các hành khách dựa trên tổng tích lũy trọn đời. 
+              Bảng xếp hạng hiển thị thứ tự di chuyển xanh của các hành khách dựa trên tổng tích lũy trọn đời.
               Biệt danh được mã hóa ẩn danh để bảo mật.
             </p>
 
@@ -840,11 +840,11 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                       const isTop3 = item.rank <= 3;
                       const medal = item.rank === 1 ? '🥇' : item.rank === 2 ? '🥈' : item.rank === 3 ? '🥉' : '';
                       return (
-                        <tr 
-                          key={idx} 
+                        <tr
+                          key={idx}
                           className={`border-b border-gray-50 transition-colors duration-150 ${
-                            item.isMe 
-                              ? 'bg-emerald-50/70 hover:bg-emerald-100/70 font-bold border-l-4 border-l-eco-primary' 
+                            item.isMe
+                              ? 'bg-emerald-50/70 hover:bg-emerald-100/70 font-bold border-l-4 border-l-eco-primary'
                               : 'hover:bg-eco-soft/40'
                           }`}
                         >

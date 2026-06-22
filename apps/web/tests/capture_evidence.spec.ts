@@ -139,7 +139,7 @@ test.describe('Evidence Generation Suite', () => {
     await page.setViewportSize({ width: 390, height: 800 });
     await page.waitForTimeout(1000);
     await page.screenshot({ path: path.join(outDir, '02-avatar-picker-mobile-390.png') });
-    
+
     // Back to desktop
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.waitForTimeout(1000);
@@ -206,9 +206,52 @@ test.describe('Evidence Generation Suite', () => {
     // 15. Ticket reversal blocked error (15-ticket-reversal-blocked-message.png)
     await page.screenshot({ path: path.join(outDir, '15-ticket-reversal-blocked-message.png') });
 
-    // Make sure we have 07-train-rapid-switch.webm placeholder or trace file as requested
-    const dummyWebmPath = path.join(outDir, '07-train-rapid-switch.webm');
-    fs.writeFileSync(dummyWebmPath, 'MOCK WEBM TRACE');
+    // Record a video for rapid switching
+    const browser = page.context().browser()!;
+    const videoContext = await browser.newContext({
+      recordVideo: {
+        dir: outDir,
+        size: { width: 1280, height: 800 }
+      },
+      viewport: { width: 1280, height: 800 }
+    });
+    const videoPage = await videoContext.newPage();
+    await videoPage.goto('/');
+
+    // Log in
+    await videoPage.locator('header button:has-text("Đăng nhập")').click();
+    await videoPage.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await videoPage.locator('input[type="password"]').fill('User@123456');
+    await videoPage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+    await expect(videoPage.locator('button:has-text("Đăng xuất")')).toBeVisible();
+    await videoPage.waitForTimeout(1000);
+
+    // Click rapid station switching
+    await videoPage.locator('a[href="#stations"]').click();
+    await videoPage.waitForTimeout(400);
+    await videoPage.locator('a[href="#points"]').click();
+    await videoPage.waitForTimeout(400);
+    await videoPage.locator('a[href="#rewards"]').click();
+    await videoPage.waitForTimeout(400);
+    await videoPage.locator('a[href="#xanhwrap"]').click();
+    await videoPage.waitForTimeout(400);
+    await videoPage.locator('a[href="#route"]').click();
+    await videoPage.waitForTimeout(1500);
+
+    const video = videoPage.video();
+    await videoContext.close();
+    if (video) {
+      const targetWebmPath = path.join(outDir, '07-train-rapid-switch.webm');
+      if (fs.existsSync(targetWebmPath)) {
+        fs.unlinkSync(targetWebmPath);
+      }
+      await video.saveAs(targetWebmPath);
+      // Delete temporary video file if generated
+      const videoPath = await video.path().catch(() => null);
+      if (videoPath && fs.existsSync(videoPath)) {
+        fs.unlinkSync(videoPath).catch(() => {});
+      }
+    }
   });
 
 });

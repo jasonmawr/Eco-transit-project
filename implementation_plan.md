@@ -20,7 +20,7 @@ None. The brand visual parameters are fully detailed and approved for direct imp
 
 ---
 
-## Proposed Changes
+## Implemented Changes
 
 ### 1. Design System & Configuration
 
