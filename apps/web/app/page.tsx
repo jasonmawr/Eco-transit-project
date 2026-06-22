@@ -25,7 +25,7 @@ export default function Home() {
   const [selectedStationId, setSelectedStationId] = useState<string>('');
   const [user, setUser] = useState<any>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  
+
   // Scene Navigation state
   const [activeSection, setActiveSection] = useState<string>('route');
   const [direction, setDirection] = useState<number>(1);
@@ -47,7 +47,7 @@ export default function Home() {
       const data = await apiFetch('/healthz');
       setApiInfo(data);
       setApiState('online');
-      
+
       // Fetch authenticated user info
       try {
         const meRes = await apiFetch('/api/auth/me');
@@ -74,11 +74,11 @@ export default function Home() {
     };
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
-    
+
     const handleReduceMotionChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches);
     };
-    
+
     checkViewport();
     window.addEventListener('resize', checkViewport);
     mediaQuery.addEventListener('change', handleReduceMotionChange);
@@ -95,7 +95,7 @@ export default function Home() {
       const searchParams = new URLSearchParams(window.location.search);
       const queryScene = searchParams.get('scene');
       const targetScene = queryScene || hash;
-      
+
       if (targetScene) {
         const oldMap: { [key: string]: string } = {
           planner: 'route',
@@ -210,13 +210,13 @@ export default function Home() {
 
   return (
     <div className="h-dvh w-screen flex flex-col eco-mesh-bg font-inter overflow-hidden relative">
-      
+
       {/* Premium Navigation Header */}
       <EcoTransitHeader activeSection={activeSection} onSectionSelect={handleSectionSelect} />
 
       {/* Main Content Container */}
       <main className="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 relative z-10 overflow-hidden">
-        
+
         {/* Verification Alert Banner */}
         {user && user.emailVerified === false && (
           <div className="bg-amber-500/10 border border-amber-500/25 px-4 py-2.5 rounded-2xl flex items-center justify-between text-xs text-amber-900 mb-3 relative z-20 shrink-0">
@@ -231,9 +231,6 @@ export default function Home() {
                 try {
                   const res = await apiFetch('/api/auth/resend-verification', { method: 'POST' });
                   alert(res.message || 'Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.');
-                  if (res.isMock && res.mockToken) {
-                    console.log(`[MOCK ONLY] Verification Link: ${window.location.origin}/verify-email?token=${res.mockToken}`);
-                  }
                 } catch (err: any) {
                   alert(err.message || 'Yêu cầu gửi lại email xác thực thất bại.');
                 }

@@ -80,20 +80,13 @@ router.post('/register', async (req: Request, res: Response) => {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
 
-    let isMock = false;
-    let mockToken = undefined;
-
     try {
-      const mailRes = await mailProvider.sendMail({
+      await mailProvider.sendMail({
         to: email,
         subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
         text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
         html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
       });
-      if (mailRes.isMock) {
-        isMock = true;
-        mockToken = rawToken;
-      }
     } catch (mailErr: any) {
       console.error('Failed to send verification email:', mailErr);
       const isProductionOrDemo =
@@ -113,8 +106,6 @@ router.post('/register', async (req: Request, res: Response) => {
 
     return res.status(201).json({
       user: userDto,
-      mockToken: isMock ? mockToken : undefined,
-      isMock,
       message: 'Đăng ký tài khoản thành công. Vui lòng kiểm tra hộp thư để xác thực email.',
     });
   } catch (err: any) {
@@ -299,32 +290,25 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
     const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
     const tokenExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        verificationTokenHash: tokenHash,
-        verificationTokenExpires: tokenExpires,
-        verificationSentAt: new Date(),
-      },
-    });
-
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
 
-    let isMock = false;
-    let mockToken = undefined;
-
     try {
-      const mailRes = await mailProvider.sendMail({
+      await mailProvider.sendMail({
         to: targetEmail,
         subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
         text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
         html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
       });
-      if (mailRes.isMock) {
-        isMock = true;
-        mockToken = rawToken;
-      }
+
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          verificationTokenHash: tokenHash,
+          verificationTokenExpires: tokenExpires,
+          verificationSentAt: new Date(),
+        },
+      });
     } catch (mailErr: any) {
       console.error('Failed to resend verification email:', mailErr);
       const isProductionOrDemo =
@@ -338,12 +322,11 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
           message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
         });
       }
+      throw mailErr;
     }
 
     return res.status(200).json({
       message: 'Yêu cầu đã được ghi nhận. Nếu email hợp lệ, một liên kết xác thực mới sẽ được gửi trong giây lát.',
-      mockToken: isMock ? mockToken : undefined,
-      isMock,
     });
   } catch (err: any) {
     console.error('Resend verification error:', err);

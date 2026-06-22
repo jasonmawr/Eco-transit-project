@@ -2,6 +2,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import { app } from '../app.js';
 import { prisma } from '../config/db.js';
+import fs from 'fs';
+import path from 'path';
 
 describe('EcoTransit Epic 10 Integration Tests', () => {
   let userAgent: any;
@@ -119,7 +121,37 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
 
   // 2. Email Verification Flow
   describe('Email Verification Flow', () => {
-    it('should register a new user as unverified', async () => {
+    function deleteMockEmailFile() {
+      const possiblePaths = [
+        path.resolve(process.cwd(), 'last-mock-email.json'),
+        path.resolve(process.cwd(), '../../last-mock-email.json'),
+        path.resolve(process.cwd(), '../last-mock-email.json'),
+      ];
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          fs.unlinkSync(p);
+        }
+      }
+    }
+
+    function getMockTokenFromEmailFile(): string {
+      const possiblePaths = [
+        path.resolve(process.cwd(), 'last-mock-email.json'),
+        path.resolve(process.cwd(), '../../last-mock-email.json'),
+        path.resolve(process.cwd(), '../last-mock-email.json'),
+      ];
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          const emailData = JSON.parse(fs.readFileSync(p, 'utf-8'));
+          const match = emailData.text.match(/token=([a-f0-9]+)/);
+          if (match) return match[1];
+        }
+      }
+      throw new Error('Mock email file not found or token not found');
+    }
+
+    it('should register a new user as unverified and not return token in HTTP response', async () => {
+      deleteMockEmailFile();
       const res = await request(app).post('/api/auth/register').send({
         email: 'test-epic10-unverified@ecotransit.vn',
         password: 'Password123',
@@ -127,8 +159,13 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
 
       expect(res.status).toBe(201);
       expect(res.body.user.emailVerified).toBe(false);
-      expect(res.body.isMock).toBe(true);
-      expect(res.body.mockToken).toBeDefined();
+      expect(res.body.mockToken).toBeUndefined();
+      expect(res.body.isMock).toBeUndefined();
+
+      // Read token from UAT mock email artifact
+      const mockToken = getMockTokenFromEmailFile();
+      expect(mockToken).toBeDefined();
+      expect(mockToken.length).toBe(64);
 
       // Clean up
       await prisma.userWallet.deleteMany({ where: { userId: res.body.user.id } });
@@ -136,12 +173,13 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
     });
 
     it('should verify email with valid token and reject expired/invalid tokens', async () => {
+      deleteMockEmailFile();
       const resReg = await request(app).post('/api/auth/register').send({
         email: 'test-verify-temp@ecotransit.vn',
         password: 'Password123',
       });
 
-      const mockToken = resReg.body.mockToken;
+      const mockToken = getMockTokenFromEmailFile();
 
       // Try verifying with invalid token
       const resVerifyBad = await request(app).post('/api/auth/verify-email').send({
@@ -174,7 +212,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       });
 
       // Instantly requesting another verification should trigger rate-limiting
-      const resResendLimit = await authAgent.post('/api/auth/resend-verification').send({});
+      const resResendLimit = await authAgent.post('/api/auth/resend-verification').send({
+        targetEmail: 'test-cooldown@ecotransit.vn'
+      });
       expect(resResendLimit.status).toBe(429);
 
       // Clean up
@@ -210,6 +250,35 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
 
   // 4. Hardened Mail Security & Migration Preservation
   describe('Hardened Mail Security & Migration Preservation', () => {
+    function deleteMockEmailFile() {
+      const possiblePaths = [
+        path.resolve(process.cwd(), 'last-mock-email.json'),
+        path.resolve(process.cwd(), '../../last-mock-email.json'),
+        path.resolve(process.cwd(), '../last-mock-email.json'),
+      ];
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          fs.unlinkSync(p);
+        }
+      }
+    }
+
+    function getMockTokenFromEmailFile(): string {
+      const possiblePaths = [
+        path.resolve(process.cwd(), 'last-mock-email.json'),
+        path.resolve(process.cwd(), '../../last-mock-email.json'),
+        path.resolve(process.cwd(), '../last-mock-email.json'),
+      ];
+      for (const p of possiblePaths) {
+        if (fs.existsSync(p)) {
+          const emailData = JSON.parse(fs.readFileSync(p, 'utf-8'));
+          const match = emailData.text.match(/token=([a-f0-9]+)/);
+          if (match) return match[1];
+        }
+      }
+      throw new Error('Mock email file not found or token not found');
+    }
+
     it('should preserve existing seed/demo/admin users as verified', async () => {
       const user = await prisma.user.findUnique({
         where: { email: 'user@ecotransit.vn' },
@@ -219,6 +288,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
     });
 
     it('should store verification token as hash in DB and never expose raw token in user DTO', async () => {
+      deleteMockEmailFile();
       const res = await request(app).post('/api/auth/register').send({
         email: 'test-hash-check@ecotransit.vn',
         password: 'Password123',
@@ -228,6 +298,8 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       // User DTO in response should NOT contain raw token or hash
       expect(res.body.user.verificationTokenHash).toBeUndefined();
       expect(res.body.user.verificationTokenExpires).toBeUndefined();
+      expect(res.body.mockToken).toBeUndefined();
+      expect(res.body.isMock).toBeUndefined();
 
       // Retrieve from DB to confirm it is hashed
       const user = await prisma.user.findUnique({
@@ -237,8 +309,10 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       expect(user!.verificationTokenHash).not.toBeNull();
       // It should be a 64-char hex hash
       expect(user!.verificationTokenHash!.length).toBe(64);
-      // Ensure it doesn't match rawToken
-      expect(user!.verificationTokenHash).not.toBe(res.body.mockToken);
+
+      // Verify token in mock file does not match db hash
+      const rawToken = getMockTokenFromEmailFile();
+      expect(user!.verificationTokenHash).not.toBe(rawToken);
 
       // Clean up
       await prisma.userWallet.deleteMany({ where: { userId: res.body.user.id } });
@@ -246,6 +320,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
     });
 
     it('should reject registration with 503 when SMTP is not configured in production mode', async () => {
+      deleteMockEmailFile();
       const origNodeEnv = process.env.NODE_ENV;
       const origAppMode = process.env.APP_MODE;
       process.env.NODE_ENV = 'production';
@@ -258,6 +333,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         });
         expect(res.status).toBe(503);
         expect(res.body.message).toContain('chưa cấu hình dịch vụ gửi thư');
+        expect(res.body.code).toBe('SMTP_NOT_CONFIGURED');
         expect(res.body.mockToken).toBeUndefined();
 
         // Verify user was NOT created in DB (cleaned up)
@@ -265,9 +341,74 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
           where: { email: 'test-prod-no-smtp@ecotransit.vn' },
         });
         expect(user).toBeNull();
+
+        // Verify NO mock email was created
+        expect(() => getMockTokenFromEmailFile()).toThrow();
       } finally {
         process.env.NODE_ENV = origNodeEnv;
         process.env.APP_MODE = origAppMode;
+      }
+    });
+
+    it('should NOT delete user or mutate state on resend failure under production no-SMTP', async () => {
+      deleteMockEmailFile();
+      // 1. Register a user in local mode
+      const resReg = await request(app).post('/api/auth/register').send({
+        email: 'test-prod-resend-keep@ecotransit.vn',
+        password: 'Password123',
+      });
+      expect(resReg.status).toBe(201);
+
+      // Get initial database values
+      const initialUser = await prisma.user.findUnique({
+        where: { email: 'test-prod-resend-keep@ecotransit.vn' },
+      });
+      expect(initialUser).not.toBeNull();
+      const initialHash = initialUser!.verificationTokenHash;
+      const initialExpires = initialUser!.verificationTokenExpires;
+
+      // Reset verificationSentAt to make sure we bypass the 60-second cooldown rate limit
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: {
+          verificationSentAt: new Date(Date.now() - 120 * 1000), // 2 minutes ago
+        },
+      });
+
+      deleteMockEmailFile();
+
+      // 2. Switch to production mode
+      const origNodeEnv = process.env.NODE_ENV;
+      const origAppMode = process.env.APP_MODE;
+      process.env.NODE_ENV = 'production';
+      process.env.APP_MODE = 'production';
+
+      try {
+        // Attempt to resend verification
+        const resResend = await request(app)
+          .post('/api/auth/resend-verification')
+          .send({ email: 'test-prod-resend-keep@ecotransit.vn' });
+
+        expect(resResend.status).toBe(503);
+        expect(resResend.body.code).toBe('SMTP_NOT_CONFIGURED');
+
+        // Retrieve user from DB to confirm not deleted and verification state not mutated
+        const afterUser = await prisma.user.findUnique({
+          where: { email: 'test-prod-resend-keep@ecotransit.vn' },
+        });
+        expect(afterUser).not.toBeNull();
+        expect(afterUser!.verificationTokenHash).toBe(initialHash);
+        expect(afterUser!.verificationTokenExpires?.getTime()).toBe(initialExpires?.getTime());
+
+        // Verify NO mock email was created during resend failure
+        expect(() => getMockTokenFromEmailFile()).toThrow();
+      } finally {
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.APP_MODE = origAppMode;
+
+        // Clean up
+        await prisma.userWallet.deleteMany({ where: { userId: resReg.body.user.id } });
+        await prisma.user.delete({ where: { id: resReg.body.user.id } });
       }
     });
   });
