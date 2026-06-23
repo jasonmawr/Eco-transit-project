@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect, useRef } from 'react';
 
 export function useMetroTravelSound() {
@@ -6,7 +8,6 @@ export function useMetroTravelSound() {
   const rollingAudioRef = useRef<HTMLAudioElement | null>(null);
   const fadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Initialize audio elements client-side
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -25,10 +26,8 @@ export function useMetroTravelSound() {
     rolling.volume = 0.22;
     rollingAudioRef.current = rolling;
 
-    // Handle tab visibility change
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        // Pause rolling sound if tab is hidden
         if (rollingAudioRef.current) {
           rollingAudioRef.current.pause();
         }
@@ -57,7 +56,6 @@ export function useMetroTravelSound() {
     localStorage.setItem('ecotransit_sound_enabled', String(nextState));
 
     if (!nextState) {
-      // Immediately stop all sounds if muted
       if (departureAudioRef.current) {
         departureAudioRef.current.pause();
         departureAudioRef.current.currentTime = 0;
@@ -76,7 +74,6 @@ export function useMetroTravelSound() {
   const playJourneySound = () => {
     if (!soundEnabled) return;
 
-    // Clear any active fade out interval to avoid volume fighting
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
       fadeIntervalRef.current = null;
@@ -87,25 +84,28 @@ export function useMetroTravelSound() {
 
     if (!departure || !rolling) return;
 
-    // 1. Departure cue - play once if not already playing and from idle
-    // If rolling is not currently playing, it means the train is starting from idle
+    // Play departure cue once if rolling is currently paused (starting from idle)
     if (rolling.paused) {
       departure.currentTime = 0;
-      departure.play().catch(() => {
-        // Suppress browser autoplay block warnings silently
-      });
+      departure.play().catch(() => {});
     }
 
-    // 2. Rolling cue - start playing looping track
+    // Play rolling loop if not already playing
     if (rolling.paused) {
       rolling.volume = 0.22;
       rolling.currentTime = 0;
-      rolling.play().catch(() => {
-        // Suppress autoplay blocks
-      });
+      rolling.play().catch(() => {});
     } else {
-      // If already playing (rapid retarget click), keep rolling at normal volume
       rolling.volume = 0.22;
+    }
+  };
+
+  const playDepartureOnly = () => {
+    if (!soundEnabled) return;
+    const departure = departureAudioRef.current;
+    if (departure) {
+      departure.currentTime = 0;
+      departure.play().catch(() => {});
     }
   };
 
@@ -119,12 +119,11 @@ export function useMetroTravelSound() {
       return;
     }
 
-    // Smoothly fade out the rolling loop over 400ms
     if (fadeIntervalRef.current) {
       clearInterval(fadeIntervalRef.current);
     }
 
-    const startVolume = rolling.volume;
+    const startVolume = 0.22;
     const steps = 10;
     const intervalTime = 40; // 40ms * 10 steps = 400ms fade out
     let currentStep = 0;
@@ -135,7 +134,7 @@ export function useMetroTravelSound() {
       if (nextVolume <= 0.01 || currentStep >= steps) {
         rolling.pause();
         rolling.currentTime = 0;
-        rolling.volume = startVolume; // reset volume for next play
+        rolling.volume = startVolume; // Reset volume for next trigger
         if (fadeIntervalRef.current) {
           clearInterval(fadeIntervalRef.current);
           fadeIntervalRef.current = null;
@@ -150,6 +149,7 @@ export function useMetroTravelSound() {
     soundEnabled,
     toggleSound,
     playJourneySound,
+    playDepartureOnly,
     stopJourneySound,
   };
 }

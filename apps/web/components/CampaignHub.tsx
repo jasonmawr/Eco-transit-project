@@ -29,8 +29,10 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(user);
 
-  // Layout collapsed state
+  // Layout collapsed state & defer collapse state
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [pendingCollapse, setPendingCollapse] = useState(false);
+  const [trainIsMoving, setTrainIsMoving] = useState(false);
 
   useEffect(() => {
     setCurrentUser(user);
@@ -97,6 +99,32 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
     return presetsMap[charId] || { characterId: 'student' as any };
   };
 
+  const handleCollapseToggle = () => {
+    if (isCollapsed) {
+      // Expanding is always immediate
+      setIsCollapsed(false);
+      setPendingCollapse(false);
+    } else {
+      // Collapsing
+      if (trainIsMoving) {
+        // Defer collapse until the current transition completes
+        setPendingCollapse(true);
+      } else {
+        // Collapse immediately if train is idle
+        setIsCollapsed(true);
+      }
+    }
+  };
+
+  const handleMovingStateChange = (moving: boolean) => {
+    setTrainIsMoving(moving);
+    if (!moving && pendingCollapse) {
+      // If motion stopped and we have a pending collapse, execute it now!
+      setIsCollapsed(true);
+      setPendingCollapse(false);
+    }
+  };
+
   if (!mounted) {
     return (
       <div className="bg-white/80 border border-eco-mint p-3 rounded-3xl shadow-md mb-1 min-h-[80px] flex items-center justify-center">
@@ -105,40 +133,44 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
     );
   }
 
+  const collapseBtnText = isCollapsed ? 'Mở rộng' : (pendingCollapse ? 'Đang thu gọn...' : 'Thu gọn');
+
   return (
     <div className="relative z-40 bg-white/95 border border-eco-mint p-1.5 sm:p-2 rounded-2xl shadow-md mb-1 flex-shrink-0">
-      {/* Decorative ambient lights wrapper with overflow-hidden */}
+      {/* Decorative ambient lights wrapper */}
       <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none z-0">
         <div className="absolute -top-12 -right-12 w-32 h-32 bg-eco-accentGreen/5 blur-2xl rounded-full" />
         <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-eco-primary/5 blur-2xl rounded-full" />
       </div>
 
-      {/* Header with Avatar Selection Button & Collapsible Toggle */}
-      <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-1 sm:pb-1.5 mb-1 sm:mb-1.5 gap-3 relative z-10">
-        <div className="flex items-center space-x-2">
-          <div className="hidden sm:block">
-            <h2 className="text-[10px] sm:text-xs font-black text-eco-ink tracking-tight font-display-campaign uppercase font-bold flex items-center gap-1.5">
-              <span>🗺️ HÀNH TRÌNH LƯỚT KHÓI CHẠM XANH</span>
-            </h2>
-          </div>
-
-          {/* Mobile-only compact title */}
-          <div className="sm:hidden flex flex-col">
-            <span className="text-[10px] font-extrabold text-eco-ink uppercase">6 chặng lướt xanh</span>
-          </div>
-
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-[9px] sm:text-[10px] font-black text-eco-primary hover:text-eco-primaryDeep bg-eco-mint border border-eco-primary/10 px-1.5 py-0.5 rounded-lg shadow-xs transition-colors flex items-center focus:outline-none focus:ring-1 focus:ring-eco-primary"
-            aria-expanded={!isCollapsed}
-            aria-label={isCollapsed ? "Mở rộng bản đồ hành trình" : "Thu gọn bản đồ hành trình"}
-          >
-            {isCollapsed ? "Mở rộng" : "Thu gọn"}
-          </button>
-        </div>
-
-        {/* Selected character badge & selector trigger */}
-        <div className="relative" style={{ paddingRight: '160px' }}> {/* Reserve space for Sound Toggle inside RailStage */}
+      {/* Render the clean, permanently mounted MetroRailStage */}
+      <MetroRailStage
+        activeSection={activeSection}
+        onSectionSelect={onSectionSelect}
+        avatarConfig={getUserAvatarConfig(selectedChar)}
+        isCollapsed={isCollapsed}
+        onMovingStateChange={handleMovingStateChange}
+        title={
+          <>
+            <div className="hidden sm:block">
+              <h2 className="text-[10px] sm:text-xs font-black text-eco-ink tracking-tight font-display-campaign uppercase font-bold flex items-center gap-1.5">
+                <span>🗺️ HÀNH TRÌNH LƯỚT KHÓI CHẠM XANH</span>
+              </h2>
+            </div>
+            <div className="sm:hidden flex flex-col">
+              <span className="text-[10px] font-extrabold text-eco-ink uppercase font-black">6 chặng lướt xanh</span>
+            </div>
+            <button
+              onClick={handleCollapseToggle}
+              className="text-[9px] sm:text-[10px] font-black text-eco-primary hover:text-eco-primaryDeep bg-eco-mint border border-eco-primary/10 px-1.5 py-0.5 rounded-lg shadow-xs transition-colors flex items-center focus:outline-none focus:ring-1 focus:ring-eco-primary cursor-pointer"
+              aria-expanded={!isCollapsed}
+              aria-label={isCollapsed ? "Mở rộng bản đồ hành trình" : "Thu gọn bản đồ hành trình"}
+            >
+              {collapseBtnText}
+            </button>
+          </>
+        }
+        headerRight={
           <button
             onClick={() => {
               if (!currentUser) {
@@ -149,7 +181,7 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
               }
               setShowAvatarSelector(true);
             }}
-            className="flex items-center space-x-1 bg-eco-mint hover:bg-eco-primary hover:text-white border border-eco-primary/20 px-1.5 py-0.5 rounded-xl transition-all duration-200 group text-left shadow-xs"
+            className="flex items-center space-x-1 bg-eco-mint hover:bg-eco-primary hover:text-white border border-eco-primary/20 px-1.5 py-0.5 rounded-xl transition-all duration-200 group text-left shadow-xs cursor-pointer"
           >
             <div className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-105 transition-transform duration-200 shrink-0">
               <AvatarSvg config={getUserAvatarConfig(selectedChar)} />
@@ -158,22 +190,13 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
               <span className="hidden sm:inline-flex items-center gap-0.5 text-[7px] text-eco-muted group-hover:text-white/80 font-bold uppercase tracking-wider">
                 Đồng hành <Edit2 className="w-2 h-2" />
               </span>
-              <span className="text-[8px] sm:text-[10px] font-black text-eco-ink group-hover:text-white block">
+              <span className="text-[8px] sm:text-[10px] font-black text-eco-ink group-hover:text-white block font-bold">
                 {getCharName(selectedChar)}
               </span>
             </div>
           </button>
-        </div>
-      </div>
-
-      {/* Render the clean, decoupled MetroRailStage components */}
-      {!isCollapsed && (
-        <MetroRailStage
-          activeSection={activeSection}
-          onSectionSelect={onSectionSelect}
-          avatarConfig={getUserAvatarConfig(selectedChar)}
-        />
-      )}
+        }
+      />
 
       {/* Full customizer modal integration */}
       <AvatarCustomizerModal

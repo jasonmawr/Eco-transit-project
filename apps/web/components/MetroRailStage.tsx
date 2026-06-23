@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { Volume2, VolumeX } from 'lucide-react';
 import { AvatarSvg, AvatarConfig } from './ui/AvatarSvg';
-import { useMetroTravelSound } from '../lib/useMetroTravelSound';
+import { useMetroTravelSound } from '../hooks/useMetroTravelSound';
 
 const JOURNEY_STATIONS = [
   { id: 'route', name: 'Lập lộ trình xanh', num: 1, desc: 'Lập lộ trình tối ưu', icon: '🛤️' },
@@ -17,6 +18,22 @@ interface MetroRailStageProps {
   activeSection: string;
   onSectionSelect: (sectionId: string) => void;
   avatarConfig: AvatarConfig;
+  title?: React.ReactNode;
+  headerRight?: React.ReactNode;
+  isCollapsed?: boolean;
+  onMovingStateChange?: (moving: boolean) => void;
+  onTransitionRun?: (e: any) => void;
+  onTransitionStart?: (e: any) => void;
+  onTransitionEnd?: (e: any) => void;
+  onTransitionCancel?: (e: any) => void;
+}
+
+interface JourneyState {
+  journeyId: string;
+  targetIndex: number;
+  prevIndex: number;
+  durationMs: number;
+  source: 'initial' | 'user' | 'external';
 }
 
 // ─── THREE-CAR DESKTOP METRO (width 132, height 40) ───
@@ -169,12 +186,22 @@ const MobileThreeCarTrain = ({ avatarConfig, direction }: { avatarConfig: Avatar
   );
 };
 
-export default function MetroRailStage({ activeSection, onSectionSelect, avatarConfig }: MetroRailStageProps) {
+export default function MetroRailStage({
+  activeSection,
+  onSectionSelect,
+  avatarConfig,
+  title,
+  headerRight,
+  isCollapsed = false,
+  onMovingStateChange,
+  onTransitionRun,
+  onTransitionStart,
+  onTransitionEnd,
+  onTransitionCancel,
+}: MetroRailStageProps) {
   const [mounted, setMounted] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
-  
-  const [prevIndex, setPrevIndex] = useState(0);
   const [direction, setDirection] = useState<'right' | 'left'>('right');
 
   const [containerWidth, setContainerWidth] = useState(0);
@@ -183,13 +210,57 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
   const desktopTrackRef = useRef<HTMLDivElement | null>(null);
   const mobileTrackRef = useRef<HTMLDivElement | null>(null);
   const trainRef = useRef<HTMLDivElement | null>(null);
-  
-  const movingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mobileTrainRef = useRef<HTMLDivElement | null>(null);
 
   // Travel sound hook
-  const { soundEnabled, toggleSound, playJourneySound, stopJourneySound } = useMetroTravelSound();
+  const { soundEnabled, toggleSound, playJourneySound, playDepartureOnly, stopJourneySound } = useMetroTravelSound();
 
-  const activeIndex = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+  // Journey state model
+  const [journey, setJourney] = useState<JourneyState>(() => {
+    const initialIndex = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+    return {
+      journeyId: 'initial',
+      targetIndex: initialIndex,
+      prevIndex: initialIndex,
+      durationMs: 0,
+      source: 'initial',
+    };
+  });
+
+  const getTransitionDuration = (fromIdx: number, toIdx: number): number => {
+    const gap = Math.abs(toIdx - fromIdx);
+    if (gap === 0) return 0;
+    if (gap === 1) return 1600; // Adjacent: 1.6s
+    if (gap <= 3) return 1950;  // 2-3 stations: 1.95s
+    return 2300;                // 4-5 stations: 2.3s
+  };
+
+  // derived state from activeSection prop - executed synchronously during render
+  const targetIdx = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+  if (targetIdx !== journey.targetIndex) {
+    const prevIdx = journey.targetIndex;
+    const duration = getTransitionDuration(prevIdx, targetIdx);
+    const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    if (targetIdx !== prevIdx) {
+      setDirection(targetIdx > prevIdx ? 'right' : 'left');
+    }
+
+    setJourney({
+      journeyId: nextJourneyId,
+      targetIndex: targetIdx,
+      prevIndex: prevIdx,
+      durationMs: duration,
+      source: 'external',
+    });
+  }
+
+  // Report moving state to parent CampaignHub
+  useEffect(() => {
+    if (onMovingStateChange) {
+      onMovingStateChange(isMoving);
+    }
+  }, [isMoving, onMovingStateChange]);
 
   useEffect(() => {
     setMounted(true);
@@ -211,7 +282,7 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
       setPrefersReducedMotion(mediaQuery.matches);
       const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
       mediaQuery.addEventListener('change', handler);
-      
+
       const t = setTimeout(handleResize, 150);
       return () => {
         window.removeEventListener('resize', handleResize);
@@ -221,62 +292,110 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
     }
   }, []);
 
-  const handleStationClick = (sectionId: string, targetIdx: number) => {
-    if (targetIdx === activeIndex) return;
-
-    if (movingTimerRef.current) {
-      clearTimeout(movingTimerRef.current);
-      movingTimerRef.current = null;
-    }
-
-    setPrevIndex(activeIndex);
-    setDirection(targetIdx > activeIndex ? 'right' : 'left');
-
-    const duration = getTransitionDuration(activeIndex, targetIdx);
-
-    // Call state update in parent
-    onSectionSelect(sectionId);
+  const handleStationClick = (sectionId: string, idx: number) => {
+    if (idx === journey.targetIndex) return;
 
     if (prefersReducedMotion) {
-      setIsMoving(false);
-      
-      // Play departure beep only
-      const departure = new Audio('/audio/metro-departure.mp3');
-      departure.volume = 0.25;
-      if (soundEnabled) {
-        departure.play().catch(() => {});
-      }
+      playDepartureOnly();
     } else {
-      setIsMoving(true);
       playJourneySound();
-
-      movingTimerRef.current = setTimeout(() => {
-        setIsMoving(false);
-        stopJourneySound(true);
-      }, duration);
     }
+
+    const prevIdx = journey.targetIndex;
+    const duration = getTransitionDuration(prevIdx, idx);
+    const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    if (idx !== prevIdx) {
+      setDirection(idx > prevIdx ? 'right' : 'left');
+    }
+
+    setJourney({
+      journeyId: nextJourneyId,
+      targetIndex: idx,
+      prevIndex: prevIdx,
+      durationMs: duration,
+      source: 'user',
+    });
+
+    onSectionSelect(sectionId);
   };
 
+  // Native DOM transition events setup to avoid React version console warnings
   useEffect(() => {
-    // Keep prevIndex aligned with activeIndex if updated externally
-    setPrevIndex(activeIndex);
-  }, [activeIndex]);
+    const desktop = trainRef.current;
+    const mobile = mobileTrainRef.current;
 
-  const getTransitionDuration = (fromIdx: number, toIdx: number): number => {
-    const gap = Math.abs(toIdx - fromIdx);
-    if (gap === 0) return 1400;
-    if (gap === 1) return 1600; // Adjacent: 1.6s
-    if (gap <= 3) return 1950;  // 2-3 stations: 1.95s
-    return 2300;                // 4-5 stations: 2.3s
-  };
+    const handleTransitionRun = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+      setIsMoving(true);
+      if (onTransitionRun) onTransitionRun(e);
+    };
 
-  const duration = getTransitionDuration(prevIndex, activeIndex);
+    const handleTransitionStart = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+      setIsMoving(true);
+      if (onTransitionStart) onTransitionStart(e);
+    };
+
+    const handleTransitionCancel = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+      // Retarget: keep moving state active
+      if (onTransitionCancel) onTransitionCancel(e);
+    };
+
+    const handleTransitionEnd = (e: TransitionEvent) => {
+      if (e.propertyName !== 'transform') return;
+
+      const parentActiveIndex = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+      if (journey.targetIndex !== parentActiveIndex) {
+        return;
+      }
+
+      setIsMoving(false);
+      stopJourneySound(true);
+
+      if (typeof window !== 'undefined') {
+        (window as any).__lastMetroAnimationDuration = journey.durationMs;
+      }
+
+      if (onTransitionEnd) onTransitionEnd(e);
+    };
+
+    if (desktop) {
+      desktop.addEventListener('transitionrun', handleTransitionRun);
+      desktop.addEventListener('transitionstart', handleTransitionStart);
+      desktop.addEventListener('transitionend', handleTransitionEnd);
+      desktop.addEventListener('transitioncancel', handleTransitionCancel);
+    }
+
+    if (mobile) {
+      mobile.addEventListener('transitionrun', handleTransitionRun);
+      mobile.addEventListener('transitionstart', handleTransitionStart);
+      mobile.addEventListener('transitionend', handleTransitionEnd);
+      mobile.addEventListener('transitioncancel', handleTransitionCancel);
+    }
+
+    return () => {
+      if (desktop) {
+        desktop.removeEventListener('transitionrun', handleTransitionRun);
+        desktop.removeEventListener('transitionstart', handleTransitionStart);
+        desktop.removeEventListener('transitionend', handleTransitionEnd);
+        desktop.removeEventListener('transitioncancel', handleTransitionCancel);
+      }
+      if (mobile) {
+        mobile.removeEventListener('transitionrun', handleTransitionRun);
+        mobile.removeEventListener('transitionstart', handleTransitionStart);
+        mobile.removeEventListener('transitionend', handleTransitionEnd);
+        mobile.removeEventListener('transitioncancel', handleTransitionCancel);
+      }
+    };
+  }, [journey, activeSection, onTransitionRun, onTransitionStart, onTransitionEnd, onTransitionCancel, stopJourneySound]);
 
   // Geometric constants
   const DESKTOP_TRAIN_W = 132;
   const DESKTOP_TRAIN_H = 40;
-  const DESKTOP_RAIL_LANE_CENTER_Y = 16; // Placed at top
-  const DESKTOP_PADDING_X = 16; 
+  const DESKTOP_RAIL_LANE_CENTER_Y = 16;
+  const DESKTOP_PADDING_X = 16;
 
   const MOBILE_TRAIN_W = 90;
   const MOBILE_TRAIN_H = 32;
@@ -295,7 +414,7 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
     if (mobileContainerHeight === 0) return 'translate3d(0px, 0px, 0)';
     const gridH = mobileContainerHeight - MOBILE_PADDING_Y * 2;
     const cy = MOBILE_PADDING_Y + (gridH * (idx * 2 + 1)) / 12;
-    const tx = -10; // small offset from right edge
+    const tx = -10;
     const ty = cy - MOBILE_TRAIN_H / 2;
     return `translate3d(${tx}px, ${ty}px, 0)`;
   };
@@ -308,216 +427,158 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
     );
   }
 
+  const travelDuration = (prefersReducedMotion || journey.journeyId === 'initial') ? 0 : journey.durationMs;
+
   return (
     <div className="relative w-full z-10 select-none">
-      {/* 🔊 Vietnamese Sound Toggle Control - absolutely positioned in the corner */}
-      <div className="absolute -top-10 right-0 z-50">
-        <button
-          onClick={toggleSound}
-          aria-pressed={soundEnabled}
-          aria-label="Bật/Tắt âm thanh hành trình"
-          className={`px-2 py-0.5 sm:px-3 sm:py-1 rounded-xl text-[8px] sm:text-[10px] font-black uppercase tracking-wider border transition-all flex items-center gap-1 focus:outline-none focus:ring-1 focus:ring-eco-primary ${
-            soundEnabled
-              ? 'bg-eco-mint text-eco-primary border-eco-primary/20 hover:bg-eco-primary hover:text-white'
-              : 'bg-slate-100 text-gray-400 border-gray-200 hover:border-gray-300'
-          }`}
-        >
-          <span>{soundEnabled ? '🔊' : '🔇'}</span>
-          <span>Âm thanh hành trình: {soundEnabled ? 'Bật' : 'Tắt'}</span>
-        </button>
-      </div>
-
-      {/* ─── DESKTOP VIEW ─── */}
-      <div
-        ref={desktopTrackRef}
-        data-testid="desktop-track"
-        className="hidden sm:block relative py-1.5 px-2 z-10"
-        style={{ position: 'relative', minHeight: '76px' }}
-      >
-        <style>{`
-          .train-visual-container.is-moving {
-            animation: train-bob-lean 0.5s ease-in-out infinite alternate;
-          }
-          .train-visual-container.is-idle {
-            transition: transform 180ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform: translateY(0px) rotate(0deg);
-          }
-          @keyframes train-bob-lean {
-            0% { transform: translateY(0px) rotate(0.4deg); }
-            100% { transform: translateY(1.2px) rotate(-0.4deg); }
-          }
-        `}</style>
-
-        {/* Rail track line */}
-        <div
-          className="absolute pointer-events-none z-0"
-          style={{
-            top: `${DESKTOP_RAIL_LANE_CENTER_Y}px`,
-            left: `${DESKTOP_PADDING_X}px`,
-            right: `${DESKTOP_PADDING_X}px`,
-            height: '3px',
-          }}
-        >
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: 'linear-gradient(90deg, #4B5E70 0%, #64748B 50%, #4B5E70 100%)',
-              opacity: 0.25,
-            }}
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(75,94,112,0.15) 18px, rgba(75,94,112,0.15) 20px)',
-            }}
-          />
-          <div
-            className="absolute inset-0 rounded-full transition-opacity duration-300"
-            style={{
-              background: 'linear-gradient(90deg, #0066FF, #9FCE1A, #0066FF)',
-              opacity: isMoving ? 0.4 : 0,
-              filter: 'blur(2px)',
-            }}
-          />
+      {/* ─── Shared Header Flex Container ─── */}
+      <div className="flex flex-row items-center justify-between border-b border-eco-primary/10 pb-1 sm:pb-1.5 mb-1 sm:mb-1.5 gap-3 relative z-10 font-sans">
+        <div className="flex items-center space-x-2">
+          {title}
         </div>
 
-        {/* Train Visual (transform-only transition) */}
-        <div
-          ref={trainRef}
-          id="desktop-train"
-          className="absolute z-30 pointer-events-none"
-          style={{
-            position: 'absolute',
-            zIndex: 30,
-            left: 0,
-            top: 0,
-            width: `${DESKTOP_TRAIN_W}px`,
-            height: `${DESKTOP_TRAIN_H}px`,
-            pointerEvents: 'none',
-            willChange: 'transform',
-            transition: prefersReducedMotion ? 'none' : `transform ${duration}ms cubic-bezier(0.33, 1, 0.68, 1)`,
-            transform: getTrainTransform(activeIndex),
-          }}
-        >
-          <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
-            <DesktopThreeCarTrain avatarConfig={avatarConfig} direction={direction} />
-          </div>
-        </div>
-
-        {/* Station Nodes Grid */}
-        <div className="relative z-10 grid grid-cols-6 gap-1" style={{ paddingTop: '36px' }}>
-          {JOURNEY_STATIONS.map((station, idx) => {
-            const isActive = activeSection === station.id;
-
-            return (
-              <div key={station.id} className="flex flex-col items-center text-center relative" style={{ paddingTop: '6px' }}>
-                <div
-                  className="absolute w-[1.5px] border-l-2 border-dashed border-eco-primary/20 pointer-events-none z-0"
-                  style={{ top: '-23px', height: '23px', left: '50%', transform: 'translateX(-50%)' }}
-                />
-                <button
-                  onClick={() => handleStationClick(station.id, idx)}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative z-10 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary ${
-                    isActive
-                      ? 'bg-eco-primary text-white border-eco-primary scale-105 shadow-sm ring-2 ring-eco-mint'
-                      : 'bg-white text-eco-ink border-gray-200 hover:border-eco-primary hover:text-eco-primary hover:scale-105'
-                  }`}
-                >
-                  <span className="text-xs">{station.icon}</span>
-                  <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[6px] w-2.5 h-2.5 rounded-full flex items-center justify-center font-bold">
-                    {station.num}
-                  </span>
-                </button>
-                <div className="mt-0.5 space-y-0">
-                  <button
-                    onClick={() => handleStationClick(station.id, idx)}
-                    className={`text-[8px] font-black uppercase tracking-wider block hover:text-eco-primary transition-all duration-200 ${
-                      isActive ? 'text-eco-primary font-black scale-105' : 'text-eco-ink'
-                    }`}
-                  >
-                    {station.name}
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+        <div className="flex items-center gap-2 relative z-50 shrink-0 font-sans">
+          {headerRight}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleSound();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                e.stopPropagation();
+                toggleSound();
+              }
+            }}
+            tabIndex={0}
+            aria-pressed={soundEnabled}
+            aria-label={soundEnabled ? "Âm thanh hành trình: Bật" : "Âm thanh hành trình: Tắt"}
+            title={soundEnabled ? "Âm thanh hành trình: Bật" : "Âm thanh hành trình: Tắt"}
+            className={`w-9 h-9 rounded-xl flex items-center justify-center border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary shrink-0 cursor-pointer ${
+              soundEnabled
+                ? 'bg-eco-mint text-eco-primary border-eco-primary/20 hover:bg-eco-primary hover:text-white'
+                : 'bg-slate-100 text-gray-400 border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            {soundEnabled ? (
+              <Volume2 className="w-4 h-4" aria-hidden="true" />
+            ) : (
+              <VolumeX className="w-4 h-4" aria-hidden="true" />
+            )}
+            <span className="sr-only">Âm thanh hành trình: {soundEnabled ? 'Bật' : 'Tắt'}</span>
+          </button>
         </div>
       </div>
 
-      {/* ─── MOBILE VIEW ─── */}
-      <div
-        ref={mobileTrackRef}
-        data-testid="mobile-track"
-        className="sm:hidden relative pl-6 pr-24 py-1.5 z-10"
-        style={{ position: 'relative' }}
-      >
-        {/* Rail Line */}
-        <div
-          className="absolute pointer-events-none z-0"
-          style={{
-            right: '52px',
-            top: `${MOBILE_PADDING_Y}px`,
-            bottom: `${MOBILE_PADDING_Y}px`,
-            width: '3px',
-          }}
-        >
-          <div
-            className="absolute inset-0 rounded-full"
-            style={{
-              background: 'linear-gradient(180deg, #4B5E70 0%, #64748B 50%, #4B5E70 100%)',
-              opacity: 0.25,
-            }}
-          />
-          <div
-            className="absolute inset-0 rounded-full transition-opacity duration-300"
-            style={{
-              background: 'linear-gradient(180deg, #0066FF, #9FCE1A, #0066FF)',
-              opacity: isMoving ? 0.4 : 0,
-              filter: 'blur(2px)',
-            }}
-          />
-        </div>
+      {/* Style injection for micro-animation bob/lean */}
+      <style>{`
+        .train-visual-container.is-moving {
+          animation: train-bob-lean 0.5s ease-in-out infinite alternate;
+        }
+        .train-visual-container.is-idle {
+          transition: transform 150ms cubic-bezier(0.25, 1, 0.5, 1);
+          transform: translateY(0px) rotate(0deg);
+        }
+        @keyframes train-bob-lean {
+          0% { transform: translateY(0px) rotate(0.38deg); }
+          100% { transform: translateY(1.1px) rotate(-0.38deg); }
+        }
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+        }
+      `}</style>
 
-        {/* Mobile Train Wrapper */}
+      {/* ─── Rail lane container (Hidden if collapsed but remains mounted) ─── */}
+      <div className={isCollapsed ? 'hidden' : ''}>
+        {/* ─── DESKTOP VIEW ─── */}
         <div
-          id="mobile-train"
-          className="absolute z-30 pointer-events-none"
-          style={{
-            position: 'absolute',
-            zIndex: 30,
-            right: '16px',
-            top: 0,
-            width: `${MOBILE_TRAIN_W}px`,
-            height: `${MOBILE_TRAIN_H}px`,
-            pointerEvents: 'none',
-            willChange: 'transform',
-            transition: prefersReducedMotion ? 'none' : `transform ${duration}ms cubic-bezier(0.33, 1, 0.68, 1)`,
-            transform: getMobileTrainTransform(activeIndex),
-          }}
+          ref={desktopTrackRef}
+          data-testid="desktop-track"
+          className="hidden sm:block relative py-1.5 px-2 z-10"
+          style={{ position: 'relative', minHeight: '76px' }}
         >
-          <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
-            <MobileThreeCarTrain avatarConfig={avatarConfig} direction={direction} />
+          {/* Rail track line */}
+          <div
+            className="absolute pointer-events-none z-0"
+            style={{
+              top: `${DESKTOP_RAIL_LANE_CENTER_Y}px`,
+              left: `${DESKTOP_PADDING_X}px`,
+              right: `${DESKTOP_PADDING_X}px`,
+              height: '3px',
+            }}
+          >
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'linear-gradient(90deg, #4B5E70 0%, #64748B 50%, #4B5E70 100%)',
+                opacity: 0.25,
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 18px, rgba(75,94,112,0.15) 18px, rgba(75,94,112,0.15) 20px)',
+              }}
+            />
+            <div
+              className="absolute inset-0 rounded-full transition-opacity duration-300"
+              style={{
+                background: 'linear-gradient(90deg, #0066FF, #9FCE1A, #0066FF)',
+                opacity: isMoving ? 0.4 : 0,
+                filter: 'blur(2px)',
+              }}
+            />
           </div>
-        </div>
 
-        {/* Vertical list of Stations */}
-        <div className="space-y-3 relative z-10">
-          {JOURNEY_STATIONS.map((station, idx) => {
-            const isActive = activeSection === station.id;
+          {/* Train Visual (transform-only transition) */}
+          <div
+            ref={trainRef}
+            id="desktop-train"
+            className="absolute z-30 pointer-events-none"
+            style={{
+              position: 'absolute',
+              zIndex: 30,
+              left: 0,
+              top: 0,
+              width: `${DESKTOP_TRAIN_W}px`,
+              height: `${DESKTOP_TRAIN_H}px`,
+              pointerEvents: 'none',
+              willChange: 'transform',
+              transition: travelDuration === 0 ? 'none' : `transform ${travelDuration}ms cubic-bezier(0.33, 1, 0.68, 1)`,
+              transform: getTrainTransform(journey.targetIndex),
+            }}
+          >
+            <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
+              <DesktopThreeCarTrain avatarConfig={avatarConfig} direction={direction} />
+            </div>
+          </div>
 
-            return (
-              <div key={station.id} className="flex items-center justify-between relative h-10">
-                <div
-                  className="absolute h-[1.5px] border-t-2 border-dashed border-eco-primary/20 pointer-events-none z-0"
-                  style={{ left: '28px', right: '36px', top: '50%', transform: 'translateY(-50%)' }}
-                />
-                <div className="flex items-center space-x-2 relative z-10 bg-white/95 pr-2 rounded-r-xl">
+          {/* Station Nodes Grid */}
+          <div className="relative z-10 grid grid-cols-6 gap-1" style={{ paddingTop: '36px' }}>
+            {JOURNEY_STATIONS.map((station, idx) => {
+              const isActive = journey.targetIndex === idx;
+
+              return (
+                <div key={station.id} className="flex flex-col items-center text-center relative" style={{ paddingTop: '6px' }}>
+                  <div
+                    className="absolute w-[1.5px] border-l-2 border-dashed border-eco-primary/20 pointer-events-none z-0"
+                    style={{ top: '-23px', height: '23px', left: '50%', transform: 'translateX(-50%)' }}
+                  />
                   <button
                     onClick={() => handleStationClick(station.id, idx)}
-                    className={`w-7 h-7 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 relative shadow-xs focus:outline-none ${
+                    className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-all duration-300 relative z-10 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-eco-primary ${
                       isActive
-                        ? 'bg-eco-primary text-white border-eco-primary ring-2 ring-eco-mint scale-105'
-                        : 'bg-white text-eco-ink border-gray-200'
+                        ? 'bg-eco-primary text-white border-eco-primary scale-105 shadow-sm ring-2 ring-eco-mint'
+                        : 'bg-white text-eco-ink border-gray-200 hover:border-eco-primary hover:text-eco-primary hover:scale-105'
                     }`}
                   >
                     <span className="text-xs">{station.icon}</span>
@@ -525,21 +586,120 @@ export default function MetroRailStage({ activeSection, onSectionSelect, avatarC
                       {station.num}
                     </span>
                   </button>
-                  <div className="flex-grow pl-0.5">
+                  <div className="mt-0.5 space-y-0">
                     <button
                       onClick={() => handleStationClick(station.id, idx)}
-                      className={`text-[10px] font-black uppercase tracking-wider block text-left hover:text-eco-primary transition-colors ${
-                        isActive ? 'text-eco-primary font-bold' : 'text-eco-ink'
+                      className={`text-[8px] font-black uppercase tracking-wider block hover:text-eco-primary transition-all duration-200 ${
+                        isActive ? 'text-eco-primary font-black scale-105' : 'text-eco-ink'
                       }`}
                     >
                       {station.name}
                     </button>
-                    <span className="text-[7px] text-eco-muted block font-medium">Ga số {station.num}</span>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* ─── MOBILE VIEW ─── */}
+        <div
+          ref={mobileTrackRef}
+          data-testid="mobile-track"
+          className="sm:hidden relative pl-6 pr-24 py-1.5 z-10"
+          style={{ position: 'relative' }}
+        >
+          {/* Rail Line */}
+          <div
+            className="absolute pointer-events-none z-0"
+            style={{
+              right: '52px',
+              top: `${MOBILE_PADDING_Y}px`,
+              bottom: `${MOBILE_PADDING_Y}px`,
+              width: '3px',
+            }}
+          >
+            <div
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: 'linear-gradient(180deg, #4B5E70 0%, #64748B 50%, #4B5E70 100%)',
+                opacity: 0.25,
+              }}
+            />
+            <div
+              className="absolute inset-0 rounded-full transition-opacity duration-300"
+              style={{
+                background: 'linear-gradient(180deg, #0066FF, #9FCE1A, #0066FF)',
+                opacity: isMoving ? 0.4 : 0,
+                filter: 'blur(2px)',
+              }}
+            />
+          </div>
+
+          {/* Mobile Train Wrapper */}
+          <div
+            ref={mobileTrainRef}
+            id="mobile-train"
+            className="absolute z-30 pointer-events-none"
+            style={{
+              position: 'absolute',
+              zIndex: 30,
+              right: '16px',
+              top: 0,
+              width: `${MOBILE_TRAIN_W}px`,
+              height: `${MOBILE_TRAIN_H}px`,
+              pointerEvents: 'none',
+              willChange: 'transform',
+              transition: travelDuration === 0 ? 'none' : `transform ${travelDuration}ms cubic-bezier(0.33, 1, 0.68, 1)`,
+              transform: getMobileTrainTransform(journey.targetIndex),
+            }}
+          >
+            <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
+              <MobileThreeCarTrain avatarConfig={avatarConfig} direction={direction} />
+            </div>
+          </div>
+
+          {/* Vertical list of Stations */}
+          <div className="space-y-3 relative z-10">
+            {JOURNEY_STATIONS.map((station, idx) => {
+              const isActive = journey.targetIndex === idx;
+
+              return (
+                <div key={station.id} className="flex items-center justify-between relative h-10">
+                  <div
+                    className="absolute h-[1.5px] border-t-2 border-dashed border-eco-primary/20 pointer-events-none z-0"
+                    style={{ left: '28px', right: '36px', top: '50%', transform: 'translateY(-50%)' }}
+                  />
+                  <div className="flex items-center space-x-2 relative z-10 bg-white/95 pr-2 rounded-r-xl">
+                    <button
+                      onClick={() => handleStationClick(station.id, idx)}
+                      className={`w-7 h-7 rounded-full flex items-center justify-center border transition-all duration-300 shrink-0 relative shadow-xs focus:outline-none ${
+                        isActive
+                          ? 'bg-eco-primary text-white border-eco-primary ring-2 ring-eco-mint scale-105'
+                          : 'bg-white text-eco-ink border-gray-200'
+                      }`}
+                    >
+                      <span className="text-xs">{station.icon}</span>
+                      <span className="absolute -bottom-1 -right-1 bg-eco-ink text-white text-[6px] w-2.5 h-2.5 rounded-full flex items-center justify-center font-bold">
+                        {station.num}
+                      </span>
+                    </button>
+                    <div className="flex-grow pl-0.5">
+                      <button
+                        onClick={() => handleStationClick(station.id, idx)}
+                        className={`text-[10px] font-black uppercase tracking-wider block text-left hover:text-eco-primary transition-colors ${
+                          isActive ? 'text-eco-primary font-bold' : 'text-eco-ink'
+                        }`}
+                      >
+                        {station.name}
+                      </button>
+                      <span className="text-[7px] text-eco-muted block font-medium">Ga số {station.num}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

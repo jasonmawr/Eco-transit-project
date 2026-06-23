@@ -510,9 +510,9 @@ test.describe('Evidence Generation Suite', () => {
     await flowPage.locator('a[href="#xanhwrap"]').click();
     await flowPage.waitForTimeout(1000);
     // Toggle sound while moving to show responsiveness of the sound controller
-    await flowPage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]').click();
+    await flowPage.locator('button[aria-label^="Âm thanh hành trình"]').click();
     await flowPage.waitForTimeout(500);
-    await flowPage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]').click();
+    await flowPage.locator('button[aria-label^="Âm thanh hành trình"]').click();
     await flowPage.waitForTimeout(1500);
 
     const flowVideo = flowPage.video();
@@ -596,7 +596,7 @@ test.describe('Evidence Generation Suite', () => {
     await togglePage.waitForTimeout(1000);
 
     // Mute sound
-    const soundToggleBtn = togglePage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    const soundToggleBtn = togglePage.locator('button[aria-label^="Âm thanh hành trình"]');
     await expect(soundToggleBtn).toContainText('Âm thanh hành trình: Bật');
     await soundToggleBtn.click();
     await expect(soundToggleBtn).toContainText('Âm thanh hành trình: Tắt');

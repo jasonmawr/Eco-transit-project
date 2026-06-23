@@ -22,7 +22,7 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
   test('should render exactly three carriages on desktop and mobile viewports', async ({ page }) => {
     // 1. Desktop viewport
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-desktop-train');
+    await page.waitForSelector('#desktop-train');
     
     const desktopCarriages = page.locator('[data-testid="desktop-carriage"]');
     await expect(desktopCarriages).toHaveCount(3);
@@ -30,7 +30,7 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
     // 2. Mobile viewport
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-mobile-train');
+    await page.waitForSelector('#mobile-train');
     
     const mobileCarriages = page.locator('[data-testid="mobile-carriage"]');
     await expect(mobileCarriages).toHaveCount(3);
@@ -39,7 +39,7 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
   test('should have keyboard-accessible sound controls and persist preferences in localStorage', async ({ page }) => {
     await page.goto('/motion-lab');
     
-    const soundBtn = page.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    const soundBtn = page.locator('button[aria-label="Âm thanh hành trình: Bật"], button[aria-label="Âm thanh hành trình: Tắt"]');
     await expect(soundBtn).toBeVisible();
     await expect(soundBtn).toContainText('Âm thanh hành trình: Bật');
     
@@ -61,14 +61,14 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
 
   test('should start audio ONLY after a station click when enabled', async ({ page }) => {
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-desktop-train');
+    await page.waitForSelector('#desktop-train');
     
     // Assert no audio played on initial load
     let playCalls = await page.evaluate(() => (window as any).__audioPlayCalls);
     expect(playCalls.length).toBe(0);
     
     // Click Station 3 (Ga số 3)
-    const station3 = page.locator('div:has(#lab-desktop-train) button:has-text("🎫")').first();
+    const station3 = page.locator('div:has(#desktop-train) button:has-text("🎫")').first();
     await expect(station3).toBeVisible();
     await station3.click();
     
@@ -84,10 +84,10 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
 
   test('should never play sound when muted', async ({ page }) => {
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-desktop-train');
+    await page.waitForSelector('#desktop-train');
     
     // Mute sound
-    const soundBtn = page.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    const soundBtn = page.locator('button[aria-label="Âm thanh hành trình: Bật"], button[aria-label="Âm thanh hành trình: Tắt"]');
     await soundBtn.click();
     await expect(soundBtn).toContainText('Âm thanh hành trình: Tắt');
     
@@ -95,7 +95,7 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
     await page.evaluate(() => { (window as any).__audioPlayCalls = []; });
     
     // Click Station 3
-    const station3 = page.locator('div:has(#lab-desktop-train) button:has-text("🎫")').first();
+    const station3 = page.locator('div:has(#desktop-train) button:has-text("🎫")').first();
     await station3.click();
     
     // Wait for transition period
@@ -108,12 +108,12 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
 
   test('should prevent multiple overlapping rolling loop creations on rapid retarget clicks', async ({ page }) => {
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-desktop-train');
+    await page.waitForSelector('#desktop-train');
     
     // Click Station 2, then Station 4, then Station 6 rapidly
-    const station2 = page.locator('div:has(#lab-desktop-train) button:has-text("🚉")').first();
-    const station4 = page.locator('div:has(#lab-desktop-train) button:has-text("🎁")').first();
-    const station6 = page.locator('div:has(#lab-desktop-train) button:has-text("📖")').first();
+    const station2 = page.locator('div:has(#desktop-train) button:has-text("🚉")').first();
+    const station4 = page.locator('div:has(#desktop-train) button:has-text("🎁")').first();
+    const station6 = page.locator('div:has(#desktop-train) button:has-text("📖")').first();
     
     await station2.click();
     await page.waitForTimeout(100);
@@ -131,13 +131,13 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
 
   test('should ensure Metro train visual stays fully inside the Motion Lab stage bounds', async ({ page }) => {
     await page.goto('/motion-lab');
-    await page.waitForSelector('#lab-desktop-train');
+    await page.waitForSelector('#desktop-train');
     
-    const trackContainer = page.locator('div:has(#lab-desktop-train)').first();
-    const train = page.locator('#lab-desktop-train');
+    const trackContainer = page.locator('div:has(#desktop-train)').first();
+    const train = page.locator('#desktop-train');
     
     // Click Station 6 to move to the far right
-    await page.locator('div:has(#lab-desktop-train) button:has-text("📖")').first().click();
+    await page.locator('div:has(#desktop-train) button:has-text("📖")').first().click();
     await page.waitForTimeout(2500); // let the transition finish
     
     const trackBox = await trackContainer.boundingBox();
