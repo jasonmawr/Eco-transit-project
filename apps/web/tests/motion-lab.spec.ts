@@ -1,0 +1,160 @@
+import { test, expect } from '@playwright/test';
+
+test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
+
+  test.beforeEach(async ({ page }) => {
+    // Set standard viewport
+    await page.setViewportSize({ width: 1366, height: 768 });
+    
+    // Inject audio spy to track plays
+    await page.addInitScript(() => {
+      const originalPlay = window.HTMLAudioElement.prototype.play;
+      const playCalls: string[] = [];
+      (window as any).__audioPlayCalls = playCalls;
+      
+      window.HTMLAudioElement.prototype.play = function() {
+        playCalls.push(this.src);
+        return originalPlay.apply(this, arguments);
+      };
+    });
+  });
+
+  test('should render exactly three carriages on desktop and mobile viewports', async ({ page }) => {
+    // 1. Desktop viewport
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-desktop-train');
+    
+    const desktopCarriages = page.locator('[data-testid="desktop-carriage"]');
+    await expect(desktopCarriages).toHaveCount(3);
+    
+    // 2. Mobile viewport
+    await page.setViewportSize({ width: 390, height: 800 });
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-mobile-train');
+    
+    const mobileCarriages = page.locator('[data-testid="mobile-carriage"]');
+    await expect(mobileCarriages).toHaveCount(3);
+  });
+
+  test('should have keyboard-accessible sound controls and persist preferences in localStorage', async ({ page }) => {
+    await page.goto('/motion-lab');
+    
+    const soundBtn = page.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    await expect(soundBtn).toBeVisible();
+    await expect(soundBtn).toContainText('Âm thanh hành trình: Bật');
+    
+    // Check key accessibility (can focus and trigger with space/enter)
+    await soundBtn.focus();
+    await page.keyboard.press('Space');
+    await expect(soundBtn).toContainText('Âm thanh hành trình: Tắt');
+    
+    // Check localStorage persistence
+    const storedPref = await page.evaluate(() => localStorage.getItem('ecotransit_sound_enabled'));
+    expect(storedPref).toBe('false');
+    
+    // Turn back on
+    await page.keyboard.press('Enter');
+    await expect(soundBtn).toContainText('Âm thanh hành trình: Bật');
+    const storedPrefOn = await page.evaluate(() => localStorage.getItem('ecotransit_sound_enabled'));
+    expect(storedPrefOn).toBe('true');
+  });
+
+  test('should start audio ONLY after a station click when enabled', async ({ page }) => {
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-desktop-train');
+    
+    // Assert no audio played on initial load
+    let playCalls = await page.evaluate(() => (window as any).__audioPlayCalls);
+    expect(playCalls.length).toBe(0);
+    
+    // Click Station 3 (Ga số 3)
+    const station3 = page.locator('div:has(#lab-desktop-train) button:has-text("🎫")').first();
+    await expect(station3).toBeVisible();
+    await station3.click();
+    
+    // Verify audio play was called
+    playCalls = await page.evaluate(() => (window as any).__audioPlayCalls);
+    expect(playCalls.length).toBeGreaterThan(0);
+    // Should have called play on departure and rolling
+    const hasDeparture = playCalls.some((src: string) => src.includes('metro-departure.mp3'));
+    const hasRolling = playCalls.some((src: string) => src.includes('metro-rolling-loop.mp3'));
+    expect(hasDeparture).toBe(true);
+    expect(hasRolling).toBe(true);
+  });
+
+  test('should never play sound when muted', async ({ page }) => {
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-desktop-train');
+    
+    // Mute sound
+    const soundBtn = page.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    await soundBtn.click();
+    await expect(soundBtn).toContainText('Âm thanh hành trình: Tắt');
+    
+    // Reset spy log
+    await page.evaluate(() => { (window as any).__audioPlayCalls = []; });
+    
+    // Click Station 3
+    const station3 = page.locator('div:has(#lab-desktop-train) button:has-text("🎫")').first();
+    await station3.click();
+    
+    // Wait for transition period
+    await page.waitForTimeout(500);
+    
+    // Assert no audio play calls
+    const playCalls = await page.evaluate(() => (window as any).__audioPlayCalls);
+    expect(playCalls.length).toBe(0);
+  });
+
+  test('should prevent multiple overlapping rolling loop creations on rapid retarget clicks', async ({ page }) => {
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-desktop-train');
+    
+    // Click Station 2, then Station 4, then Station 6 rapidly
+    const station2 = page.locator('div:has(#lab-desktop-train) button:has-text("🚉")').first();
+    const station4 = page.locator('div:has(#lab-desktop-train) button:has-text("🎁")').first();
+    const station6 = page.locator('div:has(#lab-desktop-train) button:has-text("📖")').first();
+    
+    await station2.click();
+    await page.waitForTimeout(100);
+    await station4.click();
+    await page.waitForTimeout(100);
+    await station6.click();
+    
+    // Check play calls
+    const playCalls = await page.evaluate(() => (window as any).__audioPlayCalls);
+    
+    // rolling-loop should only be started once (or keep playing) and not stacked/played multiple times
+    const rollingCalls = playCalls.filter((src: string) => src.includes('metro-rolling-loop.mp3'));
+    expect(rollingCalls.length).toBe(1);
+  });
+
+  test('should ensure Metro train visual stays fully inside the Motion Lab stage bounds', async ({ page }) => {
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#lab-desktop-train');
+    
+    const trackContainer = page.locator('div:has(#lab-desktop-train)').first();
+    const train = page.locator('#lab-desktop-train');
+    
+    // Click Station 6 to move to the far right
+    await page.locator('div:has(#lab-desktop-train) button:has-text("📖")').first().click();
+    await page.waitForTimeout(2500); // let the transition finish
+    
+    const trackBox = await trackContainer.boundingBox();
+    const trainBox = await train.boundingBox();
+    
+    expect(trackBox).not.toBeNull();
+    expect(trainBox).not.toBeNull();
+    
+    if (trackBox && trainBox) {
+      // Check horizontal containment: train left/right edge must stay inside track container
+      expect(trainBox.x).toBeGreaterThanOrEqual(trackBox.x);
+      expect(trainBox.x + trainBox.width).toBeLessThanOrEqual(trackBox.x + trackBox.width);
+      
+      // Check vertical containment: train top/bottom must stay inside track container
+      expect(trainBox.y).toBeGreaterThanOrEqual(trackBox.y);
+      expect(trainBox.y + trainBox.height).toBeLessThanOrEqual(trackBox.y + trackBox.height);
+    }
+  });
+
+});
