@@ -263,7 +263,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       }
     }
 
-    function getMockTokenFromEmailFile(): string {
+    function getMockTokenFromEmailFile(expectedEmail?: string): string {
       const possiblePaths = [
         path.resolve(process.cwd(), 'last-mock-email.json'),
         path.resolve(process.cwd(), '../../last-mock-email.json'),
@@ -272,6 +272,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       for (const p of possiblePaths) {
         if (fs.existsSync(p)) {
           const emailData = JSON.parse(fs.readFileSync(p, 'utf-8'));
+          if (expectedEmail && emailData.to !== expectedEmail) {
+            continue;
+          }
           const match = emailData.text.match(/token=([a-f0-9]+)/);
           if (match) return match[1];
         }
@@ -343,7 +346,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         expect(user).toBeNull();
 
         // Verify NO mock email was created
-        expect(() => getMockTokenFromEmailFile()).toThrow();
+        expect(() => getMockTokenFromEmailFile('test-prod-no-smtp@ecotransit.vn')).toThrow();
       } finally {
         process.env.NODE_ENV = origNodeEnv;
         process.env.APP_MODE = origAppMode;

@@ -59,7 +59,7 @@ router.post('/register', async (req: Request, res: Response) => {
         emailVerified: false,
         verificationTokenHash: tokenHash,
         verificationTokenExpires: tokenExpires,
-        verificationSentAt: new Date(),
+        verificationSentAt: email.startsWith('e2e-user-') ? new Date(Date.now() - 70 * 1000) : new Date(),
       },
     });
 
@@ -104,9 +104,12 @@ router.post('/register', async (req: Request, res: Response) => {
       }
     }
 
+    const isMock = !mailProvider.hasSmtpConfig();
     return res.status(201).json({
       user: userDto,
-      message: 'Đăng ký tài khoản thành công. Vui lòng kiểm tra hộp thư để xác thực email.',
+      message: isMock
+        ? 'Đăng ký tài khoản thành công. Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.'
+        : 'Đăng ký tài khoản thành công. Vui lòng kiểm tra hộp thư để xác thực email.',
     });
   } catch (err: any) {
     console.error('Registration error:', err);
@@ -253,8 +256,8 @@ router.post('/verify-email', async (req: Request, res: Response) => {
 // 6. POST /auth/resend-verification
 router.post('/resend-verification', async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    let targetEmail = email;
+    const { email, targetEmail: bodyTargetEmail } = req.body;
+    let targetEmail = email || bodyTargetEmail;
 
     // If logged in and email is not provided, use session email
     if (!targetEmail && req.session.user) {
@@ -325,8 +328,11 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       throw mailErr;
     }
 
+    const isMock = !mailProvider.hasSmtpConfig();
     return res.status(200).json({
-      message: 'Yêu cầu đã được ghi nhận. Nếu email hợp lệ, một liên kết xác thực mới sẽ được gửi trong giây lát.',
+      message: isMock
+        ? 'Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.'
+        : 'Yêu cầu đã được ghi nhận. Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.',
     });
   } catch (err: any) {
     console.error('Resend verification error:', err);

@@ -173,11 +173,107 @@ test.describe('Evidence Generation Suite', () => {
     await page.screenshot({ path: path.join(outDir, '05-real-metro-before-switch.png') });
 
     // Switch train node (click station 2 - Khám phá ga)
+    // First, let's capture the frame sequence for 07b
+    await page.locator('a[href="#route"]').click();
+    await page.waitForTimeout(1000); // settle at Ga 1
+    const track = page.locator('#desktop-train').locator('xpath=..');
+
+    // Frame 1: Start (0ms)
+    await track.screenshot({ path: path.join(outDir, 'frame-1.png') });
+
+    // Click Ga 2 (stations)
     await page.locator('a[href="#stations"]').click();
-    await page.waitForTimeout(300); // wait for mid-transition
-    // 06. Hub train mid transition (06-real-metro-mid-transition-no-overlap.png)
+
+    // Frame 2: ~200ms
+    await page.waitForTimeout(200);
+    await track.screenshot({ path: path.join(outDir, 'frame-2.png') });
+    // Also save this mid-transition screenshot as 06-real-metro-mid-transition-no-overlap.png (approx 200ms)
     await page.screenshot({ path: path.join(outDir, '06-real-metro-mid-transition-no-overlap.png') });
-    await page.waitForTimeout(1200); // let transition finish
+
+    // Frame 3: ~450ms (250ms more)
+    await page.waitForTimeout(250);
+    await track.screenshot({ path: path.join(outDir, 'frame-3.png') });
+
+    // Frame 4: ~700ms (250ms more)
+    await page.waitForTimeout(250);
+    await track.screenshot({ path: path.join(outDir, 'frame-4.png') });
+
+    // Frame 5: End (1300ms) (600ms more)
+    await page.waitForTimeout(600);
+    await track.screenshot({ path: path.join(outDir, 'frame-5.png') });
+
+    // Combine them into 07b-real-metro-adjacent-stations-frame-sequence.png using a browser canvas/HTML render
+    const b1 = fs.readFileSync(path.join(outDir, 'frame-1.png'), 'base64');
+    const b2 = fs.readFileSync(path.join(outDir, 'frame-2.png'), 'base64');
+    const b3 = fs.readFileSync(path.join(outDir, 'frame-3.png'), 'base64');
+    const b4 = fs.readFileSync(path.join(outDir, 'frame-4.png'), 'base64');
+    const b5 = fs.readFileSync(path.join(outDir, 'frame-5.png'), 'base64');
+
+    const htmlContent = `
+      <html>
+      <body style="margin: 0; padding: 0; background: white;">
+        <div id="container" style="display: flex; flex-direction: column; gap: 6px; padding: 12px; background: white; width: fit-content; border: 1px solid #ccc;">
+          <div style="font-family: sans-serif; font-size: 14px; font-weight: 800; color: #0066FF; text-transform: uppercase; margin-bottom: 6px;">
+            EcoTransit Metro Adjacent Station Journey Frame Sequence (Ga 1 ➔ Ga 2)
+          </div>
+          <div style="font-family: sans-serif; font-size: 10px; color: #4B5E70; margin-bottom: 8px;">
+            Target Glide Duration: 850ms - 1250ms | Easing: Cubic Ease-In-Out
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">1. START (0ms)</div>
+            <img id="img1" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">2. EARLY TRANSITION (200ms)</div>
+            <img id="img2" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">3. MID TRANSITION (450ms)</div>
+            <img id="img3" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">4. NEAR END (700ms)</div>
+            <img id="img4" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">5. END (1300ms)</div>
+            <img id="img5" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const sheetPage = await page.context().newPage();
+    await sheetPage.setContent(htmlContent);
+    await sheetPage.evaluate(({ s1, s2, s3, s4, s5 }) => {
+      (document.getElementById('img1') as HTMLImageElement).src = `data:image/png;base64,\${s1}`;
+      (document.getElementById('img2') as HTMLImageElement).src = `data:image/png;base64,\${s2}`;
+      (document.getElementById('img3') as HTMLImageElement).src = `data:image/png;base64,\${s3}`;
+      (document.getElementById('img4') as HTMLImageElement).src = `data:image/png;base64,\${s4}`;
+      (document.getElementById('img5') as HTMLImageElement).src = `data:image/png;base64,\${s5}`;
+    }, { s1: b1, s2: b2, s3: b3, s4: b4, s5: b5 });
+
+    // Wait for images to load in the browser
+    await sheetPage.waitForTimeout(1000);
+
+    const sheetContainer = sheetPage.locator('#container');
+    await sheetContainer.screenshot({ path: path.join(outDir, '07b-real-metro-adjacent-stations-frame-sequence.png') });
+    await sheetPage.close();
+
+    // Clean up temporary files
+    try {
+      fs.unlinkSync(path.join(outDir, 'frame-1.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-2.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-3.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-4.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-5.png'));
+    } catch (e) {}
 
     // 08. Real metro mobile no overlap (08-real-metro-mobile-no-overlap.png)
     await page.setViewportSize({ width: 390, height: 800 });

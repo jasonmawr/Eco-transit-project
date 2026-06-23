@@ -25,6 +25,22 @@ export default function Home() {
   const [selectedStationId, setSelectedStationId] = useState<string>('');
   const [user, setUser] = useState<any>(null);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const formatCooldown = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `Gửi lại sau ${m}:${s}`;
+  };
 
   // Scene Navigation state
   const [activeSection, setActiveSection] = useState<string>('route');
@@ -219,31 +235,57 @@ export default function Home() {
 
         {/* Verification Alert Banner */}
         {user && user.emailVerified === false && (
-          <div className="bg-amber-500/10 border border-amber-500/25 px-4 py-2.5 rounded-2xl flex items-center justify-between text-xs text-amber-900 mb-3 relative z-20 shrink-0">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm">⚠️</span>
-              <span>
-                <strong>Tài khoản chưa xác thực:</strong> Vui lòng xác thực email <strong className="font-mono">{user.email}</strong> để tham gia đầy đủ chiến dịch và thiết lập Avatar.
-              </span>
+          <div className="bg-[#FFF3DD] border border-[#0066FF]/20 px-4 py-3 rounded-2xl flex flex-col md:flex-row md:items-center justify-between text-xs text-[#0A1118] mb-3 relative z-20 shrink-0 gap-3">
+            <div className="flex items-start space-x-2.5">
+              <span className="text-sm mt-0.5" role="img" aria-label="cảnh báo">⚠️</span>
+              <div className="space-y-1">
+                <p>
+                  <strong>Tài khoản chưa xác thực:</strong> Vui lòng xác thực email <strong className="font-mono">{user.email}</strong> để tham gia đầy đủ chiến dịch và thiết lập Avatar.
+                </p>
+                {notification && (
+                  <p className={`font-semibold flex items-center gap-1 ${notification.type === 'success' ? 'text-emerald-700' : 'text-rose-700'}`} aria-live="polite">
+                    {notification.type === 'success' ? '✓' : '⚠️'} {notification.message}
+                  </p>
+                )}
+              </div>
             </div>
             <button
+              disabled={resendCooldown > 0}
               onClick={async () => {
+                setNotification(null);
                 try {
                   const res = await apiFetch('/api/auth/resend-verification', { method: 'POST' });
-                  alert(res.message || 'Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.');
+                  setResendCooldown(60);
+                  setNotification({
+                    type: 'success',
+                    message: res.message || 'Yêu cầu xác thực đã được tạo. Vui lòng kiểm tra hộp thư của bạn.'
+                  });
                 } catch (err: any) {
-                  alert(err.message || 'Yêu cầu gửi lại email xác thực thất bại.');
+                  const match = err.message.match(/(\d+)\s*giây/);
+                  if (match) {
+                    setResendCooldown(parseInt(match[1], 10));
+                  } else {
+                    setResendCooldown(60);
+                  }
+                  setNotification({
+                    type: 'error',
+                    message: err.message || 'Yêu cầu gửi lại email xác thực thất bại.'
+                  });
                 }
               }}
-              className="bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-black uppercase px-3 py-1.5 rounded-xl transition-all shadow-sm shrink-0"
+              className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-xl transition-all shadow-sm shrink-0 whitespace-nowrap ${
+                resendCooldown > 0
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed border border-gray-300'
+                  : 'bg-[#0066FF] hover:bg-[#004ecc] text-white'
+              }`}
             >
-              Gửi lại email xác thực
+              {resendCooldown > 0 ? formatCooldown(resendCooldown) : 'Gửi lại email xác thực'}
             </button>
           </div>
         )}
 
         {/* Campaign Journey Map Hub */}
-        <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} user={user} />
+        <CampaignHub activeSection={activeSection} onSectionSelect={handleSectionSelect} user={user} onLoginClick={() => setIsAuthOpen(true)} />
 
         {/* Scene viewport container (perspective boundary) */}
         <div

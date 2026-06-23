@@ -24,3 +24,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
+// Dev server restart trigger comment

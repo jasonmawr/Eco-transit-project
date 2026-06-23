@@ -29,6 +29,7 @@ interface CampaignHubProps {
   activeSection: string;
   onSectionSelect: (sectionId: string) => void;
   user?: any;
+  onLoginClick?: () => void;
 }
 
 // Sleek Desktop Metro carriage SVG (width 96, height 40)
@@ -162,7 +163,24 @@ const MobileTrain = ({ avatarConfig, direction }: { avatarConfig: AvatarConfig; 
   );
 };
 
-export default function CampaignHub({ activeSection, onSectionSelect, user }: CampaignHubProps) {
+const parseTransformMatrix = (transformStr: string): { x: number; y: number } => {
+  if (!transformStr || transformStr === 'none') {
+    return { x: 0, y: 0 };
+  }
+  const matrixMatch = transformStr.match(/^matrix\((.+)\)$/);
+  if (matrixMatch) {
+    const values = matrixMatch[1].split(',').map(Number);
+    return { x: values[4], y: values[5] };
+  }
+  const matrix3DMatch = transformStr.match(/^matrix3d\((.+)\)$/);
+  if (matrix3DMatch) {
+    const values = matrix3DMatch[1].split(',').map(Number);
+    return { x: values[12], y: values[13] };
+  }
+  return { x: 0, y: 0 };
+};
+
+export default function CampaignHub({ activeSection, onSectionSelect, user, onLoginClick }: CampaignHubProps) {
   const [mounted, setMounted] = useState(false);
   const [selectedChar, setSelectedChar] = useState<string>('student');
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
@@ -175,20 +193,15 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   const [direction, setDirection] = useState<'right' | 'left'>('right');
 
   // ──────────────────────────────────────────────────────────────
-  // ANIMATION ENGINE — Single source of truth via refs + direct DOM
+  // ANIMATION ENGINE — Web Animations API (WAAPI) implementation
   // ──────────────────────────────────────────────────────────────
 
-  // RAF handle
-  const animRef = useRef<number | null>(null);
-  // True position being rendered right now (written every RAF tick)
-  const currentPosRef = useRef({ x: 0, y: 0 });
-  // Whether an animation is currently in-flight
-  const isAnimatingRef = useRef(false);
+  const [hasPlaced, setHasPlaced] = useState(false);
+  const waapiAnimRef = useRef<Animation | null>(null);
+
   // Direct DOM ref — the ONLY element that receives position transforms
   const desktopTrainElRef = useRef<HTMLDivElement | null>(null);
   const mobileTrainElRef = useRef<HTMLDivElement | null>(null);
-  // Track whether initial placement has happened (before user sees train)
-  const hasInitialPlacement = useRef(false);
   // Last known container dimensions for delta threshold
   const lastContainerSize = useRef({ w: 0, h: 0 });
 
@@ -245,97 +258,6 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   }, [activeIndex, prevIndex]);
 
   // ──────────────────────────────────────────────────────────────
-  // Direct DOM transform writer — bypasses React render cycle
-  // ──────────────────────────────────────────────────────────────
-  const applyTransformToDOM = useCallback((x: number, y: number) => {
-    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
-    const el = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
-    if (el) {
-      el.style.transform = `translate3d(calc(${x}px - 50%), calc(${y}px - 50%), 0)`;
-    }
-  }, []);
-
-  // ──────────────────────────────────────────────────────────────
-  // Core animation: smooth glide with proper duration + easing
-  // ──────────────────────────────────────────────────────────────
-  const startAnimation = useCallback((targetX: number, targetY: number) => {
-    // Cancel any running animation — we retarget from current real position
-    if (animRef.current) {
-      cancelAnimationFrame(animRef.current);
-      animRef.current = null;
-    }
-
-    const startX = currentPosRef.current.x;
-    const startY = currentPosRef.current.y;
-
-    // First placement (before user sees train): snap immediately
-    if (!hasInitialPlacement.current || (startX === 0 && startY === 0)) {
-      currentPosRef.current = { x: targetX, y: targetY };
-      applyTransformToDOM(targetX, targetY);
-      hasInitialPlacement.current = true;
-      isAnimatingRef.current = false;
-      return;
-    }
-
-    // Snap if prefers-reduced-motion is active
-    if (prefersReducedMotion) {
-      currentPosRef.current = { x: targetX, y: targetY };
-      applyTransformToDOM(targetX, targetY);
-      isAnimatingRef.current = false;
-      return;
-    }
-
-    // Calculate distance-based duration
-    const distance = Math.hypot(targetX - startX, targetY - startY);
-
-    // If distance is negligible (< 2px), snap — no visible motion needed
-    if (distance < 2) {
-      currentPosRef.current = { x: targetX, y: targetY };
-      applyTransformToDOM(targetX, targetY);
-      isAnimatingRef.current = false;
-      return;
-    }
-
-    // Duration: minimum 650ms (adjacent), maximum 1150ms (farthest)
-    // Scale by distance with a factor that produces good results
-    const duration = Math.min(1150, Math.max(650, distance * 2.5));
-
-    // Smooth ease-in-out cubic — no overshoot, no bounce
-    const easeInOutCubic = (t: number): number => {
-      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-    };
-
-    const startTime = performance.now();
-    isAnimatingRef.current = true;
-
-    const animate = (time: number) => {
-      const elapsed = time - startTime;
-      const progress = Math.min(1, elapsed / duration);
-      const eased = easeInOutCubic(progress);
-
-      const curX = startX + (targetX - startX) * eased;
-      const curY = startY + (targetY - startY) * eased;
-
-      // Write position to ref (source of truth)
-      currentPosRef.current = { x: curX, y: curY };
-      // Write directly to DOM — no React setState
-      applyTransformToDOM(curX, curY);
-
-      if (progress < 1) {
-        animRef.current = requestAnimationFrame(animate);
-      } else {
-        // Animation complete — final sync
-        currentPosRef.current = { x: targetX, y: targetY };
-        applyTransformToDOM(targetX, targetY);
-        animRef.current = null;
-        isAnimatingRef.current = false;
-      }
-    };
-
-    animRef.current = requestAnimationFrame(animate);
-  }, [prefersReducedMotion, applyTransformToDOM]);
-
-  // ──────────────────────────────────────────────────────────────
   // Measure berth position relative to track container
   // ──────────────────────────────────────────────────────────────
   const measureBerthTarget = useCallback((sectionId: string): { x: number; y: number } | null => {
@@ -361,26 +283,91 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   }, []);
 
   // ──────────────────────────────────────────────────────────────
-  // Position update dispatcher (animate vs snap)
+  // Position update dispatcher using WAAPI
   // ──────────────────────────────────────────────────────────────
   const updateTrainPosition = useCallback((isImmediate = false) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
+    const element = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const trainWidth = rect.width > 0 ? rect.width : (isDesktop ? 96 : 72);
+    const trainHeight = rect.height > 0 ? rect.height : (isDesktop ? 40 : 48);
+
+    const offsetW = trainWidth / 2;
+    const offsetH = trainHeight / 2;
+
     const target = measureBerthTarget(activeSection);
     if (!target) return;
 
-    if (isImmediate) {
-      // Immediate snap (initial mount, reduced-motion, resize without animation)
-      if (animRef.current) {
-        cancelAnimationFrame(animRef.current);
-        animRef.current = null;
+    const targetX = target.x - offsetW;
+    const targetY = target.y - offsetH;
+
+    if (isImmediate || prefersReducedMotion) {
+      if (waapiAnimRef.current) {
+        waapiAnimRef.current.cancel();
+        waapiAnimRef.current = null;
       }
-      currentPosRef.current = { x: target.x, y: target.y };
-      applyTransformToDOM(target.x, target.y);
-      isAnimatingRef.current = false;
-    } else {
-      // Animated glide — startAnimation reads currentPosRef for retarget
-      startAnimation(target.x, target.y);
+      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      setHasPlaced(true);
+      return;
     }
-  }, [activeSection, measureBerthTarget, startAnimation, applyTransformToDOM]);
+
+    const computedStyle = window.getComputedStyle(element);
+    const currentTransform = computedStyle.transform;
+    const parsedPos = parseTransformMatrix(currentTransform);
+
+    if (!hasPlaced || (parsedPos.x === 0 && parsedPos.y === 0)) {
+      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      setHasPlaced(true);
+      return;
+    }
+
+    if (waapiAnimRef.current) {
+      waapiAnimRef.current.cancel();
+      waapiAnimRef.current = null;
+    }
+
+    element.style.transform = `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)`;
+
+    const distance = Math.hypot(targetX - parsedPos.x, targetY - parsedPos.y);
+    if (distance < 2) {
+      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      return;
+    }
+
+    const container = isDesktop ? desktopTrackRef.current : mobileTrackRef.current;
+    const trackRect = container ? container.getBoundingClientRect() : null;
+    const trackLength = trackRect ? (isDesktop ? trackRect.width : trackRect.height) : 800;
+    const duration = 950 + (distance / (trackLength || 1)) * 550;
+
+    const anim = element.animate([
+      { transform: `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)` },
+      { transform: `translate3d(${targetX}px, ${targetY}px, 0)` }
+    ], {
+      duration: duration,
+      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+      fill: 'forwards'
+    });
+
+    if (typeof window !== 'undefined') {
+      (window as any).__lastMetroAnimationStart = performance.now();
+      (window as any).__lastMetroAnimationDuration = null;
+      (window as any).__lastMetroAnimationExpectedDuration = duration;
+    }
+
+    waapiAnimRef.current = anim;
+
+    anim.onfinish = () => {
+      if (typeof window !== 'undefined' && (window as any).__lastMetroAnimationStart) {
+        (window as any).__lastMetroAnimationDuration = performance.now() - (window as any).__lastMetroAnimationStart;
+      }
+      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+      if (waapiAnimRef.current === anim) {
+        waapiAnimRef.current = null;
+      }
+    };
+  }, [activeSection, measureBerthTarget, prefersReducedMotion, hasPlaced]);
 
   // ──────────────────────────────────────────────────────────────
   // Trigger animation when section changes (user clicks station)
@@ -392,57 +379,93 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
   }, [activeSection, mounted]);
 
   // ──────────────────────────────────────────────────────────────
-  // Resize + container layout observer — GUARDED against animation kill
+  // Resize + container layout observer — retargets mid-animation
   // ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!mounted) return;
 
-    // Initial placement — snap immediately (before user sees train)
+    // Initial placement fallback in case layout isn't immediate
     const initialTimer = setTimeout(() => {
-      if (!hasInitialPlacement.current) {
+      if (!hasPlaced) {
         updateTrainPosition(true);
-        hasInitialPlacement.current = true;
       }
-    }, 60);
+    }, 200);
 
     const handleResize = () => {
-      if (isAnimatingRef.current) {
-        // Mid-animation: retarget to new berth position, don't snap
-        const target = measureBerthTarget(activeSection);
-        if (target) {
-          // Start a new animation from current real position to new target
-          startAnimation(target.x, target.y);
+      const isDesktop = window.innerWidth >= 640;
+      const element = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
+      if (!element) return;
+
+      const target = measureBerthTarget(activeSection);
+      if (!target) return;
+
+      const rect = element.getBoundingClientRect();
+      const trainWidth = rect.width > 0 ? rect.width : (isDesktop ? 96 : 72);
+      const trainHeight = rect.height > 0 ? rect.height : (isDesktop ? 40 : 48);
+      const offsetW = trainWidth / 2;
+      const offsetH = trainHeight / 2;
+
+      const targetX = target.x - offsetW;
+      const targetY = target.y - offsetH;
+
+      if (waapiAnimRef.current) {
+        const computedStyle = window.getComputedStyle(element);
+        const currentTransform = computedStyle.transform;
+        const parsedPos = parseTransformMatrix(currentTransform);
+
+        waapiAnimRef.current.cancel();
+        waapiAnimRef.current = null;
+
+        element.style.transform = `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)`;
+
+        const distance = Math.hypot(targetX - parsedPos.x, targetY - parsedPos.y);
+        const container = isDesktop ? desktopTrackRef.current : mobileTrackRef.current;
+        const trackRect = container ? container.getBoundingClientRect() : null;
+        const trackLength = trackRect ? (isDesktop ? trackRect.width : trackRect.height) : 800;
+        const duration = 950 + (distance / (trackLength || 1)) * 550;
+
+        const anim = element.animate([
+          { transform: `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)` },
+          { transform: `translate3d(${targetX}px, ${targetY}px, 0)` }
+        ], {
+          duration: duration,
+          easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
+          fill: 'forwards'
+        });
+
+        if (typeof window !== 'undefined') {
+          (window as any).__lastMetroAnimationStart = performance.now();
+          (window as any).__lastMetroAnimationDuration = null;
+          (window as any).__lastMetroAnimationExpectedDuration = duration;
         }
+
+        waapiAnimRef.current = anim;
+        anim.onfinish = () => {
+          if (typeof window !== 'undefined' && (window as any).__lastMetroAnimationStart) {
+            (window as any).__lastMetroAnimationDuration = performance.now() - (window as any).__lastMetroAnimationStart;
+          }
+          element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+          if (waapiAnimRef.current === anim) {
+            waapiAnimRef.current = null;
+          }
+        };
       } else {
-        // No animation running: snap immediately
-        updateTrainPosition(true);
+        element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
       }
     };
 
     window.addEventListener('resize', handleResize);
 
-    // ResizeObserver on track containers — guarded against animation snaps
     const observer = new ResizeObserver((entries) => {
       for (const entry of entries) {
         const { width, height } = entry.contentRect;
         const deltaW = Math.abs(width - lastContainerSize.current.w);
         const deltaH = Math.abs(height - lastContainerSize.current.h);
 
-        // Ignore sub-pixel layout thrashing (< 5px change)
         if (deltaW < 5 && deltaH < 5) continue;
 
         lastContainerSize.current = { w: width, h: height };
-
-        if (isAnimatingRef.current) {
-          // Animation in flight: retarget from current position, don't snap
-          const target = measureBerthTarget(activeSection);
-          if (target) {
-            startAnimation(target.x, target.y);
-          }
-        } else {
-          // No animation: safe to snap
-          updateTrainPosition(true);
-        }
+        handleResize();
       }
     });
 
@@ -461,9 +484,12 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
       clearTimeout(initialTimer);
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
-      if (animRef.current) cancelAnimationFrame(animRef.current);
+      if (waapiAnimRef.current) {
+        waapiAnimRef.current.cancel();
+        waapiAnimRef.current = null;
+      }
     };
-  }, [mounted, isCollapsed, activeSection, measureBerthTarget, startAnimation, updateTrainPosition]);
+  }, [mounted, isCollapsed, activeSection, measureBerthTarget, updateTrainPosition, hasPlaced]);
 
   const handleSaveAvatarSuccess = (updatedAvatarConfig: any) => {
     if (updatedAvatarConfig && updatedAvatarConfig.characterId) {
@@ -547,7 +573,9 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
           <button
             onClick={() => {
               if (!currentUser) {
-                alert('Vui lòng đăng nhập để thiết lập và tùy biến nhân vật di chuyển xanh.');
+                if (onLoginClick) {
+                  onLoginClick();
+                }
                 return;
               }
               setShowAvatarSelector(true);
@@ -600,11 +628,12 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
               zIndex: 30,
               left: 0,
               top: 0,
-              transform: 'translate3d(0px, 0px, 0)',
               width: '96px',
               height: '40px',
               pointerEvents: 'none',
               willChange: 'transform',
+              opacity: hasPlaced ? 1 : 0,
+              transition: 'opacity 0.2s ease-in-out',
             }}
           >
             {/* Inner train body — direction flip only, no position animation */}
@@ -682,11 +711,12 @@ export default function CampaignHub({ activeSection, onSectionSelect, user }: Ca
               zIndex: 30,
               left: 0,
               top: 0,
-              transform: 'translate3d(0px, 0px, 0)',
               width: '72px',
               height: '48px',
               pointerEvents: 'none',
               willChange: 'transform',
+              opacity: hasPlaced ? 1 : 0,
+              transition: 'opacity 0.2s ease-in-out',
             }}
           >
             <MobileTrain avatarConfig={getUserAvatarConfig(selectedChar)} direction={direction} />
