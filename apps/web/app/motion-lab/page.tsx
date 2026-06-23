@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { notFound } from 'next/navigation';
 import { AvatarSvg, AvatarConfig } from '../../components/ui/AvatarSvg';
 import { useMetroTravelSound } from '../../lib/useMetroTravelSound';
 
@@ -176,6 +177,10 @@ const MobileThreeCarTrain = ({ avatarConfig, direction }: { avatarConfig: Avatar
 };
 
 export default function MetroRailMotionLab() {
+  if (process.env.NODE_ENV === 'production') {
+    return notFound();
+  }
+
   const [mounted, setMounted] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState(0);

@@ -184,41 +184,49 @@ test.describe('Evidence Generation Suite', () => {
     // Click Ga 2 (stations)
     await page.locator('a[href="#stations"]').click();
 
-    // Frame 2: ~150ms
-    await page.waitForTimeout(150);
+    // Frame 2: ~160ms (10%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-2.png') });
-    // Also save this mid-transition screenshot as 06-real-metro-mid-transition-no-overlap.png (approx 150ms)
+    // Also save this mid-transition screenshot as 06-real-metro-mid-transition-no-overlap.png (approx 160ms)
     await page.screenshot({ path: path.join(outDir, '06-real-metro-mid-transition-no-overlap.png') });
 
-    // Frame 3: ~300ms (150ms more)
-    await page.waitForTimeout(150);
+    // Frame 3: ~320ms (20%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-3.png') });
 
-    // Frame 4: ~450ms (150ms more)
-    await page.waitForTimeout(150);
+    // Frame 4: ~480ms (30%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-4.png') });
 
-    // Frame 5: ~600ms (150ms more)
-    await page.waitForTimeout(150);
+    // Frame 5: ~640ms (40%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-5.png') });
 
-    // Frame 6: ~750ms (150ms more)
-    await page.waitForTimeout(150);
+    // Frame 6: ~800ms (50%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-6.png') });
 
-    // Frame 7: ~900ms (150ms more)
-    await page.waitForTimeout(150);
+    // Frame 7: ~960ms (60%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-7.png') });
 
-    // Frame 8: ~1100ms (200ms more)
-    await page.waitForTimeout(200);
+    // Frame 8: ~1120ms (70%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-8.png') });
 
-    // Frame 9: End (1400ms) (300ms more)
-    await page.waitForTimeout(300);
+    // Frame 9: ~1280ms (80%)
+    await page.waitForTimeout(160);
     await track.screenshot({ path: path.join(outDir, 'frame-9.png') });
 
-    // Combine them into 07b-real-metro-adjacent-stations-frame-sequence.png using a browser canvas/HTML render
+    // Frame 10: ~1440ms (90%)
+    await page.waitForTimeout(160);
+    await track.screenshot({ path: path.join(outDir, 'frame-10.png') });
+
+    // Frame 11: End (1600ms / 100%)
+    await page.waitForTimeout(160);
+    await track.screenshot({ path: path.join(outDir, 'frame-11.png') });
+
+    // Combine them into 07b-live-hub-three-car-frame-sequence.png using a browser canvas/HTML render
     const b1 = fs.readFileSync(path.join(outDir, 'frame-1.png'), 'base64');
     const b2 = fs.readFileSync(path.join(outDir, 'frame-2.png'), 'base64');
     const b3 = fs.readFileSync(path.join(outDir, 'frame-3.png'), 'base64');
@@ -228,6 +236,8 @@ test.describe('Evidence Generation Suite', () => {
     const b7 = fs.readFileSync(path.join(outDir, 'frame-7.png'), 'base64');
     const b8 = fs.readFileSync(path.join(outDir, 'frame-8.png'), 'base64');
     const b9 = fs.readFileSync(path.join(outDir, 'frame-9.png'), 'base64');
+    const b10 = fs.readFileSync(path.join(outDir, 'frame-10.png'), 'base64');
+    const b11 = fs.readFileSync(path.join(outDir, 'frame-11.png'), 'base64');
 
     const htmlContent = `
       <html>
@@ -237,7 +247,7 @@ test.describe('Evidence Generation Suite', () => {
             EcoTransit Metro Adjacent Station Journey Frame Sequence (Ga 1 ➔ Ga 2)
           </div>
           <div style="font-family: sans-serif; font-size: 10px; color: #4B5E70; margin-bottom: 8px;">
-            Target Glide Duration: 1200ms - 1500ms | Easing: Cubic Ease-In-Out
+            Target Glide Duration: 1600ms | Easing: Cubic Ease-In-Out | 3-Car Metro Visual
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -246,43 +256,53 @@ test.describe('Evidence Generation Suite', () => {
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">2. CHRONO FRAME 2 (150ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">2. CHRONO FRAME 2 (10% - 160ms)</div>
             <img id="img2" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">3. CHRONO FRAME 3 (300ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">3. CHRONO FRAME 3 (20% - 320ms)</div>
             <img id="img3" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">4. CHRONO FRAME 4 (450ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">4. CHRONO FRAME 4 (30% - 480ms)</div>
             <img id="img4" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">5. CHRONO FRAME 5 (600ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">5. CHRONO FRAME 5 (40% - 640ms)</div>
             <img id="img5" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">6. CHRONO FRAME 6 (750ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">6. CHRONO FRAME 6 (50% - 800ms)</div>
             <img id="img6" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">7. CHRONO FRAME 7 (900ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">7. CHRONO FRAME 7 (60% - 960ms)</div>
             <img id="img7" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">8. CHRONO FRAME 8 (1100ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">8. CHRONO FRAME 8 (70% - 1120ms)</div>
             <img id="img8" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">9. END (1400ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">9. CHRONO FRAME 9 (80% - 1280ms)</div>
             <img id="img9" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">10. CHRONO FRAME 10 (90% - 1440ms)</div>
+            <img id="img10" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">11. END (100% - 1600ms)</div>
+            <img id="img11" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
         </div>
       </body>
@@ -291,7 +311,7 @@ test.describe('Evidence Generation Suite', () => {
 
     const sheetPage = await page.context().newPage();
     await sheetPage.setContent(htmlContent);
-    await sheetPage.evaluate(({ s1, s2, s3, s4, s5, s6, s7, s8, s9 }) => {
+    await sheetPage.evaluate(({ s1, s2, s3, s4, s5, s6, s7, s8, s9, s10, s11 }) => {
       (document.getElementById('img1') as HTMLImageElement).src = `data:image/png;base64,${s1}`;
       (document.getElementById('img2') as HTMLImageElement).src = `data:image/png;base64,${s2}`;
       (document.getElementById('img3') as HTMLImageElement).src = `data:image/png;base64,${s3}`;
@@ -301,26 +321,22 @@ test.describe('Evidence Generation Suite', () => {
       (document.getElementById('img7') as HTMLImageElement).src = `data:image/png;base64,${s7}`;
       (document.getElementById('img8') as HTMLImageElement).src = `data:image/png;base64,${s8}`;
       (document.getElementById('img9') as HTMLImageElement).src = `data:image/png;base64,${s9}`;
-    }, { s1: b1, s2: b2, s3: b3, s4: b4, s5: b5, s6: b6, s7: b7, s8: b8, s9: b9 });
+      (document.getElementById('img10') as HTMLImageElement).src = `data:image/png;base64,${s10}`;
+      (document.getElementById('img11') as HTMLImageElement).src = `data:image/png;base64,${s11}`;
+    }, { s1: b1, s2: b2, s3: b3, s4: b4, s5: b5, s6: b6, s7: b7, s8: b8, s9: b9, s10: b10, s11: b11 });
 
     // Wait for images to load in the browser
     await sheetPage.waitForTimeout(1000);
 
     const sheetContainer = sheetPage.locator('#container');
-    await sheetContainer.screenshot({ path: path.join(outDir, '07b-real-metro-adjacent-stations-frame-sequence.png') });
+    await sheetContainer.screenshot({ path: path.join(outDir, '07b-live-hub-three-car-frame-sequence.png') });
     await sheetPage.close();
 
     // Clean up temporary files
     try {
-      fs.unlinkSync(path.join(outDir, 'frame-1.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-2.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-3.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-4.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-5.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-6.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-7.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-8.png'));
-      fs.unlinkSync(path.join(outDir, 'frame-9.png'));
+      for (let i = 1; i <= 11; i++) {
+        fs.unlinkSync(path.join(outDir, `frame-${i}.png`));
+      }
     } catch (e) {}
 
     // 08. Real metro mobile no overlap (08-real-metro-mobile-no-overlap.png)
@@ -425,58 +441,7 @@ test.describe('Evidence Generation Suite', () => {
     const browser = page.context().browser()!;
 
     // ====================================================================
-    // VIDEO EVIDENCE: 07-real-metro-rapid-switch.webm
-    // ====================================================================
-    const videoContext = await browser.newContext({
-      recordVideo: {
-        dir: outDir,
-        size: { width: 1280, height: 800 }
-      },
-      viewport: { width: 1280, height: 800 }
-    });
-    const videoPage = await videoContext.newPage();
-    await videoPage.goto('/');
-    await waitForAppReady(videoPage);
-
-    // Log in
-    await videoPage.locator('header button:has-text("Đăng nhập")').click();
-    await videoPage.locator('input[type="email"]').fill('user@ecotransit.vn');
-    await videoPage.locator('input[type="password"]').fill('User@123456');
-    await videoPage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
-    await expect(videoPage.locator('button:has-text("Đăng xuất")')).toBeVisible();
-    await videoPage.waitForTimeout(1000);
-
-    // Click rapid station switching
-    await videoPage.locator('a[href="#stations"]').click();
-    await videoPage.waitForTimeout(800);
-    await videoPage.locator('a[href="#tickets"]').click();
-    await videoPage.waitForTimeout(800);
-    await videoPage.locator('a[href="#rewards"]').click();
-    await videoPage.waitForTimeout(800);
-    await videoPage.locator('a[href="#xanhwrap"]').click();
-    await videoPage.waitForTimeout(800);
-    await videoPage.locator('a[href="#route"]').click();
-    await videoPage.waitForTimeout(2000);
-
-    const video = videoPage.video();
-    await videoContext.close();
-    if (video) {
-      const targetWebmPath = path.join(outDir, '07-real-metro-rapid-switch.webm');
-      if (fs.existsSync(targetWebmPath)) {
-        fs.unlinkSync(targetWebmPath);
-      }
-      await video.saveAs(targetWebmPath);
-      const videoPath = await video.path().catch(() => null);
-      if (videoPath && fs.existsSync(videoPath)) {
-        try {
-          fs.unlinkSync(videoPath);
-        } catch (e) {}
-      }
-    }
-
-    // ====================================================================
-    // VIDEO EVIDENCE: 07a-real-metro-single-click-glide.webm
-    // Single click from Ga 1 (route) to Ga 2 (stations) — continuous glide
+    // VIDEO EVIDENCE: 07a-live-hub-three-car-single-click-glide.webm
     // ====================================================================
     const glideContext = await browser.newContext({
       recordVideo: {
@@ -499,31 +464,28 @@ test.describe('Evidence Generation Suite', () => {
 
     // Single click from Ga 1 to Ga 2 — let full animation play
     await glidePage.locator('a[href="#stations"]').click();
-    await glidePage.waitForTimeout(2500); // enough for 1350ms animation + visual buffer
+    await glidePage.waitForTimeout(2500); // let animation complete
 
-    // Then click back to route (Ga 1) to show return glide
+    // Click back to route (Ga 1) to show return glide
     await glidePage.locator('a[href="#route"]').click();
     await glidePage.waitForTimeout(2500);
 
     const glideVideo = glidePage.video();
     await glideContext.close();
     if (glideVideo) {
-      const targetGlidePath = path.join(outDir, '07a-real-metro-single-click-glide.webm');
+      const targetGlidePath = path.join(outDir, '07a-live-hub-three-car-single-click-glide.webm');
       if (fs.existsSync(targetGlidePath)) {
         fs.unlinkSync(targetGlidePath);
       }
       await glideVideo.saveAs(targetGlidePath);
       const glidePath = await glideVideo.path().catch(() => null);
       if (glidePath && fs.existsSync(glidePath)) {
-        try {
-          fs.unlinkSync(glidePath);
-        } catch (e) {}
+        try { fs.unlinkSync(glidePath); } catch (e) {}
       }
     }
 
     // ====================================================================
-    // VIDEO EVIDENCE: 07c-real-metro-rail-energy-flow.webm
-    // Shows train gliding alongside direction-aware rail energy flow segment
+    // VIDEO EVIDENCE: 07c-live-hub-rail-motion-and-sound-state.webm
     // ====================================================================
     const flowContext = await browser.newContext({
       recordVideo: {
@@ -544,29 +506,31 @@ test.describe('Evidence Generation Suite', () => {
     await expect(flowPage.locator('button:has-text("Đăng xuất")')).toBeVisible();
     await flowPage.waitForTimeout(1000);
 
-    // Click Ga 5 (xanhwrap) for a long journey (~2100ms) to clearly record the flow animation
+    // Click Ga 5 (xanhwrap) for a long journey
     await flowPage.locator('a[href="#xanhwrap"]').click();
-    await flowPage.waitForTimeout(3000);
+    await flowPage.waitForTimeout(1000);
+    // Toggle sound while moving to show responsiveness of the sound controller
+    await flowPage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]').click();
+    await flowPage.waitForTimeout(500);
+    await flowPage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]').click();
+    await flowPage.waitForTimeout(1500);
 
     const flowVideo = flowPage.video();
     await flowContext.close();
     if (flowVideo) {
-      const targetFlowPath = path.join(outDir, '07c-real-metro-rail-energy-flow.webm');
+      const targetFlowPath = path.join(outDir, '07c-live-hub-rail-motion-and-sound-state.webm');
       if (fs.existsSync(targetFlowPath)) {
         fs.unlinkSync(targetFlowPath);
       }
       await flowVideo.saveAs(targetFlowPath);
       const flowVideoPath = await flowVideo.path().catch(() => null);
       if (flowVideoPath && fs.existsSync(flowVideoPath)) {
-        try {
-          fs.unlinkSync(flowVideoPath);
-        } catch (e) {}
+        try { fs.unlinkSync(flowVideoPath); } catch (e) {}
       }
     }
 
     // ====================================================================
-    // VIDEO EVIDENCE: 07d-real-metro-rapid-retarget.webm
-    // Rapid clicks proving retargeting directly from current progress coordinates
+    // VIDEO EVIDENCE: 07d-live-hub-three-car-rapid-retarget.webm
     // ====================================================================
     const retargetContext = await browser.newContext({
       recordVideo: {
@@ -598,16 +562,70 @@ test.describe('Evidence Generation Suite', () => {
     const retargetVideo = retargetPage.video();
     await retargetContext.close();
     if (retargetVideo) {
-      const targetRetargetPath = path.join(outDir, '07d-real-metro-rapid-retarget.webm');
+      const targetRetargetPath = path.join(outDir, '07d-live-hub-three-car-rapid-retarget.webm');
       if (fs.existsSync(targetRetargetPath)) {
         fs.unlinkSync(targetRetargetPath);
       }
       await retargetVideo.saveAs(targetRetargetPath);
       const retargetVideoPath = await retargetVideo.path().catch(() => null);
       if (retargetVideoPath && fs.existsSync(retargetVideoPath)) {
-        try {
-          fs.unlinkSync(retargetVideoPath);
-        } catch (e) {}
+        try { fs.unlinkSync(retargetVideoPath); } catch (e) {}
+      }
+    }
+
+    // ====================================================================
+    // VIDEO EVIDENCE: 07e-live-hub-sound-toggle.webm
+    // ====================================================================
+    const toggleContext = await browser.newContext({
+      recordVideo: {
+        dir: outDir,
+        size: { width: 1366, height: 768 }
+      },
+      viewport: { width: 1366, height: 768 }
+    });
+    const togglePage = await toggleContext.newPage();
+    await togglePage.goto('/');
+    await waitForAppReady(togglePage);
+
+    // Log in
+    await togglePage.locator('header button:has-text("Đăng nhập")').click();
+    await togglePage.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await togglePage.locator('input[type="password"]').fill('User@123456');
+    await togglePage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+    await expect(togglePage.locator('button:has-text("Đăng xuất")')).toBeVisible();
+    await togglePage.waitForTimeout(1000);
+
+    // Mute sound
+    const soundToggleBtn = togglePage.locator('button[aria-label="Bật/Tắt âm thanh hành trình"]');
+    await expect(soundToggleBtn).toContainText('Âm thanh hành trình: Bật');
+    await soundToggleBtn.click();
+    await expect(soundToggleBtn).toContainText('Âm thanh hành trình: Tắt');
+    await togglePage.waitForTimeout(500);
+
+    // Click Ga 2 (silent glide)
+    await togglePage.locator('a[href="#stations"]').click();
+    await togglePage.waitForTimeout(2000);
+
+    // Unmute sound
+    await soundToggleBtn.click();
+    await expect(soundToggleBtn).toContainText('Âm thanh hành trình: Bật');
+    await togglePage.waitForTimeout(500);
+
+    // Click Ga 1 (glide with sound)
+    await togglePage.locator('a[href="#route"]').click();
+    await togglePage.waitForTimeout(2000);
+
+    const toggleVideo = togglePage.video();
+    await toggleContext.close();
+    if (toggleVideo) {
+      const targetTogglePath = path.join(outDir, '07e-live-hub-sound-toggle.webm');
+      if (fs.existsSync(targetTogglePath)) {
+        fs.unlinkSync(targetTogglePath);
+      }
+      await toggleVideo.saveAs(targetTogglePath);
+      const toggleVideoPath = await toggleVideo.path().catch(() => null);
+      if (toggleVideoPath && fs.existsSync(toggleVideoPath)) {
+        try { fs.unlinkSync(toggleVideoPath); } catch (e) {}
       }
     }
   });

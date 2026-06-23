@@ -220,7 +220,7 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
   });
 
   test('P0-D: Metro must glide continuously with intermediate positions — no teleport', async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/#route');
     await waitForAppReady(page);
 
     const train = page.locator('#desktop-train');
