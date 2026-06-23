@@ -184,23 +184,39 @@ test.describe('Evidence Generation Suite', () => {
     // Click Ga 2 (stations)
     await page.locator('a[href="#stations"]').click();
 
-    // Frame 2: ~200ms
-    await page.waitForTimeout(200);
+    // Frame 2: ~150ms
+    await page.waitForTimeout(150);
     await track.screenshot({ path: path.join(outDir, 'frame-2.png') });
-    // Also save this mid-transition screenshot as 06-real-metro-mid-transition-no-overlap.png (approx 200ms)
+    // Also save this mid-transition screenshot as 06-real-metro-mid-transition-no-overlap.png (approx 150ms)
     await page.screenshot({ path: path.join(outDir, '06-real-metro-mid-transition-no-overlap.png') });
 
-    // Frame 3: ~450ms (250ms more)
-    await page.waitForTimeout(250);
+    // Frame 3: ~300ms (150ms more)
+    await page.waitForTimeout(150);
     await track.screenshot({ path: path.join(outDir, 'frame-3.png') });
 
-    // Frame 4: ~700ms (250ms more)
-    await page.waitForTimeout(250);
+    // Frame 4: ~450ms (150ms more)
+    await page.waitForTimeout(150);
     await track.screenshot({ path: path.join(outDir, 'frame-4.png') });
 
-    // Frame 5: End (1300ms) (600ms more)
-    await page.waitForTimeout(600);
+    // Frame 5: ~600ms (150ms more)
+    await page.waitForTimeout(150);
     await track.screenshot({ path: path.join(outDir, 'frame-5.png') });
+
+    // Frame 6: ~750ms (150ms more)
+    await page.waitForTimeout(150);
+    await track.screenshot({ path: path.join(outDir, 'frame-6.png') });
+
+    // Frame 7: ~900ms (150ms more)
+    await page.waitForTimeout(150);
+    await track.screenshot({ path: path.join(outDir, 'frame-7.png') });
+
+    // Frame 8: ~1100ms (200ms more)
+    await page.waitForTimeout(200);
+    await track.screenshot({ path: path.join(outDir, 'frame-8.png') });
+
+    // Frame 9: End (1400ms) (300ms more)
+    await page.waitForTimeout(300);
+    await track.screenshot({ path: path.join(outDir, 'frame-9.png') });
 
     // Combine them into 07b-real-metro-adjacent-stations-frame-sequence.png using a browser canvas/HTML render
     const b1 = fs.readFileSync(path.join(outDir, 'frame-1.png'), 'base64');
@@ -208,6 +224,10 @@ test.describe('Evidence Generation Suite', () => {
     const b3 = fs.readFileSync(path.join(outDir, 'frame-3.png'), 'base64');
     const b4 = fs.readFileSync(path.join(outDir, 'frame-4.png'), 'base64');
     const b5 = fs.readFileSync(path.join(outDir, 'frame-5.png'), 'base64');
+    const b6 = fs.readFileSync(path.join(outDir, 'frame-6.png'), 'base64');
+    const b7 = fs.readFileSync(path.join(outDir, 'frame-7.png'), 'base64');
+    const b8 = fs.readFileSync(path.join(outDir, 'frame-8.png'), 'base64');
+    const b9 = fs.readFileSync(path.join(outDir, 'frame-9.png'), 'base64');
 
     const htmlContent = `
       <html>
@@ -217,7 +237,7 @@ test.describe('Evidence Generation Suite', () => {
             EcoTransit Metro Adjacent Station Journey Frame Sequence (Ga 1 ➔ Ga 2)
           </div>
           <div style="font-family: sans-serif; font-size: 10px; color: #4B5E70; margin-bottom: 8px;">
-            Target Glide Duration: 850ms - 1250ms | Easing: Cubic Ease-In-Out
+            Target Glide Duration: 1200ms - 1500ms | Easing: Cubic Ease-In-Out
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px;">
@@ -226,23 +246,43 @@ test.describe('Evidence Generation Suite', () => {
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">2. EARLY TRANSITION (200ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">2. CHRONO FRAME 2 (150ms)</div>
             <img id="img2" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">3. MID TRANSITION (450ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">3. CHRONO FRAME 3 (300ms)</div>
             <img id="img3" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">4. NEAR END (700ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">4. CHRONO FRAME 4 (450ms)</div>
             <img id="img4" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
 
           <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
-            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">5. END (1300ms)</div>
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">5. CHRONO FRAME 5 (600ms)</div>
             <img id="img5" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">6. CHRONO FRAME 6 (750ms)</div>
+            <img id="img6" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">7. CHRONO FRAME 7 (900ms)</div>
+            <img id="img7" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">8. CHRONO FRAME 8 (1100ms)</div>
+            <img id="img8" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 2px; margin-top: 4px;">
+            <div style="font-family: sans-serif; font-size: 9px; font-weight: bold; color: #4B5E70; margin-bottom: 2px;">9. END (1400ms)</div>
+            <img id="img9" style="border: 1px solid #E6F0FF; display: block; max-width: 100%;" />
           </div>
         </div>
       </body>
@@ -251,13 +291,17 @@ test.describe('Evidence Generation Suite', () => {
 
     const sheetPage = await page.context().newPage();
     await sheetPage.setContent(htmlContent);
-    await sheetPage.evaluate(({ s1, s2, s3, s4, s5 }) => {
-      (document.getElementById('img1') as HTMLImageElement).src = `data:image/png;base64,\${s1}`;
-      (document.getElementById('img2') as HTMLImageElement).src = `data:image/png;base64,\${s2}`;
-      (document.getElementById('img3') as HTMLImageElement).src = `data:image/png;base64,\${s3}`;
-      (document.getElementById('img4') as HTMLImageElement).src = `data:image/png;base64,\${s4}`;
-      (document.getElementById('img5') as HTMLImageElement).src = `data:image/png;base64,\${s5}`;
-    }, { s1: b1, s2: b2, s3: b3, s4: b4, s5: b5 });
+    await sheetPage.evaluate(({ s1, s2, s3, s4, s5, s6, s7, s8, s9 }) => {
+      (document.getElementById('img1') as HTMLImageElement).src = `data:image/png;base64,${s1}`;
+      (document.getElementById('img2') as HTMLImageElement).src = `data:image/png;base64,${s2}`;
+      (document.getElementById('img3') as HTMLImageElement).src = `data:image/png;base64,${s3}`;
+      (document.getElementById('img4') as HTMLImageElement).src = `data:image/png;base64,${s4}`;
+      (document.getElementById('img5') as HTMLImageElement).src = `data:image/png;base64,${s5}`;
+      (document.getElementById('img6') as HTMLImageElement).src = `data:image/png;base64,${s6}`;
+      (document.getElementById('img7') as HTMLImageElement).src = `data:image/png;base64,${s7}`;
+      (document.getElementById('img8') as HTMLImageElement).src = `data:image/png;base64,${s8}`;
+      (document.getElementById('img9') as HTMLImageElement).src = `data:image/png;base64,${s9}`;
+    }, { s1: b1, s2: b2, s3: b3, s4: b4, s5: b5, s6: b6, s7: b7, s8: b8, s9: b9 });
 
     // Wait for images to load in the browser
     await sheetPage.waitForTimeout(1000);
@@ -273,6 +317,10 @@ test.describe('Evidence Generation Suite', () => {
       fs.unlinkSync(path.join(outDir, 'frame-3.png'));
       fs.unlinkSync(path.join(outDir, 'frame-4.png'));
       fs.unlinkSync(path.join(outDir, 'frame-5.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-6.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-7.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-8.png'));
+      fs.unlinkSync(path.join(outDir, 'frame-9.png'));
     } catch (e) {}
 
     // 08. Real metro mobile no overlap (08-real-metro-mobile-no-overlap.png)
@@ -374,10 +422,11 @@ test.describe('Evidence Generation Suite', () => {
     // 15. Ticket reversal blocked error (15-ticket-reversal-blocked-message.png)
     await page.screenshot({ path: path.join(outDir, '15-ticket-reversal-blocked-message.png') });
 
+    const browser = page.context().browser()!;
+
     // ====================================================================
     // VIDEO EVIDENCE: 07-real-metro-rapid-switch.webm
     // ====================================================================
-    const browser = page.context().browser()!;
     const videoContext = await browser.newContext({
       recordVideo: {
         dir: outDir,
@@ -450,11 +499,11 @@ test.describe('Evidence Generation Suite', () => {
 
     // Single click from Ga 1 to Ga 2 — let full animation play
     await glidePage.locator('a[href="#stations"]').click();
-    await glidePage.waitForTimeout(2000); // enough for 650-1150ms animation + visual buffer
+    await glidePage.waitForTimeout(2500); // enough for 1350ms animation + visual buffer
 
     // Then click back to route (Ga 1) to show return glide
     await glidePage.locator('a[href="#route"]').click();
-    await glidePage.waitForTimeout(2000);
+    await glidePage.waitForTimeout(2500);
 
     const glideVideo = glidePage.video();
     await glideContext.close();
@@ -468,6 +517,96 @@ test.describe('Evidence Generation Suite', () => {
       if (glidePath && fs.existsSync(glidePath)) {
         try {
           fs.unlinkSync(glidePath);
+        } catch (e) {}
+      }
+    }
+
+    // ====================================================================
+    // VIDEO EVIDENCE: 07c-real-metro-rail-energy-flow.webm
+    // Shows train gliding alongside direction-aware rail energy flow segment
+    // ====================================================================
+    const flowContext = await browser.newContext({
+      recordVideo: {
+        dir: outDir,
+        size: { width: 1366, height: 768 }
+      },
+      viewport: { width: 1366, height: 768 }
+    });
+    const flowPage = await flowContext.newPage();
+    await flowPage.goto('/');
+    await waitForAppReady(flowPage);
+
+    // Log in
+    await flowPage.locator('header button:has-text("Đăng nhập")').click();
+    await flowPage.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await flowPage.locator('input[type="password"]').fill('User@123456');
+    await flowPage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+    await expect(flowPage.locator('button:has-text("Đăng xuất")')).toBeVisible();
+    await flowPage.waitForTimeout(1000);
+
+    // Click Ga 5 (xanhwrap) for a long journey (~2100ms) to clearly record the flow animation
+    await flowPage.locator('a[href="#xanhwrap"]').click();
+    await flowPage.waitForTimeout(3000);
+
+    const flowVideo = flowPage.video();
+    await flowContext.close();
+    if (flowVideo) {
+      const targetFlowPath = path.join(outDir, '07c-real-metro-rail-energy-flow.webm');
+      if (fs.existsSync(targetFlowPath)) {
+        fs.unlinkSync(targetFlowPath);
+      }
+      await flowVideo.saveAs(targetFlowPath);
+      const flowVideoPath = await flowVideo.path().catch(() => null);
+      if (flowVideoPath && fs.existsSync(flowVideoPath)) {
+        try {
+          fs.unlinkSync(flowVideoPath);
+        } catch (e) {}
+      }
+    }
+
+    // ====================================================================
+    // VIDEO EVIDENCE: 07d-real-metro-rapid-retarget.webm
+    // Rapid clicks proving retargeting directly from current progress coordinates
+    // ====================================================================
+    const retargetContext = await browser.newContext({
+      recordVideo: {
+        dir: outDir,
+        size: { width: 1366, height: 768 }
+      },
+      viewport: { width: 1366, height: 768 }
+    });
+    const retargetPage = await retargetContext.newPage();
+    await retargetPage.goto('/');
+    await waitForAppReady(retargetPage);
+
+    // Log in
+    await retargetPage.locator('header button:has-text("Đăng nhập")').click();
+    await retargetPage.locator('input[type="email"]').fill('user@ecotransit.vn');
+    await retargetPage.locator('input[type="password"]').fill('User@123456');
+    await retargetPage.locator('form button[type="submit"]:has-text("Đăng nhập")').click();
+    await expect(retargetPage.locator('button:has-text("Đăng xuất")')).toBeVisible();
+    await retargetPage.waitForTimeout(1000);
+
+    // Trigger rapid clicks that reverse direction mid-flight: Ga 1 -> Ga 6 -> wait 400ms -> Ga 2 -> wait 400ms -> Ga 5
+    await retargetPage.locator('a[href="#guides"]').click(); // Ga 6
+    await retargetPage.waitForTimeout(400);
+    await retargetPage.locator('a[href="#stations"]').click(); // Ga 2 (reverses direction)
+    await retargetPage.waitForTimeout(400);
+    await retargetPage.locator('a[href="#xanhwrap"]').click(); // Ga 5 (reverses back)
+    await retargetPage.waitForTimeout(3000);
+
+    const retargetVideo = retargetPage.video();
+    await retargetContext.close();
+    if (retargetVideo) {
+      const targetRetargetPath = path.join(outDir, '07d-real-metro-rapid-retarget.webm');
+      if (fs.existsSync(targetRetargetPath)) {
+        fs.unlinkSync(targetRetargetPath);
+      }
+      await retargetVideo.saveAs(targetRetargetPath);
+      const retargetVideoPath = await retargetVideo.path().catch(() => null);
+      if (retargetVideoPath && fs.existsSync(retargetVideoPath)) {
+        try {
+          fs.unlinkSync(retargetVideoPath);
         } catch (e) {}
       }
     }

@@ -11,6 +11,16 @@ async function waitForAppReady(page: any) {
 
 test.describe('EcoTransit Epic 10 E2E Tests', () => {
 
+  const stationLabels = ['Lập lộ trình', 'Khám phá ga', 'Tích điểm', 'Đổi thưởng', 'XanhWrap', 'Cẩm nang'];
+
+  const getIntersection = (r1: any, r2: any) => {
+    const xLeft = Math.max(r1.x, r2.x);
+    const yTop = Math.max(r1.y, r2.y);
+    const xRight = Math.min(r1.x + r1.width, r2.x + r2.width);
+    const yBottom = Math.min(r1.y + r1.height, r2.y + r2.height);
+    return (xRight > xLeft && yBottom > yTop) ? (xRight - xLeft) * (yBottom - yTop) : 0;
+  };
+
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 768 });
     page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
@@ -71,15 +81,6 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
     const carriageCount = await train.locator('rect').count();
     expect(carriageCount).toBeGreaterThanOrEqual(4); // Carriage body 1, Carriage body 2, windows, coupler, etc.
 
-    // Helper to calculate overlap intersection area
-    const getIntersection = (r1: any, r2: any) => {
-      const xLeft = Math.max(r1.x, r2.x);
-      const yTop = Math.max(r1.y, r2.y);
-      const xRight = Math.min(r1.x + r1.width, r2.x + r2.width);
-      const yBottom = Math.min(r1.y + r1.height, r2.y + r2.height);
-      return (xRight > xLeft && yBottom > yTop) ? (xRight - xLeft) * (yBottom - yTop) : 0;
-    };
-
     // Get the train SVG bounding box (the actual visual element, not the wrapper)
     const getTrainVisualBox = async () => {
       const svg = train.locator('svg').first();
@@ -88,9 +89,6 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
       }
       return train.boundingBox();
     };
-
-    // Station labels that the train must NOT overlap (P0 requirement)
-    const stationLabels = ['Lập lộ trình', 'Khám phá ga', 'Tích điểm', 'Đổi thưởng', 'XanhWrap', 'Cẩm nang'];
 
     const checkLabelCollisions = async () => {
       const trainVisualBox = await getTrainVisualBox();
@@ -228,6 +226,11 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
     const train = page.locator('#desktop-train');
     await expect(train).toBeVisible();
 
+    const trackContainer = page.locator('[data-testid="desktop-track"]');
+    await expect(trackContainer).toBeVisible();
+    const trackBox = await trackContainer.boundingBox();
+    expect(trackBox).not.toBeNull();
+
     // Wait for initial placement to settle
     await page.waitForTimeout(300);
 
@@ -237,6 +240,14 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
         const style = window.getComputedStyle(el);
         const matrix = new DOMMatrixReadOnly(style.transform);
         return matrix.m41; // translateX component
+      });
+    };
+
+    const getTrainY = async () => {
+      return train.evaluate((el: HTMLElement) => {
+        const style = window.getComputedStyle(el);
+        const matrix = new DOMMatrixReadOnly(style.transform);
+        return matrix.m42; // translateY component
       });
     };
 
@@ -259,51 +270,129 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
       await page.waitForTimeout(10);
     }
 
-    // Sample 1: ~200ms from animation start
-    await page.waitForTimeout(200);
-    const sample1X = await getTrainX();
-    const sample1Time = Date.now() - activeStartTime;
+    // Collect 8+ chronological samples across the normal-speed journey
+    // Since duration is 1350ms, we wait 100ms between each of the 12 samples (covering up to 1200ms)
+    interface JourneySample {
+      x: number;
+      y: number;
+      time: number;
+      box: { x: number; y: number; width: number; height: number } | null;
+    }
+    const samples: JourneySample[] = [];
 
-    // Sample 2: ~450ms from animation start (250ms more)
-    await page.waitForTimeout(250);
-    const sample2X = await getTrainX();
-    const sample2Time = Date.now() - activeStartTime;
+    for (let i = 0; i < 12; i++) {
+      await page.waitForTimeout(100);
+      const currentX = await getTrainX();
+      const currentY = await getTrainY();
+      const trainBox = await train.locator('svg').first().boundingBox();
+      samples.push({
+        x: currentX,
+        y: currentY,
+        time: Date.now() - activeStartTime,
+        box: trainBox
+      });
+    }
 
-    // Sample 3: ~700ms from animation start (250ms more)
-    await page.waitForTimeout(250);
-    const sample3X = await getTrainX();
-    const sample3Time = Date.now() - activeStartTime;
-
-    // Wait for animation to finish
+    // Wait for animation to finish completely
     await page.waitForTimeout(300);
     const endX = await getTrainX();
-    // Retrieve actual duration recorded in browser via WAAPI test hook to avoid Node.js runner CPU lag
-    const totalDuration = await page.evaluate(() => (window as any).__lastMetroAnimationDuration || 900);
 
-    console.log(`Metro glide samples: start=${startX.toFixed(1)}, activeStart=${activeStartX.toFixed(1)}, sample1=${sample1X.toFixed(1)} @${sample1Time}ms, sample2=${sample2X.toFixed(1)} @${sample2Time}ms, sample3=${sample3X.toFixed(1)} @${sample3Time}ms, end=${endX.toFixed(1)}, totalDuration=${totalDuration}ms`);
+    // Retrieve actual duration recorded in browser via RAF test hook
+    const totalDuration = await page.evaluate(() => (window as any).__lastMetroAnimationDuration || 1350);
 
-    // ASSERTION 1: Intermediate samples must differ from active start
-    expect(Math.abs(sample1X - activeStartX)).toBeGreaterThan(1);
-    expect(Math.abs(sample2X - activeStartX)).toBeGreaterThan(1);
-    expect(Math.abs(sample3X - activeStartX)).toBeGreaterThan(1);
+    console.log(`Metro glide samples: start=${startX.toFixed(1)}, activeStart=${activeStartX.toFixed(1)}, samples=`, samples.map(s => `(${s.x.toFixed(1)}, ${s.y.toFixed(1)}) @${s.time}ms`), `end=${endX.toFixed(1)}, totalDuration=${totalDuration}ms`);
 
-    // ASSERTION 2: Intermediate samples must differ from end
-    expect(Math.abs(sample1X - endX)).toBeGreaterThan(1);
-    expect(Math.abs(sample2X - endX)).toBeGreaterThan(1);
-    expect(Math.abs(sample3X - endX)).toBeGreaterThan(0.01);
+    // ASSERTION 1: visible travel duration >= 1,200ms
+    expect(totalDuration).toBeGreaterThanOrEqual(1200);
+    expect(totalDuration).toBeLessThanOrEqual(2200);
 
-    // ASSERTION 3: Distance to target must decrease over time (progression toward target)
-    const distStart = Math.abs(endX - activeStartX);
-    const distSample1 = Math.abs(endX - sample1X);
-    const distSample2 = Math.abs(endX - sample2X);
-    const distSample3 = Math.abs(endX - sample3X);
-    expect(distSample1).toBeLessThan(distStart);
-    expect(distSample2).toBeLessThan(distSample1);
-    expect(distSample3).toBeLessThan(distSample2);
+    // ASSERTION 2: at least 8 distinct positions
+    const uniqueX = new Set(samples.map(s => Math.round(s.x * 10) / 10));
+    expect(uniqueX.size).toBeGreaterThanOrEqual(8);
 
-    // ASSERTION 4: Wall-clock active duration must be in range 850ms - 1250ms
-    expect(totalDuration).toBeGreaterThanOrEqual(800); // allow minor timing slack
-    expect(totalDuration).toBeLessThanOrEqual(1350);
+    // ASSERTION 3: no large late jump
+    for (let i = 1; i < samples.length; i++) {
+      const step = Math.abs(samples[i].x - samples[i - 1].x);
+      expect(step).toBeLessThan(75);
+    }
+
+    // ASSERTION 4: no static period followed by endpoint snap (monotonically moves toward target)
+    for (let i = 1; i < 8; i++) {
+      expect(samples[i].x).toBeGreaterThan(samples[i - 1].x + 0.1);
+    }
+
+    // ASSERTION 5: train center stays within rail-lane tolerance
+    // point.y = 13 relative to the track container.
+    // targetY is 13 - trainH / 2 = 13 - 20 = -7px.
+    // We assert that computed translateX component (y value of matrix) is exactly -7px (tolerance of 2px).
+    for (const sample of samples) {
+      expect(Math.abs(sample.y - (-7))).toBeLessThanOrEqual(2);
+    }
+
+    // ASSERTION 6: train does not collide with header/nav, station icons, text labels, number badges, CTAs
+    // Check all sampled positions for collisions
+    const checkCollisionsForBox = async (trainBox: JourneySample['box']) => {
+      if (!trainBox) return;
+
+      // Check station name labels
+      for (const text of stationLabels) {
+        const lbl = page.locator(`button:has-text("${text}")`).first();
+        if (await lbl.isVisible()) {
+          const lblBox = await lbl.boundingBox();
+          if (lblBox) {
+            expect(getIntersection(trainBox, lblBox)).toBe(0);
+          }
+        }
+      }
+
+      // Check number badges
+      const badges = await page.locator('.absolute.bg-eco-ink.text-white.rounded-full').all();
+      for (const badge of badges) {
+        if (await badge.isVisible()) {
+          const badgeBox = await badge.boundingBox();
+          if (badgeBox) {
+            expect(getIntersection(trainBox, badgeBox)).toBe(0);
+          }
+        }
+      }
+
+      // Check station icon buttons
+      const stationButtons = await page.locator('.relative.z-10.grid.grid-cols-6.gap-1 button').all();
+      for (const btn of stationButtons) {
+        if (await btn.isVisible()) {
+          const btnBox = await btn.boundingBox();
+          if (btnBox) {
+            expect(getIntersection(trainBox, btnBox)).toBe(0);
+          }
+        }
+      }
+
+      // Check header
+      const header = page.locator('header').first();
+      if (await header.isVisible()) {
+        const headerBox = await header.boundingBox();
+        if (headerBox) {
+          expect(getIntersection(trainBox, headerBox)).toBe(0);
+        }
+      }
+
+      // Check CTA
+      const ctas = await page.locator('button:has-text("LƯỚT LỘ TRÌNH NGAY"), button:has-text("BẢN ĐỒ & GA TÀU")').all();
+      for (const cta of ctas) {
+        if (await cta.isVisible()) {
+          const ctaBox = await cta.boundingBox();
+          if (ctaBox) {
+            expect(getIntersection(trainBox, ctaBox)).toBe(0);
+          }
+        }
+      }
+    };
+
+    for (const sample of samples) {
+      if (sample.box) {
+        await checkCollisionsForBox(sample.box);
+      }
+    }
   });
 
   test('should handle rapid station switching without queueing', async ({ page }) => {

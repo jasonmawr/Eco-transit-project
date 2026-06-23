@@ -1,144 +1,89 @@
-# EcoTransit RC2 — P0-D Metro Glide & P0-E Workspace Height Remediation
+# Implementation Plan — EcoTransit RC2 Blocker A1 Metro Motion Design Reset
 
-## Background
-
-Owner re-tested P0 items and found two remaining failures:
-- **P0-D**: Metro appears to teleport instead of gliding continuously between stations
-- **P0-E**: Route workspace is too cramped at 1366×768 with Hub open (needs ≥380px clientHeight)
-
-All other P0 items PASSED and are regression guards.
+This plan details the design and step-by-step changes required to implement a **Rail Travel System** for the visual Metro train journey. The current endpoint-displacement WAAPI engine will be replaced by a single-clock `requestAnimationFrame` progress controller that moves the train along a dedicated rail path.
 
 ---
 
-## Forensic Root Cause Analysis
+## User Review Required
 
-### P0-D — Why Metro Still Teleports
-
-Five root causes identified by code inspection of [CampaignHub.tsx](apps/web/components/CampaignHub.tsx):
-
-| # | Root Cause | Location | Effect |
-|---|-----------|----------|--------|
-| 1 | **Duration too short** | [L259-260](apps/web/components/CampaignHub.tsx#L259-L260) | `Math.max(450, distance * 1.2)` — adjacent stations at ~150px = 450ms. Owner spec requires **≥650ms**. Motion appears instant. |
-| 2 | **ResizeObserver snaps train** | [L343-345](apps/web/components/CampaignHub.tsx#L343-L345) | Observer calls `updateTrainPosition(true)` which cancels RAF and snaps to target instantly, **killing any running animation**. |
-| 3 | **Scene change triggers layout reflow** | [page.tsx L262-326](apps/web/app/page.tsx#L262-L326) | When `activeSection` changes → AnimatePresence re-renders scene content → track container dimensions shift → ResizeObserver fires → **snap** |
-| 4 | **useEffect re-registration** | [L334-356](apps/web/components/CampaignHub.tsx#L334-L356) | Effect on `[mounted, isCollapsed]` re-creates observer and calls `setTimeout(() => updateTrainPosition(true), 50)` — this fires an immediate snap 50ms after mount/collapse change. |
-| 5 | **setState on every frame** | [L272](apps/web/components/CampaignHub.tsx#L272) | `setCurrentTrainPos()` triggers React re-render every animation frame. React batching/reconciliation overhead causes frame drops that look like teleport. |
+> [!IMPORTANT]
+> - **Single-Clock requestAnimationFrame Engine**: Animate the train using a single `requestAnimationFrame` + `performance.now()` loop. WAAPI dummy property animation is rejected to keep the engine simple and robust.
+> - **Progress-Based Positioning**: The train's current visual coordinate will be computed by querying `railPath.getPointAtLength(progress * totalLength)`.
+> - **Berth Anchor Separation**: The path is drawn through dedicated, collision-free stop points (berth anchors) on the rail lane, separate from station interaction anchors (icon, badge, click targets).
+> - **Visual Energy Flow**: Overlaid visual glow and flowing dash markers restricted to the active segment via a dynamic `<clipPath>` mask show the travel direction.
+> - **Physical Train Micro-Motion**: When moving, the inner train body will bob up/down ($1.2\text{px}$ max) and lean slightly ($0.5^\circ$ max) on travel. On arrival, it will settle dynamically over $120\text{ms}$–$180\text{ms}$.
+> - **Rapid Click & Resize Retargeting**: Click interruptions read `railProgressRef.current` at that instant, cancel the running RAF loop, and smoothly retarget in the new direction.
 
 ---
 
 ## Proposed Changes
 
-### Component 1: Metro Animation Engine
+### Component 1: Campaign Hub & Rail Travel System
 
-#### [MODIFY] [CampaignHub.tsx](apps/web/components/CampaignHub.tsx)
+#### [MODIFY] apps/web/components/CampaignHub.tsx
 
-**1. Replace `setState`-driven animation with direct DOM manipulation via ref:**
-- Add a `trainElRef = useRef<HTMLDivElement>(null)` for direct transform updates
-- In the RAF loop, write `trainElRef.current.style.transform = translate3d(...)` directly instead of `setCurrentTrainPos()`
-- Only call `setCurrentTrainPos()` at animation **end** (single React render) for final state sync
-- This eliminates per-frame React re-renders
-
-**2. Fix motion profile to meet Owner spec:**
-- min duration: 650ms (adjacent station)
-- max duration: 1150ms (farthest station)  
-- easing: cubic-bezier ease-in-out, no overshoot
-- formula: Math.min(1150, Math.max(650, distance * 2.5))
-
-**3. Guard against ResizeObserver killing animation:**
-- Add an `isAnimatingRef = useRef(false)` flag
-- ResizeObserver callback: if `isAnimatingRef.current === true`, **skip** the immediate snap; only adjust `targetBerth` if layout changed, and let the running animation naturally converge to the new target
-- On animation end: set `isAnimatingRef.current = false`
-- Window resize (while NOT animating): snap immediately as before
-
-**4. Rapid-retarget behavior:**
-- On new station click while animation is running: cancel current RAF, read `currentPosRef.current` (which has the real intermediate position), start new animation from there
-- No queue — always retarget from current actual position
-
----
-
-### Component 2: Workspace Height Budget
-
-#### [MODIFY] [CampaignHub.tsx](apps/web/components/CampaignHub.tsx)
-
-- Reduce desktop Hub compact height from `h-28` (112px) to `h-20` (80px)
-- Reduce Hub header padding from `pb-1.5 sm:pb-2 mb-1.5 sm:mb-2` to `pb-1 sm:pb-1.5 mb-1 sm:mb-1`
-- Reduce Hub outer padding from `p-2 sm:p-3` to `p-1.5 sm:p-2`
-- Station button size from `w-8 h-8` to `w-7 h-7`
-- Train SVG positioning adjusted to match the reduced lane height
-- Total Hub saving: ~40-50px
-
-#### [MODIFY] [page.tsx](apps/web/app/page.tsx)
-
-- Reduce main padding from `py-2 sm:py-3` to `py-1 sm:py-1.5`
-- Reduce scene viewport padding from `p-4 sm:p-6` to `p-3 sm:p-4`
-- Reduce `my-2` gap between Hub and scene to `my-1`
-- Total saving: ~20px
-
-#### [MODIFY] [HeroSection.tsx](apps/web/components/HeroSection.tsx)
-
-- Remove the mandatory `min-h-[280px] lg:min-h-[320px]` — let it size naturally
-- Reduce padding from `p-4 sm:p-8 lg:p-10` to `p-3 sm:p-5 lg:p-6`
-- Reduce the right-side graphic max-width from `350px` to `240px` and hide on smaller desktop viewports where height is constrained
-- Reduce `mb-4` to `mb-2`
-- Reduce inner spacing `space-y-6` to `space-y-3`
-- Total saving: ~120-160px
-
-#### [MODIFY] [RoutePlannerShell.tsx](apps/web/components/RoutePlannerShell.tsx)
-
-- Reduce `space-y-6` to `space-y-4` between form sections
-- Reduce grid gap from `gap-6` to `gap-4`
-- Marginal height savings
-
----
-
-### Component 3: Tests
-
-#### [MODIFY] [epic10.spec.ts](apps/web/tests/epic10.spec.ts)
-
-Add/update tests:
-1. **Metro continuous glide proof test**: Click station A→B, capture transform at start, ~200ms, ~400ms (mid), and end. Assert each intermediate differs from start and end.
-2. **Duration assertion**: Measure actual wall-clock time from first position change to final rest. Assert ≥650ms for adjacent station.
-3. **Rapid 4-station retarget**: Click 4 stations in 100ms intervals, verify final position matches last station, no queue.
-4. **Workspace height test**: Assert `scene-viewport clientHeight ≥ 380` at 1366×768
-5. **Scroll/wheel/thumb**: Assert scrollHeight > clientHeight after route results, wheel increases scrollTop
-
-#### [MODIFY] [capture_evidence.spec.ts](apps/web/tests/capture_evidence.spec.ts)
-
-Capture new evidence:
-- `06-real-metro-mid-transition-no-overlap.png`
-- `07-real-metro-rapid-switch.webm`
-- `07a-real-metro-single-click-glide.webm`
-- `16-route-workspace-1366-top.png`
-- `17-route-workspace-1366-result-scrolled-bottom.png`
-- `17a-route-workspace-1366-height-proof.png`
-
----
-
-## Regression Guards
-
-All changes will be verified against:
-
-| Guard | What to check |
-|-------|--------------|
-| Two-car Metro | SVG still has 2 carriage bodies + coupler |
-| No icon/label overlap | Collision test at start/mid/end positions |
-| Avatar attachment | Avatar div still inside train container |
-| Footer safety | Footer rect.y ≥ viewport rect.y + viewport height |
-| Wheel scroll + thumb | scrollHeight > clientHeight, scrollTop increases |
-| Desktop 1366/1440/1920 | Layout doesn't clip |
-| Mobile 390×800 | Mobile train visible, no overflow |
-| Other scenes (XanhWrap, Rewards) | No regression from Hub/workspace CSS changes |
+- **State & Ref Additions**:
+  - `railProgressRef = useRef(0)` (scalar value from 0.0 to 1.0; the single source of truth for the current location of the train).
+  - `isMovingRef = useRef(false)` (track active motion state).
+  - `rafIdRef = useRef<number | null>(null)` (single RAF loop handle).
+  - `desktopPathD` and `mobilePathD` states to hold dynamic SVG path representations.
+- **Compute Berth Anchors and Generate Paths**:
+  - Calculate desktop and mobile berth coordinates dynamically on mount and whenever the container dimensions change (ResizeObserver).
+  - Berth stop points are offset horizontally/vertically from the station buttons to keep the train in its own dedicated lane.
+  - Generate the SVG path data `d` connecting all 6 station berths:
+    - Desktop: `M P1.x 12 L P2.x 12 L ... L P6.x 12`
+    - Mobile: `M P1.x P1.y L P2.x P2.y L ... L P6.x P6.y`
+  - Define mapped progress indices for each station: `stationProgress[i] = cumulativeDistanceToStation[i] / totalLength`.
+- **Single RAF Clock Motion Loop**:
+  - Cancel any active RAF loop on station selection.
+  - Read `railProgressRef.current` as `startProgress`.
+  - Calculate travel target progress `targetProgress` based on the clicked station.
+  - Determine direction of travel:
+    - If `targetProgress > startProgress`, set direction to `'right'` (or `'down'`).
+    - If `targetProgress < startProgress`, set direction to `'left'` (or `'up'`).
+  - Calculate travel duration matching timing contracts:
+    - Adjacent station (1 station gap): $1350\text{ms}$.
+    - Two or three stations gap: $1700\text{ms}$.
+    - Longest journey (4+ stations gap): $2100\text{ms}$.
+  - Run the `requestAnimationFrame` loop using `performance.now()`:
+    - Calculate elapsed time fraction: $t = (\text{currentTime} - \text{startTime}) / \text{duration}$.
+    - Clamp $t$ between $0$ and $1$.
+    - Apply ease-in-out cubic interpolation: $f = t^2 (3 - 2t)$ or standard cubic bezier easing.
+    - Interpolate progress: $p = p_{\text{start}} + (p_{\text{target}} - p_{\text{start}}) \times f$.
+    - Update `railProgressRef.current = p`.
+    - Retrieve coordinate: `point = pathElement.getPointAtLength(p * totalLength)`.
+    - Write translation `transform: translate3d(x, y, 0)` directly to the outer train element.
+    - End the loop once $t \geq 1$.
+- **Resize Handling**:
+  - When the track container bounds change (ResizeObserver), recalculate path geometry.
+  - Continue travel from the exact current `railProgressRef.current` along the newly computed path.
+- **Energy Flow & Flowing Markers**:
+  - Render overlaid `<path>` elements using the track geometry.
+  - Wrap them under a `<clipPath id="desktop-active-clip">` with `stroke-dasharray` defined by segment bounds ($p_{\text{min}}$ to $p_{\text{max}}$).
+  - Apply `animate-flow-dash` CSS to slide the dash-offset of the markers when moving.
+- **Train Micro-Motion**:
+  - Add classes to the inner train container to bob it ($1.2\text{px}$) and lean it ($0.4^\circ$) during movement.
+  - Smoothly transition back to default angles on arrival over $150\text{ms}$.
 
 ---
 
 ## Verification Plan
 
 ### Automated Tests
-
+Run playwright E2E test suites to assert progress-based travel:
 ```bash
-npm run build
-npm run test
-npx playwright test apps/web/tests/route-planner.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --repeat-each=5 --retries=0 --workers=1
-npx playwright test apps/web/tests/epic10.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1
-npx playwright test apps/web/tests/capture_evidence.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --reporter=line --retries=0 --workers=1
+npx playwright test apps/web/tests/route-planner.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --workers=1
+npx playwright test apps/web/tests/epic10.spec.ts --config=apps/web/playwright.config.ts --project=chromium-desktop --workers=1
 ```
+
+Modify assertions in `apps/web/tests/epic10.spec.ts`:
+- Collect at least 8 samples during the $1350\text{ms}$ adjacent transition and assert progressive distance reduction along the rail path.
+- Verify rapid click interruption reads progress correctly.
+
+### Manual Verification
+- Review normal playback video files at $1366\times768$ and $390\times800$ viewports.
+- Record and verify the required evidence files:
+  - `evidence/epic10/07a-real-metro-single-click-glide.webm`
+  - `evidence/epic10/07b-real-metro-adjacent-stations-frame-sequence.png`
+  - `evidence/epic10/07c-real-metro-rail-energy-flow.webm`
+  - `evidence/epic10/07d-real-metro-rapid-retarget.webm`

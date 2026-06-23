@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Edit2 } from 'lucide-react';
 import { AvatarSvg, AvatarConfig } from './ui/AvatarSvg';
@@ -179,7 +179,6 @@ const parseTransformMatrix = (transformStr: string): { x: number; y: number } =>
   }
   return { x: 0, y: 0 };
 };
-
 export default function CampaignHub({ activeSection, onSectionSelect, user, onLoginClick }: CampaignHubProps) {
   const [mounted, setMounted] = useState(false);
   const [selectedChar, setSelectedChar] = useState<string>('student');
@@ -193,23 +192,49 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
   const [direction, setDirection] = useState<'right' | 'left'>('right');
 
   // ──────────────────────────────────────────────────────────────
-  // ANIMATION ENGINE — Web Animations API (WAAPI) implementation
+  // ANIMATION ENGINE — requestAnimationFrame Path Travel System
   // ──────────────────────────────────────────────────────────────
 
   const [hasPlaced, setHasPlaced] = useState(false);
-  const waapiAnimRef = useRef<Animation | null>(null);
+  const [isMoving, setIsMoving] = useState(false);
+  const [desktopPathD, setDesktopPathD] = useState('');
+  const [mobilePathD, setMobilePathD] = useState('');
+  const [containerWidth, setContainerWidth] = useState(1000);
+  const [containerHeight, setContainerHeight] = useState(72);
+  const [pathLength, setPathLength] = useState(1000);
 
-  // Direct DOM ref — the ONLY element that receives position transforms
+  // Animation boundaries for segment clipping energy flows
+  const [startProgressVal, setStartProgressVal] = useState(0);
+  const [targetProgressVal, setTargetProgressVal] = useState(0);
+  const [isForwards, setIsForwards] = useState(true);
+
+  // Progress references and loop handlers
+  const railProgressRef = useRef(0);
+  const isMovingRef = useRef(false);
+  const rafIdRef = useRef<number | null>(null);
+
+  // Mapped stop point coordinates
+  const stationProgressRef = useRef<Record<string, number>>({});
+  const stationDistanceRef = useRef<Record<string, number>>({});
+
+  // Safe dynamic IDs per instance
+  const clipId = useId();
+  const desktopClipId = `desktop-active-clip-${clipId}`;
+  const mobileClipId = `mobile-active-clip-${clipId}`;
+
+  // Direct DOM refs
   const desktopTrainElRef = useRef<HTMLDivElement | null>(null);
   const mobileTrainElRef = useRef<HTMLDivElement | null>(null);
-  // Last known container dimensions for delta threshold
-  const lastContainerSize = useRef({ w: 0, h: 0 });
+  const desktopRailPathRef = useRef<SVGPathElement | null>(null);
+  const mobileRailPathRef = useRef<SVGPathElement | null>(null);
 
   // Bounding containers & station button refs
   const desktopTrackRef = useRef<HTMLDivElement | null>(null);
   const mobileTrackRef = useRef<HTMLDivElement | null>(null);
   const desktopRefs = useRef<{[key: string]: HTMLButtonElement | null}>({});
   const mobileRefs = useRef<{[key: string]: HTMLButtonElement | null}>({});
+
+  const lastContainerSize = useRef({ w: 0, h: 0 });
 
   useEffect(() => {
     setCurrentUser(user);
@@ -258,97 +283,150 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
   }, [activeIndex, prevIndex]);
 
   // ──────────────────────────────────────────────────────────────
-  // Measure berth position relative to track container
+  // Position update dispatcher using SVG path
   // ──────────────────────────────────────────────────────────────
-  const measureBerthTarget = useCallback((sectionId: string): { x: number; y: number } | null => {
-    if (typeof window === 'undefined') return null;
-    const isDesktop = window.innerWidth >= 640;
-    const activeRef = isDesktop ? desktopRefs.current[sectionId] : mobileRefs.current[sectionId];
-    const container = isDesktop ? desktopTrackRef.current : mobileTrackRef.current;
+  const updateToProgress = useCallback((p: number) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
+    const trainEl = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
+    const pathEl = isDesktop ? desktopRailPathRef.current : mobileRailPathRef.current;
+    if (!trainEl || !pathEl) return;
 
-    if (!activeRef || !container) return null;
+    try {
+      const totalLen = pathEl.getTotalLength();
+      const point = pathEl.getPointAtLength(p * totalLen);
 
-    const activeRect = activeRef.getBoundingClientRect();
-    const containerRect = container.getBoundingClientRect();
+      const trainRect = trainEl.getBoundingClientRect();
+      const trainW = trainRect.width > 0 ? trainRect.width : (isDesktop ? 96 : 72);
+      const trainH = trainRect.height > 0 ? trainRect.height : (isDesktop ? 40 : 48);
 
-    if (isDesktop) {
-      const x = activeRect.left - containerRect.left + activeRect.width / 2;
-      const y = 12; // Lane offset from top of compacted track
-      return { x, y };
-    } else {
-      const x = containerRect.width - 36;
-      const y = activeRect.top - containerRect.top + activeRect.height / 2;
-      return { x, y };
+      const targetX = point.x - trainW / 2;
+      const targetY = point.y - trainH / 2;
+
+      trainEl.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
+    } catch (e) {
+      // Swallowed: path length query may fail if rendering is incomplete
     }
   }, []);
 
   // ──────────────────────────────────────────────────────────────
-  // Position update dispatcher using WAAPI
+  // Measure layout and dynamically build SVG rails
   // ──────────────────────────────────────────────────────────────
-  const updateTrainPosition = useCallback((isImmediate = false) => {
-    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
-    const element = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
-    if (!element) return;
-
-    const rect = element.getBoundingClientRect();
-    const trainWidth = rect.width > 0 ? rect.width : (isDesktop ? 96 : 72);
-    const trainHeight = rect.height > 0 ? rect.height : (isDesktop ? 40 : 48);
-
-    const offsetW = trainWidth / 2;
-    const offsetH = trainHeight / 2;
-
-    const target = measureBerthTarget(activeSection);
-    if (!target) return;
-
-    const targetX = target.x - offsetW;
-    const targetY = target.y - offsetH;
-
-    if (isImmediate || prefersReducedMotion) {
-      if (waapiAnimRef.current) {
-        waapiAnimRef.current.cancel();
-        waapiAnimRef.current = null;
-      }
-      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-      setHasPlaced(true);
-      return;
-    }
-
-    const computedStyle = window.getComputedStyle(element);
-    const currentTransform = computedStyle.transform;
-    const parsedPos = parseTransformMatrix(currentTransform);
-
-    if (!hasPlaced || (parsedPos.x === 0 && parsedPos.y === 0)) {
-      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-      setHasPlaced(true);
-      return;
-    }
-
-    if (waapiAnimRef.current) {
-      waapiAnimRef.current.cancel();
-      waapiAnimRef.current = null;
-    }
-
-    element.style.transform = `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)`;
-
-    const distance = Math.hypot(targetX - parsedPos.x, targetY - parsedPos.y);
-    if (distance < 2) {
-      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-      return;
-    }
-
+  const measureAndBuildPaths = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const isDesktop = window.innerWidth >= 640;
     const container = isDesktop ? desktopTrackRef.current : mobileTrackRef.current;
-    const trackRect = container ? container.getBoundingClientRect() : null;
-    const trackLength = trackRect ? (isDesktop ? trackRect.width : trackRect.height) : 800;
-    const duration = 950 + (distance / (trackLength || 1)) * 550;
+    if (!container) return;
 
-    const anim = element.animate([
-      { transform: `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)` },
-      { transform: `translate3d(${targetX}px, ${targetY}px, 0)` }
-    ], {
-      duration: duration,
-      easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-      fill: 'forwards'
-    });
+    const containerRect = container.getBoundingClientRect();
+    if (containerRect.width <= 0 || containerRect.height <= 0) return;
+
+    setContainerWidth(containerRect.width);
+    setContainerHeight(containerRect.height);
+
+    // Derived rail center coordinates (desktop horizontal line, mobile vertical line)
+    const railCenterY = 13;
+    const railCenterX = containerRect.width - 36;
+
+    const berths: { x: number; y: number }[] = [];
+    const activeRefs = isDesktop ? desktopRefs.current : mobileRefs.current;
+
+    for (let i = 0; i < JOURNEY_STATIONS.length; i++) {
+      const station = JOURNEY_STATIONS[i];
+      const button = activeRefs[station.id];
+      if (!button) return; // Wait until all buttons render
+
+      const buttonRect = button.getBoundingClientRect();
+      const buttonCenterX = buttonRect.left - containerRect.left + buttonRect.width / 2;
+      const buttonCenterY = buttonRect.top - containerRect.top + buttonRect.height / 2;
+
+      if (isDesktop) {
+        berths.push({ x: buttonCenterX, y: railCenterY });
+      } else {
+        berths.push({ x: railCenterX, y: buttonCenterY });
+      }
+    }
+
+    let totalLen = 0;
+    const distances = [0];
+    for (let i = 1; i < berths.length; i++) {
+      const dist = Math.hypot(berths[i].x - berths[i - 1].x, berths[i].y - berths[i - 1].y);
+      totalLen += dist;
+      distances.push(totalLen);
+    }
+
+    if (totalLen <= 0) return;
+
+    setPathLength(totalLen);
+
+    const progressMap: Record<string, number> = {};
+    const distanceMap: Record<string, number> = {};
+    for (let i = 0; i < JOURNEY_STATIONS.length; i++) {
+      progressMap[JOURNEY_STATIONS[i].id] = distances[i] / totalLen;
+      distanceMap[JOURNEY_STATIONS[i].id] = distances[i];
+    }
+    stationProgressRef.current = progressMap;
+    stationDistanceRef.current = distanceMap;
+
+    let pathDStr = `M ${berths[0].x} ${berths[0].y}`;
+    for (let i = 1; i < berths.length; i++) {
+      pathDStr += ` L ${berths[i].x} ${berths[i].y}`;
+    }
+
+    if (isDesktop) {
+      setDesktopPathD(pathDStr);
+    } else {
+      setMobilePathD(pathDStr);
+    }
+
+    if (!isMovingRef.current) {
+      const currentStationProgress = progressMap[activeSection] ?? 0;
+      railProgressRef.current = currentStationProgress;
+      setHasPlaced(true);
+      requestAnimationFrame(() => {
+        updateToProgress(currentStationProgress);
+      });
+    }
+  }, [activeSection, updateToProgress]);
+
+  // ──────────────────────────────────────────────────────────────
+  // Trigger single RAF animation loop on station changes
+  // ──────────────────────────────────────────────────────────────
+  const startRailAnimation = useCallback((targetProgress: number) => {
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 640;
+    const pathEl = isDesktop ? desktopRailPathRef.current : mobileRailPathRef.current;
+    if (!pathEl) return;
+
+    let totalLen = 1000;
+    try {
+      totalLen = pathEl.getTotalLength();
+    } catch (e) {}
+
+    const startProgress = railProgressRef.current;
+    const distanceToTravel = Math.abs(targetProgress - startProgress) * totalLen;
+
+    if (distanceToTravel < 0.5) {
+      railProgressRef.current = targetProgress;
+      updateToProgress(targetProgress);
+      return;
+    }
+
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
+    setStartProgressVal(startProgress);
+    setTargetProgressVal(targetProgress);
+    setIsForwards(targetProgress >= startProgress);
+
+    // Timing formula: Adjacent station (1 station gap length) is 1350ms, longest (5 stations) is 2100ms.
+    // Proportional scaling for intermediate/rapid-click remaining distances.
+    const minGapDistance = totalLen / 5;
+    const duration = 1350 + Math.max(0, (distanceToTravel - minGapDistance) / (totalLen - minGapDistance || 1)) * 750;
+
+    const startTime = performance.now();
+    isMovingRef.current = true;
+    setIsMoving(true);
 
     if (typeof window !== 'undefined') {
       (window as any).__lastMetroAnimationStart = performance.now();
@@ -356,102 +434,67 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
       (window as any).__lastMetroAnimationExpectedDuration = duration;
     }
 
-    waapiAnimRef.current = anim;
+    const loop = (now: number) => {
+      const elapsed = now - startTime;
+      const t = Math.min(1, elapsed / duration);
 
-    anim.onfinish = () => {
-      if (typeof window !== 'undefined' && (window as any).__lastMetroAnimationStart) {
-        (window as any).__lastMetroAnimationDuration = performance.now() - (window as any).__lastMetroAnimationStart;
-      }
-      element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-      if (waapiAnimRef.current === anim) {
-        waapiAnimRef.current = null;
+      // Ease-in-out cubic easing
+      const f = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      const p = startProgress + (targetProgress - startProgress) * f;
+      railProgressRef.current = p;
+
+      updateToProgress(p);
+
+      if (t < 1) {
+        rafIdRef.current = requestAnimationFrame(loop);
+      } else {
+        railProgressRef.current = targetProgress;
+        updateToProgress(targetProgress);
+        isMovingRef.current = false;
+        setIsMoving(false);
+        rafIdRef.current = null;
+
+        if (typeof window !== 'undefined' && (window as any).__lastMetroAnimationStart) {
+          (window as any).__lastMetroAnimationDuration = performance.now() - (window as any).__lastMetroAnimationStart;
+        }
       }
     };
-  }, [activeSection, measureBerthTarget, prefersReducedMotion, hasPlaced]);
 
-  // ──────────────────────────────────────────────────────────────
-  // Trigger animation when section changes (user clicks station)
-  // ──────────────────────────────────────────────────────────────
+    rafIdRef.current = requestAnimationFrame(loop);
+  }, [updateToProgress]);
+
+  // Click triggers
   useEffect(() => {
     if (mounted) {
-      updateTrainPosition(false);
+      const targetProgress = stationProgressRef.current[activeSection] ?? 0;
+      if (prefersReducedMotion) {
+        if (rafIdRef.current !== null) {
+          cancelAnimationFrame(rafIdRef.current);
+          rafIdRef.current = null;
+        }
+        railProgressRef.current = targetProgress;
+        updateToProgress(targetProgress);
+        setHasPlaced(true);
+      } else {
+        startRailAnimation(targetProgress);
+      }
     }
-  }, [activeSection, mounted]);
+  }, [activeSection, mounted, prefersReducedMotion, startRailAnimation, updateToProgress]);
 
-  // ──────────────────────────────────────────────────────────────
   // Resize + container layout observer — retargets mid-animation
-  // ──────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!mounted) return;
 
     // Initial placement fallback in case layout isn't immediate
     const initialTimer = setTimeout(() => {
       if (!hasPlaced) {
-        updateTrainPosition(true);
+        measureAndBuildPaths();
       }
     }, 200);
 
     const handleResize = () => {
-      const isDesktop = window.innerWidth >= 640;
-      const element = isDesktop ? desktopTrainElRef.current : mobileTrainElRef.current;
-      if (!element) return;
-
-      const target = measureBerthTarget(activeSection);
-      if (!target) return;
-
-      const rect = element.getBoundingClientRect();
-      const trainWidth = rect.width > 0 ? rect.width : (isDesktop ? 96 : 72);
-      const trainHeight = rect.height > 0 ? rect.height : (isDesktop ? 40 : 48);
-      const offsetW = trainWidth / 2;
-      const offsetH = trainHeight / 2;
-
-      const targetX = target.x - offsetW;
-      const targetY = target.y - offsetH;
-
-      if (waapiAnimRef.current) {
-        const computedStyle = window.getComputedStyle(element);
-        const currentTransform = computedStyle.transform;
-        const parsedPos = parseTransformMatrix(currentTransform);
-
-        waapiAnimRef.current.cancel();
-        waapiAnimRef.current = null;
-
-        element.style.transform = `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)`;
-
-        const distance = Math.hypot(targetX - parsedPos.x, targetY - parsedPos.y);
-        const container = isDesktop ? desktopTrackRef.current : mobileTrackRef.current;
-        const trackRect = container ? container.getBoundingClientRect() : null;
-        const trackLength = trackRect ? (isDesktop ? trackRect.width : trackRect.height) : 800;
-        const duration = 950 + (distance / (trackLength || 1)) * 550;
-
-        const anim = element.animate([
-          { transform: `translate3d(${parsedPos.x}px, ${parsedPos.y}px, 0)` },
-          { transform: `translate3d(${targetX}px, ${targetY}px, 0)` }
-        ], {
-          duration: duration,
-          easing: 'cubic-bezier(0.25, 1, 0.5, 1)',
-          fill: 'forwards'
-        });
-
-        if (typeof window !== 'undefined') {
-          (window as any).__lastMetroAnimationStart = performance.now();
-          (window as any).__lastMetroAnimationDuration = null;
-          (window as any).__lastMetroAnimationExpectedDuration = duration;
-        }
-
-        waapiAnimRef.current = anim;
-        anim.onfinish = () => {
-          if (typeof window !== 'undefined' && (window as any).__lastMetroAnimationStart) {
-            (window as any).__lastMetroAnimationDuration = performance.now() - (window as any).__lastMetroAnimationStart;
-          }
-          element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-          if (waapiAnimRef.current === anim) {
-            waapiAnimRef.current = null;
-          }
-        };
-      } else {
-        element.style.transform = `translate3d(${targetX}px, ${targetY}px, 0)`;
-      }
+      measureAndBuildPaths();
     };
 
     window.addEventListener('resize', handleResize);
@@ -484,12 +527,12 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
       clearTimeout(initialTimer);
       window.removeEventListener('resize', handleResize);
       observer.disconnect();
-      if (waapiAnimRef.current) {
-        waapiAnimRef.current.cancel();
-        waapiAnimRef.current = null;
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
       }
     };
-  }, [mounted, isCollapsed, activeSection, measureBerthTarget, updateTrainPosition, hasPlaced]);
+  }, [mounted, hasPlaced, measureAndBuildPaths]);
 
   const handleSaveAvatarSuccess = (updatedAvatarConfig: any) => {
     if (updatedAvatarConfig && updatedAvatarConfig.characterId) {
@@ -601,20 +644,96 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
       {!isCollapsed && (
         <div
           ref={desktopTrackRef}
+          data-testid="desktop-track"
           className="hidden sm:block relative py-1.5 px-2 z-10"
-          style={{ position: 'relative', height: '72px' }}
+          style={{ position: 'relative', height: '76px' }}
         >
+          {/* Style injection for markers flow and bob-lean animations */}
+          <style>{`
+            @keyframes flow-dash {
+              to {
+                stroke-dashoffset: -32;
+              }
+            }
+            .train-visual-container.is-moving {
+              animation: train-bob-lean 0.5s ease-in-out infinite alternate;
+            }
+            .train-visual-container.is-idle {
+              transition: transform 180ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
+              transform: translateY(0px) rotate(0deg);
+            }
+            @keyframes train-bob-lean {
+              0% { transform: translateY(0px) rotate(0.4deg); }
+              100% { transform: translateY(1.2px) rotate(-0.4deg); }
+            }
+          `}</style>
+
           {/* SVG Railway Track Background */}
-          <div className="absolute top-[21px] left-0 right-0 h-3 -translate-y-1/2 pointer-events-none z-0 px-12">
-            <svg className="w-full h-full overflow-visible" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <svg
+              className="w-full h-full overflow-visible"
+              viewBox={`0 0 ${containerWidth} ${containerHeight}`}
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path
-                d="M 10,6 L 10,-6 M 40,6 L 40,-6 M 70,6 L 70,-6 M 100,6 L 100,-6 M 130,6 L 130,-6 M 160,6 L 160,-6 M 190,6 L 190,-6 M 220,6 L 220,-6 M 250,6 L 250,-6 M 280,6 L 280,-6 M 310,6 L 310,-6 M 340,6 L 340,-6 M 370,6 L 370,-6 M 400,6 L 400,-6 M 430,6 L 430,-6 M 460,6 L 460,-6 M 490,6 L 490,-6 M 520,6 L 520,-6 M 550,6 L 550,-6 M 580,6 L 580,-6 M 610,6 L 610,-6 M 640,6 L 640,-6 M 670,6 L 670,-6 M 700,6 L 700,-6 M 730,6 L 730,-6 M 760,6 L 760,-6 M 790,6 L 790,-6 M 820,6 L 820,-6 M 850,6 L 850,-6 M 880,6 L 880,-6 M 910,6 L 910,-6 M 940,6 L 940,-6 M 970,6 L 970,-6 M 1000,6 L 1000,-6 M 1030,6 L 1030,-6 M 1060,6 L 1060,-6 M 1090,6 L 1090,-6 M 1120,6 L 1120,-6"
+                ref={desktopRailPathRef}
+                id="desktopRailPath"
+                d={desktopPathD}
+                stroke="none"
+                fill="none"
+              />
+
+              <path
+                d={desktopPathD}
                 stroke="#4B5E70"
-                strokeWidth="1.5"
+                strokeWidth="1.2"
+                strokeOpacity="0.15"
+                strokeDasharray="2 6"
+              />
+
+              <path
+                d={desktopPathD}
+                stroke="#4B5E70"
+                strokeWidth="2.5"
                 strokeOpacity="0.2"
               />
-              <line x1="0%" y1="-2" x2="100%" y2="-2" stroke="#0066FF" strokeWidth="1.5" strokeOpacity="0.3" />
-              <line x1="0%" y1="2" x2="100%" y2="2" stroke="#9FCE1A" strokeWidth="1.5" strokeOpacity="0.3" />
+
+              {/* Active segment clip path */}
+              <clipPath id={desktopClipId}>
+                <path
+                  d={desktopPathD}
+                  stroke="white"
+                  strokeWidth="8"
+                  strokeDasharray={`0 ${Math.min(startProgressVal, targetProgressVal) * pathLength} ${Math.abs(targetProgressVal - startProgressVal) * pathLength} ${pathLength}`}
+                  fill="none"
+                />
+              </clipPath>
+
+              {/* Glow overlay */}
+              <path
+                d={desktopPathD}
+                stroke="#0066FF"
+                strokeWidth="3.5"
+                opacity={isMoving ? 0.35 : 0}
+                clipPath={`url(#${desktopClipId})`}
+                className="transition-opacity duration-300"
+              />
+
+              {/* Flow dashes */}
+              <path
+                d={desktopPathD}
+                stroke="#9FCE1A"
+                strokeWidth="2"
+                strokeDasharray="8 20"
+                clipPath={`url(#${desktopClipId})`}
+                style={{
+                  opacity: isMoving ? 0.8 : 0,
+                  animation: isMoving ? 'flow-dash 0.8s linear infinite' : 'none',
+                  animationDirection: isForwards ? 'normal' : 'reverse'
+                }}
+                className="transition-opacity duration-300"
+              />
             </svg>
           </div>
 
@@ -636,8 +755,10 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
               transition: 'opacity 0.2s ease-in-out',
             }}
           >
-            {/* Inner train body — direction flip only, no position animation */}
-            <DesktopTrain avatarConfig={getUserAvatarConfig(selectedChar)} direction={direction} />
+            {/* Inner train body — direction flip, bobbing, leaning */}
+            <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
+              <DesktopTrain avatarConfig={getUserAvatarConfig(selectedChar)} direction={direction} />
+            </div>
           </div>
 
           {/* Nodes Grid — station buttons below train lane */}
@@ -646,11 +767,11 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
               const isActive = activeSection === station.id;
 
               return (
-                <div key={station.id} className="flex flex-col items-center text-center relative" style={{ paddingTop: '28px' }}>
+                <div key={station.id} className="flex flex-col items-center text-center relative" style={{ paddingTop: '36px' }}>
                   {/* Connector line from rail down to station button */}
                   <div
                     className="absolute w-[1.5px] border-l-2 border-dashed border-eco-primary/20 pointer-events-none z-0"
-                    style={{ top: '-8px', height: '36px', left: '50%', transform: 'translateX(-50%)' }}
+                    style={{ top: '-23px', height: '23px', left: '50%', transform: 'translateX(-50%)' }}
                   />
 
                   {/* The station dot/node button */}
@@ -691,14 +812,77 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
       {!isCollapsed && (
         <div
           ref={mobileTrackRef}
+          data-testid="mobile-track"
           className="sm:hidden relative pl-6 pr-24 py-1.5 z-10"
           style={{ position: 'relative' }}
         >
           {/* Steel Rail Line Background on the right */}
-          <div className="absolute top-0 bottom-0 right-[36px] w-[6px] pointer-events-none z-0">
-            <div className="w-full h-full bg-slate-100 border-l border-r border-eco-primary/10 relative">
-              <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[2px] bg-eco-primary/30" />
-            </div>
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <svg
+              className="w-full h-full overflow-visible"
+              viewBox={`0 0 ${containerWidth} ${containerHeight}`}
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                ref={mobileRailPathRef}
+                id="mobileRailPath"
+                d={mobilePathD}
+                stroke="none"
+                fill="none"
+              />
+
+              <path
+                d={mobilePathD}
+                stroke="#4B5E70"
+                strokeWidth="1.2"
+                strokeOpacity="0.15"
+                strokeDasharray="2 6"
+              />
+
+              <path
+                d={mobilePathD}
+                stroke="#4B5E70"
+                strokeWidth="2.5"
+                strokeOpacity="0.2"
+              />
+
+              {/* Active segment clip path */}
+              <clipPath id={mobileClipId}>
+                <path
+                  d={mobilePathD}
+                  stroke="white"
+                  strokeWidth="8"
+                  strokeDasharray={`0 ${Math.min(startProgressVal, targetProgressVal) * pathLength} ${Math.abs(targetProgressVal - startProgressVal) * pathLength} ${pathLength}`}
+                  fill="none"
+                />
+              </clipPath>
+
+              {/* Glow overlay */}
+              <path
+                d={mobilePathD}
+                stroke="#0066FF"
+                strokeWidth="3.5"
+                opacity={isMoving ? 0.35 : 0}
+                clipPath={`url(#${mobileClipId})`}
+                className="transition-opacity duration-300"
+              />
+
+              {/* Flow dashes */}
+              <path
+                d={mobilePathD}
+                stroke="#9FCE1A"
+                strokeWidth="2"
+                strokeDasharray="8 20"
+                clipPath={`url(#${mobileClipId})`}
+                style={{
+                  opacity: isMoving ? 0.8 : 0,
+                  animation: isMoving ? 'flow-dash 0.8s linear infinite' : 'none',
+                  animationDirection: isForwards ? 'normal' : 'reverse'
+                }}
+                className="transition-opacity duration-300"
+              />
+            </svg>
           </div>
 
           {/* Dynamic train — outer position layer */}
@@ -719,7 +903,9 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
               transition: 'opacity 0.2s ease-in-out',
             }}
           >
-            <MobileTrain avatarConfig={getUserAvatarConfig(selectedChar)} direction={direction} />
+            <div className={`train-visual-container ${isMoving ? 'is-moving' : 'is-idle'}`}>
+              <MobileTrain avatarConfig={getUserAvatarConfig(selectedChar)} direction={direction} />
+            </div>
           </div>
 
           {/* Vertical List of Stations */}
