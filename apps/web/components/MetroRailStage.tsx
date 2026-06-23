@@ -236,24 +236,31 @@ export default function MetroRailStage({
   };
 
   // Sync prop activeSection with internal journey state (Effect-phase state synchronization)
+  const lastActiveSectionRef = useRef(activeSection);
+
   useEffect(() => {
-    const targetIdx = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
-    if (targetIdx !== journey.targetIndex) {
-      const prevIdx = journey.targetIndex;
-      const duration = getTransitionDuration(prevIdx, targetIdx);
-      const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const hasSectionChanged = activeSection !== lastActiveSectionRef.current;
+    lastActiveSectionRef.current = activeSection;
 
-      if (targetIdx !== prevIdx) {
-        setDirection(targetIdx > prevIdx ? 'right' : 'left');
+    if (hasSectionChanged) {
+      const targetIdx = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+      if (targetIdx !== journey.targetIndex) {
+        const prevIdx = journey.targetIndex;
+        const duration = getTransitionDuration(prevIdx, targetIdx);
+        const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+        if (targetIdx !== prevIdx) {
+          setDirection(targetIdx > prevIdx ? 'right' : 'left');
+        }
+
+        setJourney({
+          journeyId: nextJourneyId,
+          targetIndex: targetIdx,
+          prevIndex: prevIdx,
+          durationMs: duration,
+          source: 'external',
+        });
       }
-
-      setJourney({
-        journeyId: nextJourneyId,
-        targetIndex: targetIdx,
-        prevIndex: prevIdx,
-        durationMs: duration,
-        source: 'external',
-      });
     }
   }, [activeSection, journey.targetIndex]);
 

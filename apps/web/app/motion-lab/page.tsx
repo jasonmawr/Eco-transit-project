@@ -31,6 +31,7 @@ export default function MetroRailMotionLab() {
   const [mounted, setMounted] = useState(false);
   const [activeSection, setActiveSection] = useState('route');
   const [isMoving, setIsMoving] = useState(false);
+  const [delayParentUpdate, setDelayParentUpdate] = useState(false);
   const labIdRef = useRef('');
 
   // CSS transition event telemetry
@@ -71,7 +72,14 @@ export default function MetroRailMotionLab() {
     });
 
     setEventLogs(prev => [`[${new Date().toLocaleTimeString()}] Navigating to station ${targetIdx + 1}. Starting journey...`, ...prev]);
-    setActiveSection(sectionId);
+
+    if (delayParentUpdate) {
+      setTimeout(() => {
+        setActiveSection(sectionId);
+      }, 1000);
+    } else {
+      setActiveSection(sectionId);
+    }
   };
 
   // Callbacks passed to shared MetroRailStage to feed the telemetry panel
@@ -184,6 +192,19 @@ export default function MetroRailMotionLab() {
               >
                 Test: Rapid clicks (Ga 2 ➔ 4 ➔ 6)
               </button>
+            </div>
+            <div className="flex items-center gap-2 pt-3 border-t border-slate-700/50">
+              <input
+                type="checkbox"
+                id="delay-parent-toggle"
+                data-testid="delay-parent-toggle"
+                checked={delayParentUpdate}
+                onChange={(e) => setDelayParentUpdate(e.target.checked)}
+                className="w-4 h-4 rounded text-[#9FCE1A] focus:ring-[#9FCE1A] bg-slate-900 border-slate-700"
+              />
+              <label htmlFor="delay-parent-toggle" className="text-[10px] text-slate-300 font-bold select-none cursor-pointer">
+                Trì hoãn cập nhật Section (1s)
+              </label>
             </div>
           </div>
 

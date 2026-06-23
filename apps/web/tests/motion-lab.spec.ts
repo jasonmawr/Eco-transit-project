@@ -157,4 +157,41 @@ test.describe('EcoTransit Motion Lab Phase A.1 Tests', () => {
     }
   });
 
+  test('should not rebound or reset user-initiated train journey when parent state update commits late', async ({ page }) => {
+    await page.goto('/motion-lab');
+    await page.waitForSelector('#desktop-train');
+
+    const train = page.locator('#desktop-train');
+    const initialBox = await train.boundingBox();
+    expect(initialBox).not.toBeNull();
+
+    // 1. Enable parent update delay
+    const delayCheckbox = page.locator('[data-testid="delay-parent-toggle"]');
+    await expect(delayCheckbox).toBeVisible();
+    await delayCheckbox.check();
+    await expect(delayCheckbox).toBeChecked();
+
+    // 2. Click Station 3 (Ga số 3) to trigger a user-initiated journey
+    const station3 = page.locator('div:has(#desktop-train) button:has-text("🎫")').first();
+    await expect(station3).toBeVisible();
+    await station3.click();
+
+    // 3. Wait 500ms: the train must be actively moving and must NOT have rebounded to starting station
+    // Since parent state update is delayed by 1000ms, activeSection prop is still 'route' (index 0).
+    // If the bug exists, the train will have rebounded and stayed at index 0 (matching the initial coordinates).
+    // If the guard works, it continues to move.
+    await page.waitForTimeout(500);
+    const midBox = await train.boundingBox();
+    expect(midBox).not.toBeNull();
+    // Train should have moved away from initial position
+    expect(midBox!.x).not.toBe(initialBox!.x);
+
+    // 4. Wait another 1800ms (total 2300ms, which is well after the 1000ms delay and transit completes)
+    await page.waitForTimeout(1800);
+    const finalBox = await train.boundingBox();
+    expect(finalBox).not.toBeNull();
+    // Train should have completed the journey and not rebounded to initial index
+    expect(finalBox!.x).not.toBe(initialBox!.x);
+  });
+
 });

@@ -34,3 +34,7 @@ Tài liệu này đóng băng và liệt kê các giới hạn kỹ thuật củ
 ## 6. Sẵn Sàng Triển Khai (Deployment Readiness Accepted)
 - Toàn bộ codebase monorepo của EcoTransit đã vượt qua tất cả các điều kiện ràng buộc build tĩnh (`npm run build`), kiểm thử tự động (`npm run test` 93/93 tests pass), và liveness/readiness check cục bộ.
 - Dự án đang ở trạng thái **Sẵn sàng triển khai thực tế (Ready for Live Deploy)**. Việc đưa dự án lên chạy thật (Live Deployment) trên Vercel/Render/Neon sẽ được hoàn tất ngay khi người vận hành thực hiện cấu hình các tài khoản dịch vụ và biến môi trường tương ứng.
+
+## 7. Microsoft Edge prefers-reduced-motion Runtime Condition
+- **Confirmed runtime condition**: Microsoft Edge evaluated `prefers-reduced-motion: reduce` as true during the affected Owner UAT session. This correctly activated the application's reduced-motion fallback.
+- **Configuration source**: Not conclusively identified in that UAT session.

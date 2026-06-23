@@ -62,3 +62,9 @@ A frame-by-frame sample series demonstrating continuous visual translation (0ms 
 ### 3. Epic 10 E2E Verification Tests
 - Asserted email verification token security, registration rate limits, resend cooldowns, avatar customizations, and responsive widths.
 - **Playwright Execution**: Passed 11 out of 11 tests (self-test pass).
+
+---
+
+## 4. Microsoft Edge prefers-reduced-motion Runtime Condition
+- **Confirmed runtime condition**: Microsoft Edge evaluated `prefers-reduced-motion: reduce` as true during the affected Owner UAT session. This correctly activated the application's reduced-motion fallback.
+- **Configuration source**: Not conclusively identified in that UAT session.
