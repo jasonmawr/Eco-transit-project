@@ -189,7 +189,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                     className="w-full flex items-center justify-center space-x-2 py-2 px-3 bg-gradient-to-r from-eco-primary/5 to-eco-accentGreen/5 border border-eco-mint/40 rounded-xl hover:from-eco-primary/10 hover:to-eco-accentGreen/10 transition-all text-[11px] font-bold text-eco-primary"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-eco-accentGreen" />
-                    <span>Trải nghiệm nhanh bằng tài khoản Demo</span>
+                    <span>Đăng nhập nhanh bằng tài khoản có sẵn</span>
                   </button>
                 )}
 

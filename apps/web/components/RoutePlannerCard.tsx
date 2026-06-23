@@ -59,7 +59,7 @@ export default function RoutePlannerCard({
             <span>🎛️ Bảng Điều Khiển Lộ Trình</span>
           </h3>
           <p className="text-[10px] text-eco-muted font-medium mt-0.5">
-            Định tuyến cục bộ Dijkstra tối ưu hóa theo thời tiết
+            Gợi ý lộ trình theo điều kiện thời tiết bạn đã chọn.
           </p>
         </div>
         <span className="text-[9px] font-bold text-eco-primary bg-eco-mint px-2 py-0.5 rounded-md">
@@ -147,7 +147,8 @@ export default function RoutePlannerCard({
 
       {/* Local routing note */}
       <p className="text-[9px] text-eco-muted text-center leading-relaxed">
-        Bằng cách bấm tìm kiếm, bạn đang sử dụng <strong>thuật toán Dijkstra cục bộ</strong> chạy hoàn toàn offline trên trình duyệt thông qua dữ liệu mạng lưới nhà ga HCM Metro Số 1 và xe buýt.
+        Chọn điểm đi và điểm đến để xem gợi ý lộ trình xanh.<br />
+        Gợi ý được xây dựng từ mạng lưới Metro và xe buýt trong ứng dụng.
       </p>
 
     </form>

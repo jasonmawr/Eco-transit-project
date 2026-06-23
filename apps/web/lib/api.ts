@@ -33,30 +33,53 @@ export async function apiFetch(path: string, options?: RequestInit) {
     },
   };
 
-  const res = await fetch(url, defaultOptions);
+  let res: Response;
+  try {
+    res = await fetch(url, defaultOptions);
+  } catch (netErr: any) {
+    console.error('[apiFetch Network Error Diagnostics]:', netErr);
+    throw new Error('Không thể kết nối lúc này. Vui lòng thử lại sau.');
+  }
   
   if (!res.ok) {
-    let errorMessage = res.status === 429
-      ? 'Vui lòng đợi 60 giây trước khi yêu cầu gửi lại email xác thực.'
-      : `API error: ${res.status}`;
+    let responseBodyText = '';
     try {
-      const text = await res.text();
-      console.log(`[apiFetch Debug] status=${res.status} body="${text}"`);
+      responseBodyText = await res.text();
+    } catch (_) {}
+
+    console.warn(`[apiFetch HTTP Error Diagnostics] status=${res.status} body="${responseBodyText}"`);
+
+    // 1. Direct status mapping for security/expiry gates
+    if (res.status === 401) {
+      throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+    }
+    if (res.status === 403) {
+      throw new Error('Bạn không có quyền thực hiện thao tác này.');
+    }
+    if (res.status === 429) {
+      throw new Error('Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.');
+    }
+
+    // 2. Parse custom business messages (e.g. form verification errors) without technical leakage
+    if (responseBodyText) {
       try {
-        const errorBody = JSON.parse(text);
-        if (errorBody && errorBody.message) {
-          errorMessage = errorBody.message;
+        const errorBody = JSON.parse(responseBodyText);
+        if (errorBody && errorBody.message && typeof errorBody.message === 'string') {
+          // Reject technical messages containing developer jargon
+          const isTechnical = /API|debug|database|sql|prisma|error|undefined|null|nan|status|exception|stack|route|uuid|invalid/i.test(errorBody.message);
+          if (!isTechnical) {
+            throw new Error(errorBody.message);
+          }
         }
-      } catch (e: any) {
-        console.log(`[apiFetch Debug] JSON parse error:`, e.message);
-        if (text) {
-          errorMessage = text;
+      } catch (err: any) {
+        if (err.message && !err.message.includes('JSON') && err.message !== 'Unexpected token') {
+          throw err;
         }
       }
-    } catch (err: any) {
-      console.log(`[apiFetch Debug] text read error:`, err.message);
     }
-    throw new Error(errorMessage);
+
+    // 3. General public fallback
+    throw new Error('Có sự cố tạm thời. Vui lòng thử lại sau.');
   }
 
   return res.json();

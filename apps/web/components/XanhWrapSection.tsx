@@ -313,7 +313,8 @@ export default function XanhWrapSection() {
           </p>
           <div className="text-[9px] text-emerald-700/80 leading-normal space-y-1 pt-1.5 border-t border-emerald-200/30">
             <p>• Ban tổ chức sẽ tiến hành đối soát và xác minh nội dung/tương tác thủ công trước khi trao giải.</p>
-            <p>• Hệ thống không tự động đo lường lượt tương tác trên mạng xã hội do không sử dụng API liên kết trực tiếp.</p>
+            <p>• Sau khi chia sẻ hành trình, hãy gửi minh chứng để đội ngũ xét duyệt.</p>
+            <p>• Lượt tương tác trên mạng xã hội không được tự động ghi nhận.</p>
             <p>• Kết quả cuối cùng sẽ được công bố chính thức tại trang chủ chiến dịch.</p>
           </div>
         </div>
@@ -421,7 +422,7 @@ export default function XanhWrapSection() {
                 {/* Disclaimer */}
                 <div className="border-t border-white/5 pt-3.5 text-center">
                   <p className="text-[8px] text-white/35 italic leading-normal">
-                    ⚠️ Các chỉ số xanh là ước tính demo cho chiến dịch, không thay thế dữ liệu đo đạc thực tế.
+                    ⚠️ Các chỉ số xanh là ước tính tham khảo cho chiến dịch, không thay thế dữ liệu đo đạc thực tế.
                   </p>
                 </div>
 

@@ -235,25 +235,27 @@ export default function MetroRailStage({
     return 2300;                // 4-5 stations: 2.3s
   };
 
-  // derived state from activeSection prop - executed synchronously during render
-  const targetIdx = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
-  if (targetIdx !== journey.targetIndex) {
-    const prevIdx = journey.targetIndex;
-    const duration = getTransitionDuration(prevIdx, targetIdx);
-    const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  // Sync prop activeSection with internal journey state (Effect-phase state synchronization)
+  useEffect(() => {
+    const targetIdx = Math.max(0, JOURNEY_STATIONS.findIndex((s) => s.id === activeSection));
+    if (targetIdx !== journey.targetIndex) {
+      const prevIdx = journey.targetIndex;
+      const duration = getTransitionDuration(prevIdx, targetIdx);
+      const nextJourneyId = `journey-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
-    if (targetIdx !== prevIdx) {
-      setDirection(targetIdx > prevIdx ? 'right' : 'left');
+      if (targetIdx !== prevIdx) {
+        setDirection(targetIdx > prevIdx ? 'right' : 'left');
+      }
+
+      setJourney({
+        journeyId: nextJourneyId,
+        targetIndex: targetIdx,
+        prevIndex: prevIdx,
+        durationMs: duration,
+        source: 'external',
+      });
     }
-
-    setJourney({
-      journeyId: nextJourneyId,
-      targetIndex: targetIdx,
-      prevIndex: prevIdx,
-      durationMs: duration,
-      source: 'external',
-    });
-  }
+  }, [activeSection, journey.targetIndex]);
 
   // Report moving state to parent CampaignHub
   useEffect(() => {

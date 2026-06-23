@@ -178,9 +178,7 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
             </div>
           </div>
 
-          <p className="text-[10px] text-eco-muted font-medium text-center mt-6 max-w-xs leading-relaxed">
-            🌿 Thiết kế phong cách vector tối giản, phối màu đô thị Electric Blue / Vibrant Green / Urban Beige thân thiện.
-          </p>
+
         </div>
 
         {/* RIGHT PANEL: Customizer Options & Tabs (Grid Span 7) */}
@@ -349,9 +347,9 @@ export default function AvatarCustomizerModal({ isOpen, onClose, user, onSaveSuc
                   <span className="text-[10px] font-black text-eco-muted uppercase tracking-wider block">Màu sắc áo</span>
                   <div className="grid grid-cols-3 gap-2">
                     {[
-                      { id: 'electricBlue', name: 'Electric Blue', color: '#0066FF' },
-                      { id: 'vibrantGreen', name: 'Vibrant Green', color: '#9FCE1A' },
-                      { id: 'urbanBeige', name: 'Urban Beige', color: '#FFF3DD' }
+                      { id: 'electricBlue', name: 'Xanh dương', color: '#0066FF' },
+                      { id: 'vibrantGreen', name: 'Xanh lá', color: '#9FCE1A' },
+                      { id: 'urbanBeige', name: 'Màu be', color: '#FFF3DD' }
                     ].map(color => (
                       <button
                         key={color.id}

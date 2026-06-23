@@ -33,7 +33,7 @@ export default function RouteNetworkPreview() {
         </div>
         <div className="flex items-center space-x-2">
           <span className="flex h-2.5 w-2.5 rounded-full bg-eco-accentGreen animate-pulse-glow" />
-          <span className="text-[10px] font-bold text-eco-muted">Tối ưu Dijkstra</span>
+          <span className="text-[10px] font-bold text-eco-muted">Gợi ý lộ trình</span>
         </div>
       </div>
 

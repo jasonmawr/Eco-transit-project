@@ -128,13 +128,11 @@ export default function GuidesSection() {
               <Video className="w-6 h-6" />
             </div>
 
-            <h5 className="text-xs font-black tracking-wider uppercase text-emerald-400">Social Video / Campaign Feed</h5>
+            <h5 className="text-xs font-black tracking-wider uppercase text-emerald-400">Video chiến dịch & Tin tức</h5>
             <p className="text-[10px] text-white/50 max-w-xs mt-2 leading-relaxed font-semibold">
-              Video/Feed chiến dịch sẽ được cập nhật khi có tư liệu production.
+              Chưa có nội dung mới. Hãy quay lại sau nhé.<br />
+              Những câu chuyện xanh mới sẽ sớm xuất hiện tại đây.
             </p>
-            <span className="text-[8px] text-white/30 font-mono mt-3 uppercase tracking-widest bg-white/5 px-2.5 py-0.5 rounded">
-              EcoTransit Media Placeholder
-            </span>
 
           </div>
         </div>

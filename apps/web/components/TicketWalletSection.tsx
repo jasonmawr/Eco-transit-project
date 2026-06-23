@@ -699,7 +699,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                         )}
                         {brokenTickets[t.id] && (
                           <p className="text-[9px] font-bold text-amber-600 mt-1 italic">
-                            ⚠️ Ảnh vé không còn khả dụng trong bản demo
+                            ⚠️ Không thể hiển thị ảnh vé này.
                           </p>
                         )}
                         <p className="text-[9px] text-eco-muted/70 mt-0.5">

@@ -853,7 +853,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                         </div>
                         {brokenTickets[t.id] && (
                           <p className="text-[10px] font-bold text-amber-600 mt-1 italic">
-                            ⚠️ Ảnh vé không còn khả dụng trong bản demo
+                            ⚠️ Không thể hiển thị ảnh vé này.
                           </p>
                         )}
                         

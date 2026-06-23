@@ -162,7 +162,8 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
     await page.locator('a[href="#stations"]').evaluate((el: HTMLElement) => el.click());
 
     // 2. Wait for mid-transition (approx 200ms)
-    await page.waitForTimeout(200);
+    await page.waitForSelector('.train-visual-container.is-moving', { timeout: 3000 });
+    await page.waitForTimeout(250);
     const midBox = await train.boundingBox();
     expect(midBox).not.toBeNull();
     expect(midBox!.x).not.toBe(initialBox!.x); // Position must have changed
@@ -662,7 +663,7 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
     await resendResponsePromise;
 
     // Verify that the rate limit notification message displays on the page
-    await expect(page.locator('text=Vui lòng đợi')).toBeVisible();
+    await expect(page.locator('text=Bạn thao tác quá nhanh')).toBeVisible();
 
     // Wait until the email file is updated with the new verification token from the resend trigger
     let finalToken = originalToken;

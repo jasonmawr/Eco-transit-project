@@ -70,7 +70,7 @@ function VerifyEmailContent() {
           <div>
             <h3 className="text-lg font-black uppercase tracking-wide text-emerald-400">Đang xác thực</h3>
             <p className="text-xs text-white/60 mt-2 leading-relaxed font-semibold">
-              Hệ thống đang kiểm tra chữ ký số của mã thông báo...
+              Hệ thống đang xác thực tài khoản của bạn...
             </p>
           </div>
         </div>
