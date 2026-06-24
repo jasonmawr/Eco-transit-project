@@ -31,6 +31,19 @@ router.post('/register', async (req: Request, res: Response) => {
 
     const { email, password } = parseResult.data;
 
+    const isProductionOrDemo =
+      process.env.NODE_ENV === 'production' ||
+      process.env.APP_MODE === 'production' ||
+      process.env.APP_MODE === 'demo';
+
+    // Hard preflight configuration failure check
+    if (isProductionOrDemo && !mailProvider.hasSmtpConfig()) {
+      return res.status(503).json({
+        code: 'SMTP_NOT_CONFIGURED',
+        message: 'Tính năng gửi email xác minh đang tạm thời chưa khả dụng. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
+      });
+    }
+
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
@@ -73,13 +86,11 @@ router.post('/register', async (req: Request, res: Response) => {
       createdAt: user.createdAt,
     };
 
-    // Bind session
-    req.session.user = userDto;
-
     // Send email
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
     const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
 
+    let mailSent = true;
     try {
       await mailProvider.sendMail({
         to: email,
@@ -89,25 +100,44 @@ router.post('/register', async (req: Request, res: Response) => {
       });
     } catch (mailErr: any) {
       console.error('Failed to send verification email:', mailErr);
-      const isProductionOrDemo =
-        process.env.NODE_ENV === 'production' ||
-        process.env.APP_MODE === 'production' ||
-        process.env.APP_MODE === 'demo';
 
-      if (isProductionOrDemo || mailErr.message === 'SMTP_NOT_CONFIGURED') {
+      // Rollback and fail only if SMTP is explicitly not configured
+      if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
         req.session.destroy(() => {});
         await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
         return res.status(503).json({
           code: 'SMTP_NOT_CONFIGURED',
-          message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
+          message: 'Tính năng gửi email xác minh đang tạm thời chưa khả dụng. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
         });
       }
+
+      // Retain user as unverified for connection timeouts or actual delivery failures
+      mailSent = false;
     }
+
+    // Regenerate session before setting the recovery state (Session Fixation Safeguard)
+    await new Promise<void>((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regeneration failed on registration:', err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    req.session.unverifiedUserEmail = user.email;
 
     const isMock = !mailProvider.hasSmtpConfig();
     return res.status(201).json({
       user: userDto,
-      message: isMock
+      accountCreated: true,
+      verificationEmailSent: mailSent,
+      recoveryAvailable: true,
+      message: !mailSent
+        ? 'Tài khoản đã được tạo nhưng email xác minh chưa được gửi thành công. Đăng nhập để gửi lại email xác minh.'
+        : isMock
         ? 'Đăng ký tài khoản thành công. Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.'
         : 'Đăng ký tài khoản thành công. Vui lòng kiểm tra hộp thư để xác thực email.',
     });
@@ -137,16 +167,47 @@ router.post('/login', async (req: Request, res: Response) => {
       where: { email },
     });
     if (!user) {
+      // Failed login attempt must not log out an existing authenticated user.
+      if (!req.session.user) {
+        delete req.session.unverifiedUserEmail;
+      }
       return res.status(401).json({
-        message: 'Tài khoản hoặc mật khẩu không chính xác.',
+        message: 'Email hoặc mật khẩu chưa đúng.',
       });
     }
 
     // Verify argon2 password
     const isPasswordValid = await argon2.verify(user.passwordHash, password);
     if (!isPasswordValid) {
+      // Failed login attempt must not log out an existing authenticated user.
+      if (!req.session.user) {
+        delete req.session.unverifiedUserEmail;
+      }
       return res.status(401).json({
-        message: 'Tài khoản hoặc mật khẩu không chính xác.',
+        message: 'Email hoặc mật khẩu chưa đúng.',
+      });
+    }
+
+    // Block login if email is not verified
+    if (!user.emailVerified) {
+      // Regenerate session before setting the recovery state (Session Fixation Safeguard)
+      await new Promise<void>((resolve, reject) => {
+        req.session.regenerate((err) => {
+          if (err) {
+            console.error('Session regeneration failed on unverified login:', err);
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+
+      req.session.unverifiedUserEmail = user.email;
+      return res.status(401).json({
+        code: 'EMAIL_UNVERIFIED',
+        recoveryAvailable: true,
+        verificationEmailSent: false,
+        message: 'Tài khoản chưa được xác minh. Hãy kiểm tra email hoặc gửi lại email xác minh.',
       });
     }
 
@@ -159,6 +220,18 @@ router.post('/login', async (req: Request, res: Response) => {
       avatarConfig: user.avatarConfig,
       createdAt: user.createdAt,
     };
+
+    // Regenerate session before setting authenticated user (Session Fixation Safeguard)
+    await new Promise<void>((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regeneration failed on successful login:', err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
 
     // Bind session
     req.session.user = userDto;
@@ -177,7 +250,12 @@ router.post('/login', async (req: Request, res: Response) => {
 });
 
 // 3. POST /auth/logout
-router.post('/logout', requireAuth, (req: Request, res: Response) => {
+router.post('/logout', (req: Request, res: Response) => {
+  if (!req.session || (!req.session.user && !req.session.unverifiedUserEmail)) {
+    return res.status(401).json({
+      message: 'Bạn chưa đăng nhập. Vui lòng đăng nhập để thực hiện tác vụ này.',
+    });
+  }
   req.session.destroy((err) => {
     if (err) {
       console.error('Session destruction failed:', err);
@@ -234,9 +312,9 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       },
     });
 
-    // Update session user if logged in
-    if (req.session.user && req.session.user.id === user.id) {
-      req.session.user.emailVerified = true;
+    // Clear unverifiedUserEmail upon successful verification
+    if (req.session.unverifiedUserEmail) {
+      delete req.session.unverifiedUserEmail;
     }
 
     return res.status(200).json({
@@ -256,26 +334,43 @@ router.post('/verify-email', async (req: Request, res: Response) => {
 // 6. POST /auth/resend-verification
 router.post('/resend-verification', async (req: Request, res: Response) => {
   try {
-    const { email, targetEmail: bodyTargetEmail } = req.body;
-    let targetEmail = email || bodyTargetEmail;
+    const sessionEmail = req.session.user?.email || req.session.unverifiedUserEmail;
+    const genericSuccessMessage = 'Yêu cầu đã được ghi nhận. Nếu email hợp lệ và chưa được xác minh, một liên kết xác thực mới sẽ được gửi tới hòm thư của bạn.';
 
-    // If logged in and email is not provided, use session email
-    if (!targetEmail && req.session.user) {
-      targetEmail = req.session.user.email;
+    if (!sessionEmail) {
+      return res.status(200).json({
+        message: genericSuccessMessage,
+      });
     }
 
-    if (!targetEmail || typeof targetEmail !== 'string') {
-      return res.status(400).json({ message: 'Thiếu thông tin email.' });
+    const normalizedSessionEmail = sessionEmail.trim().toLowerCase();
+
+    // If client provided an email field, strictly compare it against session-held canonical identity
+    const clientEmail = req.body.email || req.body.targetEmail;
+    if (clientEmail && typeof clientEmail === 'string') {
+      if (clientEmail.trim().toLowerCase() !== normalizedSessionEmail) {
+        return res.status(200).json({
+          message: genericSuccessMessage,
+        });
+      }
     }
+
+    const normalizedEmail = normalizedSessionEmail;
 
     const user = await prisma.user.findUnique({
-      where: { email: targetEmail },
+      where: { email: normalizedEmail },
     });
 
-    // Rate limit and no user enumeration
     if (!user) {
       return res.status(200).json({
-        message: 'Yêu cầu đã được ghi nhận. Nếu email hợp lệ, một liên kết xác thực mới sẽ được gửi trong giây lát.',
+        message: genericSuccessMessage,
+      });
+    }
+
+    // If user is already verified, do not send email, but return generic success message
+    if (user.emailVerified) {
+      return res.status(200).json({
+        message: genericSuccessMessage,
       });
     }
 
@@ -284,7 +379,8 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       const secondsSinceSent = Math.floor((Date.now() - new Date(user.verificationSentAt).getTime()) / 1000);
       if (secondsSinceSent < 60) {
         return res.status(429).json({
-          message: `Vui lòng đợi ${60 - secondsSinceSent} giây trước khi yêu cầu gửi lại email xác thực.`,
+          message: `Bạn thao tác quá nhanh. Vui lòng đợi ${60 - secondsSinceSent} giây trước khi yêu cầu gửi lại email xác thực.`,
+          cooldownRemaining: 60 - secondsSinceSent,
         });
       }
     }
@@ -298,7 +394,7 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
 
     try {
       await mailProvider.sendMail({
-        to: targetEmail,
+        to: normalizedEmail,
         subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
         text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
         html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
@@ -322,7 +418,7 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       if (isProductionOrDemo || mailErr.message === 'SMTP_NOT_CONFIGURED') {
         return res.status(503).json({
           code: 'SMTP_NOT_CONFIGURED',
-          message: 'Tính năng xác thực email tạm thời chưa khả dụng do chưa cấu hình dịch vụ gửi thư. Vui lòng liên hệ Ban tổ chức để được kích hoạt tài khoản.',
+          message: 'Gửi email xác thực thất bại. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
         });
       }
       throw mailErr;

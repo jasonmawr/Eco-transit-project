@@ -33,6 +33,14 @@ describe('EcoTransit Ticket Upload & Green Points Ledger Integration Tests', () 
       email: 'test-user-wallet@ecotransit.vn',
       password: 'UserPassword123',
     });
+    await prisma.user.update({
+      where: { email: 'test-user-wallet@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await userAgent.post('/api/auth/login').send({
+      email: 'test-user-wallet@ecotransit.vn',
+      password: 'UserPassword123',
+    });
 
     testUser = await prisma.user.findUnique({
       where: { email: 'test-user-wallet@ecotransit.vn' },
@@ -45,6 +53,7 @@ describe('EcoTransit Ticket Upload & Green Points Ledger Integration Tests', () 
         email: 'test-admin-wallet@ecotransit.vn',
         passwordHash: adminPass,
         role: 'ADMIN',
+        emailVerified: true,
       },
     });
 
@@ -197,6 +206,14 @@ describe('EcoTransit Ticket Upload & Green Points Ledger Integration Tests', () 
     // 3. Different user cannot access
     const otherUserAgent = request.agent(app);
     await otherUserAgent.post('/api/auth/register').send({
+      email: 'other-user@ecotransit.vn',
+      password: 'OtherPassword123',
+    });
+    await prisma.user.update({
+      where: { email: 'other-user@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await otherUserAgent.post('/api/auth/login').send({
       email: 'other-user@ecotransit.vn',
       password: 'OtherPassword123',
     });

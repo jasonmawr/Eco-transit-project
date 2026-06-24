@@ -21,6 +21,14 @@ describe('EcoTransit Rewards / Voucher Wallet Integration Tests', () => {
       email: 'test-user-rewards@ecotransit.vn',
       password: 'UserPassword123',
     });
+    await prisma.user.update({
+      where: { email: 'test-user-rewards@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await userAgent.post('/api/auth/login').send({
+      email: 'test-user-rewards@ecotransit.vn',
+      password: 'UserPassword123',
+    });
 
     testUser = await prisma.user.findUnique({
       where: { email: 'test-user-rewards@ecotransit.vn' },

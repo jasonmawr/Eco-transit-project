@@ -55,12 +55,25 @@ describe('EcoTransit API Integration Tests', () => {
     expect(regRes.body.user.email).toBe('test-register@ecotransit.vn');
     expect(regRes.body.user.role).toBe('USER');
 
-    // B. Check Me (Cookie should be sent automatically by agent)
+    // Verify email in DB manually to allow login
+    await prisma.user.update({
+      where: { email: 'test-register@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+
+    // B. Log in to establish authenticated session
+    const loginRes = await agent.post('/api/auth/login').send({
+      email: 'test-register@ecotransit.vn',
+      password: 'TestPassword123',
+    });
+    expect(loginRes.status).toBe(200);
+
+    // C. Check Me (Cookie should be sent automatically by agent)
     const meRes = await agent.get('/api/auth/me');
     expect(meRes.status).toBe(200);
     expect(meRes.body.user.email).toBe('test-register@ecotransit.vn');
 
-    // C. Logout user
+    // D. Logout user
     const logoutRes = await agent.post('/api/auth/logout');
     expect(logoutRes.status).toBe(200);
 

@@ -59,6 +59,14 @@ describe('EcoTransit Moderator/Admin Console Integration Tests', () => {
       email: 'user-admin-t@ecotransit.vn',
       password: 'UserPassword123'
     });
+    await prisma.user.update({
+      where: { email: 'user-admin-t@ecotransit.vn' },
+      data: { emailVerified: true }
+    });
+    await userAgent.post('/api/auth/login').send({
+      email: 'user-admin-t@ecotransit.vn',
+      password: 'UserPassword123'
+    });
     const uUser = await prisma.user.findUnique({ where: { email: 'user-admin-t@ecotransit.vn' } });
     userId = uUser!.id;
 
@@ -69,7 +77,7 @@ describe('EcoTransit Moderator/Admin Console Integration Tests', () => {
     });
     const uAdmin = await prisma.user.update({
       where: { email: 'admin-admin-t@ecotransit.vn' },
-      data: { role: 'ADMIN' }
+      data: { role: 'ADMIN', emailVerified: true }
     });
     adminId = uAdmin.id;
     // Log in again to bind the ADMIN role session
@@ -85,7 +93,7 @@ describe('EcoTransit Moderator/Admin Console Integration Tests', () => {
     });
     const uMod = await prisma.user.update({
       where: { email: 'mod-admin-t@ecotransit.vn' },
-      data: { role: 'MODERATOR' }
+      data: { role: 'MODERATOR', emailVerified: true }
     });
     modId = uMod.id;
     // Log in again to bind the MODERATOR role session

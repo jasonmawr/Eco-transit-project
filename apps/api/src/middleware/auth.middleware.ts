@@ -6,6 +6,7 @@ import { prisma } from '../config/db.js';
 declare module 'express-session' {
   interface SessionData {
     user: UserDTO;
+    unverifiedUserEmail?: string;
   }
 }
 

@@ -2,6 +2,24 @@
  * EcoTransit API Client Utilities
  */
 
+export class ApiError extends Error {
+  status?: number;
+  code?: string;
+  verificationEmailSent?: boolean;
+  recoveryAvailable?: boolean;
+  cooldownRemaining?: number;
+
+  constructor(message: string, options?: { status?: number; code?: string; verificationEmailSent?: boolean; recoveryAvailable?: boolean; cooldownRemaining?: number }) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = options?.status;
+    this.code = options?.code;
+    this.verificationEmailSent = options?.verificationEmailSent;
+    this.recoveryAvailable = options?.recoveryAvailable;
+    this.cooldownRemaining = options?.cooldownRemaining;
+  }
+}
+
 export function getApiBaseUrl(): string {
   // 1. Check if the environment variable is explicitly defined (prioritize BASE_URL)
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
@@ -38,7 +56,7 @@ export async function apiFetch(path: string, options?: RequestInit) {
     res = await fetch(url, defaultOptions);
   } catch (netErr: any) {
     console.error('[apiFetch Network Error Diagnostics]:', netErr);
-    throw new Error('Không thể kết nối lúc này. Vui lòng thử lại sau.');
+    throw new ApiError('Không thể kết nối lúc này. Vui lòng thử lại sau.');
   }
   
   if (!res.ok) {
@@ -47,39 +65,59 @@ export async function apiFetch(path: string, options?: RequestInit) {
       responseBodyText = await res.text();
     } catch (_) {}
 
-    console.warn(`[apiFetch HTTP Error Diagnostics] status=${res.status} body="${responseBodyText}"`);
-
-    // 1. Direct status mapping for security/expiry gates
-    if (res.status === 401) {
-      throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
-    }
-    if (res.status === 403) {
-      throw new Error('Bạn không có quyền thực hiện thao tác này.');
-    }
-    if (res.status === 429) {
-      throw new Error('Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.');
-    }
-
-    // 2. Parse custom business messages (e.g. form verification errors) without technical leakage
+    let errorBody: any = null;
     if (responseBodyText) {
       try {
-        const errorBody = JSON.parse(responseBodyText);
-        if (errorBody && errorBody.message && typeof errorBody.message === 'string') {
-          // Reject technical messages containing developer jargon
-          const isTechnical = /API|debug|database|sql|prisma|error|undefined|null|nan|status|exception|stack|route|uuid|invalid/i.test(errorBody.message);
-          if (!isTechnical) {
-            throw new Error(errorBody.message);
-          }
+        errorBody = JSON.parse(responseBodyText);
+      } catch (_) {}
+    }
+
+    // Suppress console diagnostics noise for expected unauthenticated GET /api/auth/me
+    const isAuthMe = path === '/api/auth/me' || path === 'api/auth/me' || path === '/auth/me' || path === 'auth/me';
+    if (!(res.status === 401 && isAuthMe)) {
+      console.warn(`[apiFetch HTTP Error Diagnostics] status=${res.status} body="${responseBodyText}"`);
+    }
+
+    // 1. Rate limit (429) is absolute priority to match public display contracts
+    if (res.status === 429) {
+      if (errorBody && errorBody.message && typeof errorBody.message === 'string') {
+        const isTechnical = /API|debug|database|sql|prisma|error|undefined|null|nan|status|exception|stack|route|uuid|invalid/i.test(errorBody.message);
+        if (!isTechnical) {
+          throw new ApiError(errorBody.message, {
+            status: 429,
+            code: errorBody.code,
+            verificationEmailSent: errorBody.verificationEmailSent,
+            recoveryAvailable: errorBody.recoveryAvailable,
+            cooldownRemaining: errorBody.cooldownRemaining,
+          });
         }
-      } catch (err: any) {
-        if (err.message && !err.message.includes('JSON') && err.message !== 'Unexpected token') {
-          throw err;
-        }
+      }
+      throw new ApiError('Bạn thao tác quá nhanh. Vui lòng thử lại sau ít phút.', { status: 429 });
+    }
+
+    // 2. Prioritize custom business/validation messages if they are not developer-facing technical messages
+    if (errorBody && errorBody.message && typeof errorBody.message === 'string') {
+      const isTechnical = /API|debug|database|sql|prisma|error|undefined|null|nan|status|exception|stack|route|uuid|invalid/i.test(errorBody.message);
+      if (!isTechnical) {
+        throw new ApiError(errorBody.message, {
+          status: res.status,
+          code: errorBody.code,
+          verificationEmailSent: errorBody.verificationEmailSent,
+          recoveryAvailable: errorBody.recoveryAvailable,
+        });
       }
     }
 
-    // 3. General public fallback
-    throw new Error('Có sự cố tạm thời. Vui lòng thử lại sau.');
+    // 3. Direct status mapping for security/expiry gates
+    if (res.status === 401) {
+      throw new ApiError('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.', { status: 401 });
+    }
+    if (res.status === 403) {
+      throw new ApiError('Bạn không có quyền thực hiện thao tác này.', { status: 403 });
+    }
+
+    // 4. General public fallback
+    throw new ApiError('Có sự cố tạm thời. Vui lòng thử lại sau.');
   }
 
   return res.json();

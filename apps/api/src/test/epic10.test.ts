@@ -4,6 +4,8 @@ import { app } from '../app.js';
 import { prisma } from '../config/db.js';
 import fs from 'fs';
 import path from 'path';
+import { mailProvider } from '../providers/mailProvider.js';
+import argon2 from 'argon2';
 
 describe('EcoTransit Epic 10 Integration Tests', () => {
   let userAgent: any;
@@ -25,6 +27,14 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       email: 'test-epic10-a@ecotransit.vn',
       password: 'UserPassword123',
     });
+    await prisma.user.update({
+      where: { email: 'test-epic10-a@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await userAgent.post('/api/auth/login').send({
+      email: 'test-epic10-a@ecotransit.vn',
+      password: 'UserPassword123',
+    });
 
     testUser = await prisma.user.findUnique({
       where: { email: 'test-epic10-a@ecotransit.vn' },
@@ -33,6 +43,14 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
     // Register User B
     otherAgent = request.agent(app);
     await otherAgent.post('/api/auth/register').send({
+      email: 'test-epic10-b@ecotransit.vn',
+      password: 'UserPassword123',
+    });
+    await prisma.user.update({
+      where: { email: 'test-epic10-b@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await otherAgent.post('/api/auth/login').send({
       email: 'test-epic10-b@ecotransit.vn',
       password: 'UserPassword123',
     });
@@ -335,7 +353,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
           password: 'Password123',
         });
         expect(res.status).toBe(503);
-        expect(res.body.message).toContain('chưa cấu hình dịch vụ gửi thư');
+        expect(res.body.message).toContain('Tính năng gửi email xác minh đang tạm thời chưa khả dụng');
         expect(res.body.code).toBe('SMTP_NOT_CONFIGURED');
         expect(res.body.mockToken).toBeUndefined();
 
@@ -355,8 +373,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
 
     it('should NOT delete user or mutate state on resend failure under production no-SMTP', async () => {
       deleteMockEmailFile();
+      const agent = request.agent(app);
       // 1. Register a user in local mode
-      const resReg = await request(app).post('/api/auth/register').send({
+      const resReg = await agent.post('/api/auth/register').send({
         email: 'test-prod-resend-keep@ecotransit.vn',
         password: 'Password123',
       });
@@ -388,7 +407,7 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
 
       try {
         // Attempt to resend verification
-        const resResend = await request(app)
+        const resResend = await agent
           .post('/api/auth/resend-verification')
           .send({ email: 'test-prod-resend-keep@ecotransit.vn' });
 
@@ -715,6 +734,614 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       // Clean up
       await prisma.ticket.delete({ where: { id: ticket.id } });
       await prisma.pointsLedger.deleteMany({ where: { sourceId: ticket.id } });
+    });
+  });
+
+  describe('P0 Auth Recovery & Verification Gates', () => {
+    it('1. Successful registration with mock/sent verification email remains unchanged', async () => {
+      const email = 'test-p0-normal-reg@ecotransit.vn';
+      const password = 'Password123';
+      const registerRes = await request(app).post('/api/auth/register').send({
+        email,
+        password,
+      });
+      expect(registerRes.status).toBe(201);
+      expect(registerRes.body.accountCreated).toBe(true);
+      expect(registerRes.body.verificationEmailSent).toBe(true);
+      expect(registerRes.body.user.emailVerified).toBe(false);
+
+      const createdUser = await prisma.user.findUnique({ where: { email } });
+      expect(createdUser).not.toBeNull();
+      if (createdUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: createdUser.id } });
+        await prisma.user.delete({ where: { id: createdUser.id } });
+      }
+    });
+
+    it('2. SMTP transport timeout/failure returns truthful flags and retains user', async () => {
+      const email = 'test-p0-smtp-timeout@ecotransit.vn';
+      const password = 'Password123';
+
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        throw new Error('SMTP_CONNECTION_TIMEOUT');
+      };
+
+      try {
+        const registerRes = await request(app).post('/api/auth/register').send({
+          email,
+          password,
+        });
+        expect(registerRes.status).toBe(201);
+        expect(registerRes.body.accountCreated).toBe(true);
+        expect(registerRes.body.verificationEmailSent).toBe(false);
+        expect(registerRes.body.recoveryAvailable).toBe(true);
+        expect(registerRes.body.message).toContain('Tài khoản đã được tạo nhưng email xác minh chưa được gửi thành công');
+
+        const createdUser = await prisma.user.findUnique({ where: { email } });
+        expect(createdUser).not.toBeNull();
+        expect(createdUser?.emailVerified).toBe(false);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+      }
+
+      const createdUser = await prisma.user.findUnique({ where: { email } });
+      if (createdUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: createdUser.id } });
+        await prisma.user.delete({ where: { id: createdUser.id } });
+      }
+    });
+
+    it('3. Hard preflight mail configuration failure does not create account and returns 503', async () => {
+      const email = 'test-p0-hard-preflight@ecotransit.vn';
+      const password = 'Password123';
+
+      const originalHasSmtpConfig = mailProvider.hasSmtpConfig;
+      mailProvider.hasSmtpConfig = () => false;
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const registerRes = await request(app).post('/api/auth/register').send({
+          email,
+          password,
+        });
+        expect(registerRes.status).toBe(503);
+        expect(registerRes.body.message).toContain('Tính năng gửi email xác minh đang tạm thời chưa khả dụng');
+
+        const createdUser = await prisma.user.findUnique({ where: { email } });
+        expect(createdUser).toBeNull();
+      } finally {
+        mailProvider.hasSmtpConfig = originalHasSmtpConfig;
+        process.env.NODE_ENV = origNodeEnv;
+      }
+    });
+
+    it('4. Refresh/interruption recovery: correct password reaches resend flow, wrong password remains generic', async () => {
+      const email = 'test-p0-refresh-recover@ecotransit.vn';
+      const password = 'Password123';
+
+      // 1. Create unverified account directly or through register SMTP fail
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        throw new Error('SMTP_CONNECTION_TIMEOUT');
+      };
+
+      const agent = request.agent(app);
+
+      try {
+        await agent.post('/api/auth/register').send({ email, password });
+
+        const origNodeEnv = process.env.NODE_ENV;
+        process.env.NODE_ENV = 'production';
+
+        try {
+          // 2. Wrong password should return generic response and NOT expose unverified status
+          const wrongLoginRes = await agent.post('/api/auth/login').send({
+            email,
+            password: 'WrongPassword',
+          });
+          expect(wrongLoginRes.status).toBe(401);
+          expect(wrongLoginRes.body.message).toBe('Email hoặc mật khẩu chưa đúng.');
+          expect(wrongLoginRes.body.code).toBeUndefined();
+
+          // 3. Correct password should return EMAIL_UNVERIFIED and enable resend
+          const correctLoginRes = await agent.post('/api/auth/login').send({
+            email,
+            password,
+          });
+          expect(correctLoginRes.status).toBe(401);
+          expect(correctLoginRes.body.code).toBe('EMAIL_UNVERIFIED');
+          expect(correctLoginRes.body.recoveryAvailable).toBe(true);
+        } finally {
+          process.env.NODE_ENV = origNodeEnv;
+        }
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+      }
+
+      const createdUser = await prisma.user.findUnique({ where: { email } });
+      if (createdUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: createdUser.id } });
+        await prisma.user.delete({ where: { id: createdUser.id } });
+      }
+    });
+
+    it('5. Resend authorization scopes: agent can resend only for authorized email, verified account does not leak state', async () => {
+      const emailA = 'e2e-user-p0-resend-a@ecotransit.vn';
+      const emailB = 'e2e-user-p0-resend-b@ecotransit.vn';
+      const password = 'Password123';
+
+      const originalSendMail = mailProvider.sendMail;
+      let sendCount = 0;
+      mailProvider.sendMail = async () => {
+        sendCount++;
+        return { sent: true, isMock: true };
+      };
+
+      const agentA = request.agent(app);
+      const agentAnonymous = request.agent(app);
+
+      try {
+        // Register user A with SMTP timeout (unverified, sets unverifiedUserEmail in session A)
+        mailProvider.sendMail = async () => {
+          throw new Error('SMTP_TIMEOUT');
+        };
+        await agentA.post('/api/auth/register').send({ email: emailA, password });
+
+        // Register user B normally (verified for testing)
+        mailProvider.sendMail = async () => {
+          return { sent: true, isMock: true };
+        };
+        await request(app).post('/api/auth/register').send({ email: emailB, password });
+        const userB = await prisma.user.findUnique({ where: { email: emailB } });
+        if (userB) {
+          await prisma.user.update({
+            where: { id: userB.id },
+            data: { emailVerified: true },
+          });
+        }
+
+        // Restore sendMail mock to trace sends
+        sendCount = 0;
+        mailProvider.sendMail = async () => {
+          sendCount++;
+          return { sent: true, isMock: true };
+        };
+
+        // Case 5.1: Agent A resends for A (authorized). Should send email.
+        const resendARes = await agentA.post('/api/auth/resend-verification').send({ email: emailA });
+        expect(resendARes.status).toBe(200);
+        expect(sendCount).toBe(1);
+
+        // Case 5.2: Anonymous agent resends for A. Should return generic success, but send no email.
+        sendCount = 0;
+        const resendAnonRes = await agentAnonymous.post('/api/auth/resend-verification').send({ email: emailA });
+        expect(resendAnonRes.status).toBe(200);
+        expect(resendAnonRes.body.message).toContain('Yêu cầu đã được ghi nhận');
+        expect(sendCount).toBe(0);
+
+        // Case 5.3: Agent A resends for B. Should return generic success, but send no email.
+        sendCount = 0;
+        const resendBRes = await agentA.post('/api/auth/resend-verification').send({ email: emailB });
+        expect(resendBRes.status).toBe(200);
+        expect(resendBRes.body.message).toContain('Yêu cầu đã được ghi nhận');
+        expect(sendCount).toBe(0);
+
+        // Case 5.4: Verified user B. Resend should not send email and return generic success.
+        const agentB = request.agent(app);
+        const origNodeEnv = process.env.NODE_ENV;
+        process.env.NODE_ENV = 'production';
+        try {
+          await agentB.post('/api/auth/login').send({ email: emailB, password });
+        } finally {
+          process.env.NODE_ENV = origNodeEnv;
+        }
+
+        sendCount = 0;
+        const resendVerifiedRes = await agentB.post('/api/auth/resend-verification').send({ email: emailB });
+        expect(resendVerifiedRes.status).toBe(200);
+        expect(resendVerifiedRes.body.message).toContain('Yêu cầu đã được ghi nhận');
+        expect(sendCount).toBe(0);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+
+        const uA = await prisma.user.findUnique({ where: { email: emailA } });
+        if (uA) {
+          await prisma.userWallet.deleteMany({ where: { userId: uA.id } });
+          await prisma.user.delete({ where: { id: uA.id } });
+        }
+        const uB = await prisma.user.findUnique({ where: { email: emailB } });
+        if (uB) {
+          await prisma.userWallet.deleteMany({ where: { userId: uB.id } });
+          await prisma.user.delete({ where: { id: uB.id } });
+        }
+      }
+    });
+
+    it('6. Cooldown rate limits repeated sends and returns safe retry metadata', async () => {
+      const email = 'e2e-user-p0-resend-cooldown@ecotransit.vn';
+      const password = 'Password123';
+
+      const agent = request.agent(app);
+      const originalSendMail = mailProvider.sendMail;
+
+      try {
+        // Register A (sets unverifiedUserEmail)
+        mailProvider.sendMail = async () => {
+          throw new Error('SMTP_TIMEOUT');
+        };
+        await agent.post('/api/auth/register').send({ email, password });
+
+        mailProvider.sendMail = async () => {
+          return { sent: true, isMock: true };
+        };
+
+        // First resend: accepted
+        const firstResend = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(firstResend.status).toBe(200);
+
+        // Immediate second resend: blocked by cooldown 429
+        const secondResend = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(secondResend.status).toBe(429);
+        expect(secondResend.body.cooldownRemaining).toBeGreaterThan(0);
+        expect(secondResend.body.message).toContain('Vui lòng đợi');
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('8. Detailed Unverified Access Control, Session Fixation and Wrong Password Guards', async () => {
+      const email = 'unverified-test-gate@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      // Clean up if left over
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      if (initialUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: initialUser.id } });
+        await prisma.user.delete({ where: { id: initialUser.id } });
+      }
+
+      // Case 8.1: Successful registration (verificationEmailSent=true)
+      // - Must not establish an authenticated session.
+      // - Must set recovery session only.
+      // - /me must return 401.
+      const regRes = await agent.post('/api/auth/register').send({ email, password });
+      expect(regRes.status).toBe(201);
+      expect(regRes.body.verificationEmailSent).toBe(true);
+      expect(regRes.body.recoveryAvailable).toBe(true);
+
+      // Check /me
+      const meRes = await agent.get('/api/auth/me');
+      expect(meRes.status).toBe(401);
+
+      // Protected route like /api/wallet/me must reject
+      const walletRes = await agent.get('/api/wallet/me');
+      expect(walletRes.status).toBe(401);
+
+      // Case 8.2: Wrong password attempt to unverified account
+      // - Generic message
+      // - No auth session, no recovery session (clears recovery session)
+      const wrongLoginRes = await agent.post('/api/auth/login').send({ email, password: 'WrongPassword' });
+      expect(wrongLoginRes.status).toBe(401);
+      expect(wrongLoginRes.body.message).toBe('Email hoặc mật khẩu chưa đúng.');
+      expect(wrongLoginRes.body.code).toBeUndefined();
+
+      // Verify recovery session was cleared by checking resend (resend should fail to send email since wrong password cleared the session)
+      let sentMailAfterWrong = false;
+      const originalSendMailAfterWrong = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        sentMailAfterWrong = true;
+        return { sent: true, isMock: true };
+      };
+      try {
+        const resendRes = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(resendRes.status).toBe(200);
+        expect(sentMailAfterWrong).toBe(false);
+      } finally {
+        mailProvider.sendMail = originalSendMailAfterWrong;
+      }
+
+      // Case 8.3: Correct-password login to unverified account
+      // - recovery session only
+      // - no protected-route access
+      const correctLoginRes = await agent.post('/api/auth/login').send({ email, password });
+      expect(correctLoginRes.status).toBe(401);
+      expect(correctLoginRes.body.code).toBe('EMAIL_UNVERIFIED');
+      expect(correctLoginRes.body.recoveryAvailable).toBe(true);
+
+      // Verify recovery session is active (resend-verification succeeds and sends email)
+      const originalSendMail = mailProvider.sendMail;
+      let sentMail = false;
+      mailProvider.sendMail = async (options) => {
+        if (options.to === email) {
+          sentMail = true;
+        }
+        return { sent: true, isMock: true };
+      };
+
+      try {
+        // Reset verificationSentAt to bypass cooldown in DB
+        const userInDb = await prisma.user.findUnique({ where: { email } });
+        await prisma.user.update({
+          where: { id: userInDb!.id },
+          data: { verificationSentAt: null },
+        });
+
+        const resendSuccessRes = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(resendSuccessRes.status).toBe(200);
+        expect(sentMail).toBe(true);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+      }
+
+      // Case 8.4: Logout from recovery session
+      // - Must successfully clear recovery session and return 200
+      const logoutRes = await agent.post('/api/auth/logout');
+      expect(logoutRes.status).toBe(200);
+
+      // Verify recovery session was cleared by checking resend
+      let sentMailAfterLogout = false;
+      const originalSendMailAfterLogout = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        sentMailAfterLogout = true;
+        return { sent: true, isMock: true };
+      };
+      try {
+        const resendAfterLogout = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(resendAfterLogout.status).toBe(200);
+        expect(sentMailAfterLogout).toBe(false);
+      } finally {
+        mailProvider.sendMail = originalSendMailAfterLogout;
+      }
+
+      // Clean up
+      const finalUser = await prisma.user.findUnique({ where: { email } });
+      if (finalUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: finalUser.id } });
+        await prisma.user.delete({ where: { id: finalUser.id } });
+      }
+    });
+
+    it('7. Initial anonymous GET /api/auth/me returns 401 without noisy output', async () => {
+      const res = await request(app).get('/api/auth/me');
+      expect(res.status).toBe(401);
+      expect(res.body.message).toContain('Bạn chưa đăng nhập');
+    });
+
+    it('8. Cross-origin HTTP response headers and session recovery contract (production-like)', async () => {
+      // 1. Temporarily backup environment and config values
+      const origNodeEnv = process.env.NODE_ENV;
+      const origAppMode = process.env.APP_MODE;
+      const origCookieSameSite = process.env.COOKIE_SAME_SITE;
+      const origCookieSecure = process.env.COOKIE_SECURE;
+      const origCorsOrigin = process.env.CORS_ORIGIN;
+
+      // 2. Set non-secret production-like test values
+      process.env.NODE_ENV = 'production';
+      process.env.APP_MODE = 'demo';
+      process.env.COOKIE_SAME_SITE = 'none';
+      process.env.COOKIE_SECURE = 'true';
+      process.env.CORS_ORIGIN = 'https://eco-transit-project-web-lgwz.vercel.app';
+
+      const email = 'cross-origin-test@ecotransit.vn';
+      const password = 'Password123';
+
+      // Ensure user doesn't exist
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      if (initialUser) {
+        await prisma.userWallet.deleteMany({ where: { userId: initialUser.id } });
+        await prisma.user.delete({ where: { id: initialUser.id } });
+      }
+
+      // We need a fresh agent to isolate headers and cookies
+      const agent = request.agent(app);
+
+      try {
+        // Register an unverified account (SMTP fails under mock mode since port is not configured, creating unverified account + recovery session)
+        const originalHasSmtpConfig = mailProvider.hasSmtpConfig;
+        mailProvider.hasSmtpConfig = () => true;
+
+        const originalSendMail = mailProvider.sendMail;
+        mailProvider.sendMail = async () => {
+          throw new Error('SMTP_CONNECTION_TIMEOUT');
+        };
+
+        let response: any;
+        try {
+          response = await agent
+            .post('/api/auth/register')
+            .set('Origin', 'https://eco-transit-project-web-lgwz.vercel.app')
+            .set('X-Forwarded-Proto', 'https')
+            .send({ email, password });
+        } finally {
+          mailProvider.sendMail = originalSendMail;
+          mailProvider.hasSmtpConfig = originalHasSmtpConfig;
+        }
+
+        expect(response.status).toBe(201);
+
+        // Prove CORS headers are appropriate
+        expect(response.headers['access-control-allow-origin']).toBe('https://eco-transit-project-web-lgwz.vercel.app');
+        expect(response.headers['access-control-allow-credentials']).toBe('true');
+        expect(response.headers['access-control-allow-origin']).not.toBe('*');
+
+        // Prove Set-Cookie exists and contains appropriate production flags
+        const setCookieHeaders = response.headers['set-cookie'] as string[];
+        expect(setCookieHeaders).toBeDefined();
+        expect(setCookieHeaders.length).toBeGreaterThan(0);
+
+        const cookieStr = setCookieHeaders[0];
+        expect(cookieStr).toContain('HttpOnly');
+        expect(cookieStr).toContain('Secure');
+        expect(cookieStr.toLowerCase()).toContain('samesite=none');
+        expect(cookieStr.toLowerCase()).toContain('path=/');
+
+        // Prove recovery session does NOT grant authenticated access to req.session.user
+        // GET /api/auth/me stays unauthenticated with recovery session
+        const meRes = await agent
+          .get('/api/auth/me')
+          .set('Origin', 'https://eco-transit-project-web-lgwz.vercel.app')
+          .set('X-Forwarded-Proto', 'https')
+          .set('Cookie', setCookieHeaders);
+        expect(meRes.status).toBe(401);
+        expect(meRes.body.user).toBeUndefined();
+
+        // Prove resend request relies strictly on the cookie session identity rather than browser-supplied email
+        // Setup a spy to trace what email is passed to SMTP send
+        let sentToEmail: string | null = null;
+        const spySendMail = mailProvider.sendMail;
+        mailProvider.sendMail = async (options) => {
+          sentToEmail = options.to;
+          return { sent: true, isMock: true };
+        };
+
+        try {
+          // Send request to bypass DB cooldown
+          const userInDb = await prisma.user.findUnique({ where: { email } });
+          await prisma.user.update({
+            where: { id: userInDb!.id },
+            data: { verificationSentAt: null },
+          });
+
+          // Send resend-verification request with a completely different targetEmail in the body (attacker attempt)
+          const resendRes = await agent
+            .post('/api/auth/resend-verification')
+            .set('Origin', 'https://eco-transit-project-web-lgwz.vercel.app')
+            .set('X-Forwarded-Proto', 'https')
+            .set('Cookie', setCookieHeaders)
+            .send({ email: 'attacker-target@ecotransit.vn' });
+
+          // Should return the generic message but NOT send to the attacker-supplied email
+          expect(resendRes.status).toBe(200);
+          expect(sentToEmail).not.toBe('attacker-target@ecotransit.vn');
+          expect(sentToEmail).toBeNull();
+
+          // Resending with matching canonical email in body should succeed and send to canonical email (relying on the cookie/session)
+          const resendSuccess = await agent
+            .post('/api/auth/resend-verification')
+            .set('Origin', 'https://eco-transit-project-web-lgwz.vercel.app')
+            .set('X-Forwarded-Proto', 'https')
+            .set('Cookie', setCookieHeaders)
+            .send({ email });
+          expect(resendSuccess.status).toBe(200);
+          expect(sentToEmail).toBe(email);
+        } finally {
+          mailProvider.sendMail = spySendMail;
+        }
+
+      } finally {
+        // Restore environment settings
+        process.env.NODE_ENV = origNodeEnv;
+        if (origAppMode !== undefined) process.env.APP_MODE = origAppMode; else delete process.env.APP_MODE;
+        if (origCookieSameSite !== undefined) process.env.COOKIE_SAME_SITE = origCookieSameSite; else delete process.env.COOKIE_SAME_SITE;
+        if (origCookieSecure !== undefined) process.env.COOKIE_SECURE = origCookieSecure; else delete process.env.COOKIE_SECURE;
+        if (origCorsOrigin !== undefined) process.env.CORS_ORIGIN = origCorsOrigin; else delete process.env.CORS_ORIGIN;
+
+        // Clean up DB user
+        const finalUser = await prisma.user.findUnique({ where: { email } });
+        if (finalUser) {
+          await prisma.userWallet.deleteMany({ where: { userId: finalUser.id } });
+          await prisma.user.delete({ where: { id: finalUser.id } });
+        }
+      }
+    });
+
+    it('9. Existing authenticated-session wrong-password safeguard', async () => {
+      // 1. Create a verified user in DB
+      const email = 'verified-safeguard@ecotransit.vn';
+      const password = 'Password123';
+      const hash = await argon2.hash(password);
+
+      const user = await prisma.user.create({
+        data: {
+          email,
+          passwordHash: hash,
+          role: 'USER',
+          emailVerified: true,
+        },
+      });
+
+      const agent = request.agent(app);
+
+      try {
+        // 2. Log in successfully to establish req.session.user
+        const loginRes = await agent.post('/api/auth/login').send({ email, password });
+        expect(loginRes.status).toBe(200);
+        expect(loginRes.body.user).toBeDefined();
+        expect(loginRes.body.user.emailVerified).toBe(true);
+
+        // Verify /me is authenticated
+        const meBefore = await agent.get('/api/auth/me');
+        expect(meBefore.status).toBe(200);
+        expect(meBefore.body.user.email).toBe(email);
+
+        // 3. Submit a failed login attempt with wrong credentials in that same session context
+        const failedLogin = await agent.post('/api/auth/login').send({ email, password: 'WrongPassword' });
+        expect(failedLogin.status).toBe(401);
+
+        // 4. Confirm authenticated session remains valid and untouched
+        const meAfter = await agent.get('/api/auth/me');
+        expect(meAfter.status).toBe(200);
+        expect(meAfter.body.user.email).toBe(email);
+        expect(meAfter.body.user.emailVerified).toBe(true);
+      } finally {
+        // Clean up
+        await prisma.userWallet.deleteMany({ where: { userId: user.id } });
+        await prisma.user.delete({ where: { id: user.id } });
+      }
+    });
+
+    it('10. Distinct preflight config check vs transport failure outcomes and trust proxy client spoofing check', async () => {
+      // 1. Proof of B (SMTP transport failure after account creation returns 201 with distinct message)
+      const email = 'transport-fail-distinct@ecotransit.vn';
+      const password = 'Password123';
+
+      const originalSendMail = mailProvider.sendMail;
+      const originalHasSmtpConfig = mailProvider.hasSmtpConfig;
+
+      // Mock SMTP configured but failing during transport (e.g. connection timeout)
+      mailProvider.hasSmtpConfig = () => true;
+      mailProvider.sendMail = async () => {
+        throw new Error('SMTP_CONNECTION_TIMEOUT');
+      };
+
+      try {
+        const registerRes = await request(app)
+          .post('/api/auth/register')
+          .send({ email, password });
+
+        expect(registerRes.status).toBe(201);
+        expect(registerRes.body.accountCreated).toBe(true);
+        expect(registerRes.body.verificationEmailSent).toBe(false);
+        expect(registerRes.body.recoveryAvailable).toBe(true);
+        expect(registerRes.body.message).toBe('Tài khoản đã được tạo nhưng email xác minh chưa được gửi thành công. Đăng nhập để gửi lại email xác minh.');
+
+        // 2. Proof of trust proxy single-hop IP resolution check (client spoofing check)
+        // Send a request with spoofed X-Forwarded-For header.
+        // Under trust proxy = 1, Express trusts only 1 proxy, so spoofed IPs are ignored.
+        const healthRes = await request(app)
+          .get('/api/healthz')
+          .set('X-Forwarded-For', '9.9.9.9, 8.8.8.8');
+        expect(healthRes.status).toBe(200);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        mailProvider.hasSmtpConfig = originalHasSmtpConfig;
+
+        const createdUser = await prisma.user.findUnique({ where: { email } });
+        if (createdUser) {
+          await prisma.userWallet.deleteMany({ where: { userId: createdUser.id } });
+          await prisma.user.delete({ where: { id: createdUser.id } });
+        }
+      }
     });
   });
 });

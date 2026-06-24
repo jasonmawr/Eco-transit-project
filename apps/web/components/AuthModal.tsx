@@ -18,14 +18,33 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Clear inputs and error on modal open/tab change
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const [resendSuccess, setResendSuccess] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [showSlowMessage, setShowSlowMessage] = useState(false);
+  const [showResendCTA, setShowResendCTA] = useState(false);
+
+  // Clear inputs, errors, and resend states on modal open/tab change
   useEffect(() => {
     setError(null);
+    setResendSuccess(null);
+    setShowSlowMessage(false);
+    setShowResendCTA(false);
     if (!isOpen) {
       setEmail('');
       setPassword('');
+      setResendCooldown(0);
     }
   }, [isOpen, activeTab]);
+
+  // Cooldown countdown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
 
   // Handle Escape key to close
   useEffect(() => {
@@ -42,12 +61,49 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     setEmail('user@ecotransit.vn');
     setPassword('User@123456');
     setError(null);
+    setShowResendCTA(false);
+  };
+
+  const handleResend = async () => {
+    setResendLoading(true);
+    setResendSuccess(null);
+    setError(null);
+    try {
+      const data = await apiFetch('/api/auth/resend-verification', {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      });
+      setResendCooldown(60);
+      setResendSuccess(data.message || 'Yêu cầu gửi lại email xác thực thành công. Vui lòng kiểm tra hộp thư.');
+    } catch (err: any) {
+      console.error(err);
+      if (err.cooldownRemaining && typeof err.cooldownRemaining === 'number') {
+        setResendCooldown(err.cooldownRemaining);
+      } else {
+        const match = err.message.match(/(\d+)\s*giây/);
+        if (match) {
+          setResendCooldown(parseInt(match[1], 10));
+        } else {
+          setResendCooldown(60);
+        }
+      }
+      setError(err.message || 'Yêu cầu gửi lại email xác thực thất bại.');
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setResendSuccess(null);
     setLoading(true);
+    setShowSlowMessage(false);
+    setShowResendCTA(false);
+
+    const slowTimer = setTimeout(() => {
+      setShowSlowMessage(true);
+    }, 4000);
 
     try {
       const endpoint = activeTab === 'login' ? '/api/auth/login' : '/api/auth/register';
@@ -55,13 +111,31 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });
+
+      if (activeTab === 'register') {
+        if (data.verificationEmailSent === false) {
+          setError('Tài khoản đã được tạo nhưng email xác minh chưa được gửi thành công. Đăng nhập để gửi lại email xác minh.');
+        } else {
+          setResendSuccess(data.message || 'Đăng ký tài khoản thành công. Vui lòng kiểm tra hộp thư để xác thực email.');
+        }
+        if (data.recoveryAvailable === true) {
+          setShowResendCTA(true);
+        }
+        return;
+      }
+
       onSuccess(data.user);
       onClose();
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+      if (err.code === 'EMAIL_UNVERIFIED' || err.recoveryAvailable === true) {
+        setShowResendCTA(true);
+      }
     } finally {
+      clearTimeout(slowTimer);
       setLoading(false);
+      setShowSlowMessage(false);
     }
   };
 
@@ -140,8 +214,36 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
 
               {/* Error Message */}
               {error && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-semibold">
-                  ⚠️ {error}
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-semibold flex flex-col items-start gap-2">
+                  <span className="flex items-center gap-1.5">⚠️ {error}</span>
+                </div>
+              )}
+
+              {/* Resend Success Message */}
+              {resendSuccess && (
+                <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs font-semibold">
+                  ✓ {resendSuccess}
+                </div>
+              )}
+
+              {/* Resend CTA */}
+              {showResendCTA && (
+                <div className="mb-4 flex items-center justify-start">
+                  <button
+                    type="button"
+                    disabled={resendLoading || resendCooldown > 0}
+                    onClick={handleResend}
+                    className="text-[10px] font-black uppercase px-3 py-1.5 rounded-lg bg-eco-primary hover:bg-eco-primaryDeep text-white transition-all shadow-sm disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
+                  >
+                    {resendLoading ? 'Đang gửi...' : resendCooldown > 0 ? `Gửi lại sau 00:${resendCooldown < 10 ? '0' : ''}${resendCooldown}` : 'Gửi lại email xác thực'}
+                  </button>
+                </div>
+              )}
+
+              {/* Slow loading helper progress message */}
+              {loading && showSlowMessage && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-700 text-xs font-medium animate-pulse">
+                  ℹ️ Dịch vụ đang khởi động. Việc gửi email có thể mất thêm một chút thời gian.
                 </div>
               )}
 

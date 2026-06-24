@@ -33,6 +33,14 @@ describe('EcoTransit Station Experience & UGC Integration Tests', () => {
       email: 'test-ugc-user@ecotransit.vn',
       password: 'TestPassword123',
     });
+    await prisma.user.update({
+      where: { email: 'test-ugc-user@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await testAgent.post('/api/auth/login').send({
+      email: 'test-ugc-user@ecotransit.vn',
+      password: 'TestPassword123',
+    });
 
     // Fetch the test user from DB
     testUser = await prisma.user.findUnique({

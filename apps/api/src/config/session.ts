@@ -7,8 +7,14 @@ export const sessionMiddleware = session({
   cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     httpOnly: true,
-    secure: config.COOKIE_SECURE,
-    sameSite: config.COOKIE_SAME_SITE,
+    get secure(): boolean {
+      const isProdOrDemo = process.env.NODE_ENV === 'production' || process.env.APP_MODE === 'demo' || config.APP_MODE === 'demo';
+      return process.env.COOKIE_SECURE === 'true' || (isProdOrDemo && process.env.COOKIE_SECURE !== 'false');
+    },
+    get sameSite(): any {
+      const isProdOrDemo = process.env.NODE_ENV === 'production' || process.env.APP_MODE === 'demo' || config.APP_MODE === 'demo';
+      return process.env.COOKIE_SAME_SITE || (isProdOrDemo ? 'none' : 'lax');
+    },
   },
   secret: config.SESSION_SECRET,
   resave: false,

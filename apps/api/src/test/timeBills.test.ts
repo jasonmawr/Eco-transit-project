@@ -24,6 +24,14 @@ describe('EcoTransit Time Bill Generator & Social Share Integration Tests', () =
       email: 'test-bill-owner@ecotransit.vn',
       password: 'OwnerPassword123',
     });
+    await prisma.user.update({
+      where: { email: 'test-bill-owner@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await userAgent.post('/api/auth/login').send({
+      email: 'test-bill-owner@ecotransit.vn',
+      password: 'OwnerPassword123',
+    });
 
     testUser = await prisma.user.findUnique({
       where: { email: 'test-bill-owner@ecotransit.vn' },
@@ -33,6 +41,14 @@ describe('EcoTransit Time Bill Generator & Social Share Integration Tests', () =
     // Register other user
     otherUserAgent = request.agent(app);
     await otherUserAgent.post('/api/auth/register').send({
+      email: 'test-bill-other@ecotransit.vn',
+      password: 'OtherPassword123',
+    });
+    await prisma.user.update({
+      where: { email: 'test-bill-other@ecotransit.vn' },
+      data: { emailVerified: true },
+    });
+    await otherUserAgent.post('/api/auth/login').send({
       email: 'test-bill-other@ecotransit.vn',
       password: 'OtherPassword123',
     });

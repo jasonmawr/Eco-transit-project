@@ -20,11 +20,20 @@ export class MailProvider {
 
     if (host && portStr && user && pass && from) {
       const port = parseInt(portStr, 10);
+      // Bounded but tolerant timeouts configured to prevent indefinite Express blocks
+      // while still providing enough margin for normal production mail transport routes.
+      const connectionTimeout = parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '15000', 10);
+      const greetingTimeout = parseInt(process.env.SMTP_GREETING_TIMEOUT || '15000', 10);
+      const socketTimeout = parseInt(process.env.SMTP_SOCKET_TIMEOUT || '30000', 10);
+
       this.transporter = nodemailer.createTransport({
         host,
         port,
         secure: port === 465,
         auth: { user, pass },
+        connectionTimeout,
+        greetingTimeout,
+        socketTimeout,
       });
       this.isConfigured = true;
     } else {

@@ -592,7 +592,7 @@ test.describe('EcoTransit Epic 10 E2E Tests', () => {
 
     await page.locator('form button[type="submit"]:has-text("Đăng ký tài khoản")').evaluate((el: HTMLElement) => el.click());
 
-    await expect(page.locator('text=Tài khoản chưa xác thực:')).toBeVisible();
+    await expect(page.locator('text=Đăng ký tài khoản thành công')).toBeVisible();
 
     const possiblePaths = [
       path.resolve(process.cwd(), '../../last-mock-email.json'),

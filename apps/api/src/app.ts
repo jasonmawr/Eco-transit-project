@@ -18,24 +18,14 @@ import leaderboardRouter from './routes/leaderboard.js';
 
 const app = express();
 
-// Trust proxy behind load balancers/CDNs for secure cookies in production/demo
-if (process.env.NODE_ENV === 'production' || config.APP_MODE === 'demo') {
-  app.set('trust proxy', 1);
-}
-
-// Parse comma-separated list of allowed origins from config
-const allowedOrigins = (config.CORS_ORIGIN || '')
-  .split(',')
-  .map(o => o.trim())
-  .filter(Boolean);
-
-// Always append local defaults to whitelist
-if (!allowedOrigins.includes('http://localhost:3000')) {
-  allowedOrigins.push('http://localhost:3000');
-}
-if (!allowedOrigins.includes('http://localhost:3001')) {
-  allowedOrigins.push('http://localhost:3001');
-}
+// Trust proxy behind load balancers/CDNs for secure cookies in production/demo.
+// Render's routing layer acts as a single reverse proxy (1 hop) in front of the application.
+// By setting 'trust proxy' to 1, we trust only the single immediate proxy hop (Render's load balancer).
+// Express will resolve the client's actual connection IP as the rightmost entry in X-Forwarded-For,
+// and it will ignore any upstream addresses that a malicious client might have appended to spoof their IP.
+// This prevents header spoofing attacks while ensuring correct client IP resolution for rate limiting,
+// geo-ip logic, and correct HTTPS/Secure session cookie transmission over proxy tunnels.
+app.set('trust proxy', 1);
 
 // Strict CORS check
 app.use(
@@ -43,6 +33,19 @@ app.use(
     origin: (origin, callback) => {
       if (!origin) return callback(null, true);
       
+      // Parse dynamically to support runtime config changes during tests
+      const currentCorsOrigin = process.env.CORS_ORIGIN || config.CORS_ORIGIN || '';
+      const allowedOrigins = currentCorsOrigin
+        .split(',')
+        .map(o => o.trim())
+        .filter(Boolean);
+
+      if (!allowedOrigins.includes('http://localhost:3000')) {
+        allowedOrigins.push('http://localhost:3000');
+      }
+      if (!allowedOrigins.includes('http://localhost:3001')) {
+        allowedOrigins.push('http://localhost:3001');
+      }
       const isAllowed = allowedOrigins.some(allowed => allowed === origin || allowed === origin + '/') ||
                         (config.APP_MODE === 'local' && (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')));
       if (isAllowed) {
