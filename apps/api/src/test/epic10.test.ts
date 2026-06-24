@@ -1642,4 +1642,232 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       }
     });
   });
+
+  describe('P0.2 Safe SMTP Diagnostics & Cooldown Audit Integration Tests', () => {
+    it('P0.2-1. Gmail authentication rejection EAUTH mapping & server-side logging check', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          const err = new Error('Invalid login: 535-5.7.8 Username and Password not accepted.');
+          (err as any).code = 'EAUTH';
+          throw err;
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=AUTH_REJECTED');
+        expect(loggedOutput).not.toContain('Username and Password not accepted');
+        expect(loggedOutput).not.toContain('EAUTH');
+      } finally {
+        console.error = originalConsoleError;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.2-2. Timeout-style transport error mapping & server-side logging check', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          const err = new Error('Connection timed out');
+          (err as any).code = 'ETIMEDOUT';
+          throw err;
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=CONNECTION_TIMEOUT');
+        expect(loggedOutput).not.toContain('Connection timed out');
+        expect(loggedOutput).not.toContain('ETIMEDOUT');
+      } finally {
+        console.error = originalConsoleError;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.2-3. Connection refused mapping & server-side logging check', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          const err = new Error('connect ECONNREFUSED 127.0.0.1:25');
+          (err as any).code = 'ECONNREFUSED';
+          throw err;
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=CONNECTION_REFUSED');
+        expect(loggedOutput).not.toContain('ECONNREFUSED');
+        expect(loggedOutput).not.toContain('127.0.0.1');
+      } finally {
+        console.error = originalConsoleError;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.2-4. Unknown transport error mapping & server-side logging check', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          throw new Error('Something very strange happened on socket');
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=UNKNOWN_TRANSPORT_FAILURE');
+        expect(loggedOutput).not.toContain('Something very strange');
+      } finally {
+        console.error = originalConsoleError;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.2-5. Failed resend with no pre-existing successful resend does not create cooldown/token update', async () => {
+      const email = 'p02-test-failed-cooldown@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(503);
+        expect(res.body.code).toBe('EMAIL_DELIVERY_UNAVAILABLE');
+        expect(res.body.cooldownRemaining).toBeUndefined();
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
+        expect(userAfter!.verificationSentAt).toBeNull();
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        process.env.NODE_ENV = origNodeEnv;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.2-6. Pre-existing valid cooldown and token are preserved on subsequent failed resend', async () => {
+      const email = 'p02-test-preserve-cooldown@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      const recentDate = new Date(Date.now() - 10 * 1000);
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: {
+          verificationSentAt: recentDate,
+        },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+      };
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(429);
+        expect(res.body.cooldownRemaining).toBeDefined();
+        expect(res.body.cooldownRemaining).toBeLessThanOrEqual(50);
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
+        expect(userAfter!.verificationSentAt?.getTime()).toBe(recentDate.getTime());
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+  });
 });

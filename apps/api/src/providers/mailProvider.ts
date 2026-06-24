@@ -7,6 +7,44 @@ export interface MailOptions {
   html: string;
 }
 
+function classifyMailError(error: any): string {
+  if (!error) return 'UNKNOWN_TRANSPORT_FAILURE';
+
+  const code = error.code ? String(error.code).toUpperCase() : '';
+  const message = error.message ? String(error.message) : '';
+  const messageUpper = message.toUpperCase();
+
+  if (code === 'EAUTH' || messageUpper.includes('AUTH') || messageUpper.includes('PASSWORD') || messageUpper.includes('USERNAME') || messageUpper.includes('ACCEPTED')) {
+    return 'AUTH_REJECTED';
+  }
+
+  if (code === 'ETIMEDOUT' || messageUpper.includes('TIMEOUT') || messageUpper.includes('TIMEDOUT')) {
+    return 'CONNECTION_TIMEOUT';
+  }
+
+  if (code === 'ECONNREFUSED' || messageUpper.includes('CONNREFUSED') || messageUpper.includes('CONNECTION REFUSED')) {
+    return 'CONNECTION_REFUSED';
+  }
+
+  if (code === 'EPROTO' || messageUpper.includes('TLS') || messageUpper.includes('SSL') || messageUpper.includes('HANDSHAKE')) {
+    return 'TLS_FAILURE';
+  }
+
+  if (messageUpper.includes('SENDER') && (messageUpper.includes('REJECT') || messageUpper.includes('DENY') || messageUpper.includes('DENIED'))) {
+    return 'SENDER_REJECTED';
+  }
+
+  if (messageUpper.includes('RECIPIENT') && (messageUpper.includes('REJECT') || messageUpper.includes('DENY') || messageUpper.includes('DENIED'))) {
+    return 'RECIPIENT_REJECTED';
+  }
+
+  if (code === 'EENVELOPE' || messageUpper.includes('SMTP RESPONSE') || messageUpper.includes('REJECT')) {
+    return 'SMTP_RESPONSE_REJECTED';
+  }
+
+  return 'UNKNOWN_TRANSPORT_FAILURE';
+}
+
 export class MailProvider {
   private transporter: nodemailer.Transporter | null = null;
   private isConfigured = false;
@@ -27,6 +65,7 @@ export class MailProvider {
           process.env.APP_MODE === 'production' ||
           process.env.APP_MODE === 'demo';
         if (isProductionOrDemo) {
+          console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
           console.warn('SMTP configuration is invalid. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
         } else {
           console.warn('SMTP configuration is invalid. MailProvider will run in MOCK mode.');
@@ -55,6 +94,7 @@ export class MailProvider {
         process.env.APP_MODE === 'production' ||
         process.env.APP_MODE === 'demo';
       if (isProductionOrDemo) {
+        console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
         console.warn('SMTP configuration is missing. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
       } else {
         console.warn('SMTP configuration is missing. MailProvider will run in MOCK mode.');
@@ -80,12 +120,14 @@ export class MailProvider {
         });
         return { sent: true, isMock: false, info };
       } catch (error: any) {
-        console.error('[MAIL_TRANSPORT_FAILURE] phase=send');
+        const category = classifyMailError(error);
+        console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category}`);
         throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
       }
     } else {
       // If we are in production or demo and SMTP is not configured, throw a clear operational error
       if (isProductionOrDemo) {
+        console.error('[MAIL_TRANSPORT_FAILURE] phase=send category=CONFIGURATION_INVALID');
         throw new Error('SMTP_NOT_CONFIGURED');
       }
 

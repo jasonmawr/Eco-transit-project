@@ -88,7 +88,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       }
       if (err.cooldownRemaining && typeof err.cooldownRemaining === 'number') {
         setResendCooldown(err.cooldownRemaining);
-      } else {
+      } else if (err.status === 429) {
         const match = err.message.match(/(\d+)\s*giây/);
         if (match) {
           setResendCooldown(parseInt(match[1], 10));
