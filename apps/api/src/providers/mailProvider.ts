@@ -20,22 +20,35 @@ export class MailProvider {
 
     if (host && portStr && user && pass && from) {
       const port = parseInt(portStr, 10);
-      // Bounded but tolerant timeouts configured to prevent indefinite Express blocks
-      // while still providing enough margin for normal production mail transport routes.
-      const connectionTimeout = parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '15000', 10);
-      const greetingTimeout = parseInt(process.env.SMTP_GREETING_TIMEOUT || '15000', 10);
-      const socketTimeout = parseInt(process.env.SMTP_SOCKET_TIMEOUT || '30000', 10);
+      if (isNaN(port) || port <= 0) {
+        this.isConfigured = false;
+        const isProductionOrDemo =
+          process.env.NODE_ENV === 'production' ||
+          process.env.APP_MODE === 'production' ||
+          process.env.APP_MODE === 'demo';
+        if (isProductionOrDemo) {
+          console.warn('SMTP configuration is invalid. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
+        } else {
+          console.warn('SMTP configuration is invalid. MailProvider will run in MOCK mode.');
+        }
+      } else {
+        // Bounded but tolerant timeouts configured to prevent indefinite Express blocks
+        // while still providing enough margin for normal production mail transport routes.
+        const connectionTimeout = parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '15000', 10);
+        const greetingTimeout = parseInt(process.env.SMTP_GREETING_TIMEOUT || '15000', 10);
+        const socketTimeout = parseInt(process.env.SMTP_SOCKET_TIMEOUT || '30000', 10);
 
-      this.transporter = nodemailer.createTransport({
-        host,
-        port,
-        secure: port === 465,
-        auth: { user, pass },
-        connectionTimeout,
-        greetingTimeout,
-        socketTimeout,
-      });
-      this.isConfigured = true;
+        this.transporter = nodemailer.createTransport({
+          host,
+          port,
+          secure: port === 465,
+          auth: { user, pass },
+          connectionTimeout,
+          greetingTimeout,
+          socketTimeout,
+        });
+        this.isConfigured = true;
+      }
     } else {
       const isProductionOrDemo =
         process.env.NODE_ENV === 'production' ||
@@ -66,9 +79,9 @@ export class MailProvider {
           html: options.html,
         });
         return { sent: true, isMock: false, info };
-      } catch (error) {
-        console.error('Failed to send email via SMTP:', error);
-        throw error;
+      } catch (error: any) {
+        console.error('[MAIL_TRANSPORT_FAILURE] phase=send');
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
       }
     } else {
       // If we are in production or demo and SMTP is not configured, throw a clear operational error

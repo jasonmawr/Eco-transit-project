@@ -76,7 +76,16 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       setResendCooldown(60);
       setResendSuccess(data.message || 'Yêu cầu gửi lại email xác thực thành công. Vui lòng kiểm tra hộp thư.');
     } catch (err: any) {
-      console.error(err);
+      const isProduction = process.env.NODE_ENV === 'production';
+      const isExpectedError = isProduction && (
+        err.status === 429 ||
+        err.status === 503 ||
+        err.code === 'SMTP_NOT_CONFIGURED' ||
+        err.code === 'EMAIL_DELIVERY_UNAVAILABLE'
+      );
+      if (!isExpectedError) {
+        console.error(err);
+      }
       if (err.cooldownRemaining && typeof err.cooldownRemaining === 'number') {
         setResendCooldown(err.cooldownRemaining);
       } else {
@@ -127,7 +136,18 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
       onSuccess(data.user);
       onClose();
     } catch (err: any) {
-      console.error(err);
+      const isProduction = process.env.NODE_ENV === 'production';
+      const isExpectedError = isProduction && (
+        err.status === 429 ||
+        err.status === 401 ||
+        err.status === 503 ||
+        err.code === 'EMAIL_UNVERIFIED' ||
+        err.code === 'SMTP_NOT_CONFIGURED' ||
+        err.code === 'EMAIL_DELIVERY_UNAVAILABLE'
+      );
+      if (!isExpectedError) {
+        console.error(err);
+      }
       setError(err.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
       if (err.code === 'EMAIL_UNVERIFIED' || err.recoveryAvailable === true) {
         setShowResendCTA(true);

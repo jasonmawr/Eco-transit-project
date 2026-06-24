@@ -74,7 +74,13 @@ export async function apiFetch(path: string, options?: RequestInit) {
 
     // Suppress console diagnostics noise for expected unauthenticated GET /api/auth/me
     const isAuthMe = path === '/api/auth/me' || path === 'api/auth/me' || path === '/auth/me' || path === 'auth/me';
-    if (!(res.status === 401 && isAuthMe)) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isExpectedAuthMailError = isProduction && (
+      res.status === 429 ||
+      (res.status === 401 && responseBodyText && (responseBodyText.includes('EMAIL_UNVERIFIED') || responseBodyText.includes('mật khẩu chưa đúng'))) ||
+      (res.status === 503 && responseBodyText && (responseBodyText.includes('SMTP_NOT_CONFIGURED') || responseBodyText.includes('EMAIL_DELIVERY_UNAVAILABLE')))
+    );
+    if (!(res.status === 401 && isAuthMe) && !isExpectedAuthMailError) {
       console.warn(`[apiFetch HTTP Error Diagnostics] status=${res.status} body="${responseBodyText}"`);
     }
 

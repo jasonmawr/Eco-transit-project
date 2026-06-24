@@ -331,6 +331,9 @@ router.post('/verify-email', async (req: Request, res: Response) => {
   }
 });
 
+// Module-level in-flight guard map to prevent concurrent/rapid duplicate resends on the single worker
+const inFlightResends = new Set<string>();
+
 // 6. POST /auth/resend-verification
 router.post('/resend-verification', async (req: Request, res: Response) => {
   try {
@@ -385,51 +388,86 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       }
     }
 
-    const rawToken = crypto.randomBytes(32).toString('hex');
-    const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
-    const tokenExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
-
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
-
-    try {
-      await mailProvider.sendMail({
-        to: normalizedEmail,
-        subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
-        text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
-        html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
+    // Concurrency check to prevent duplicate sends while in flight
+    if (inFlightResends.has(normalizedEmail)) {
+      return res.status(429).json({
+        message: 'Yêu cầu gửi lại email xác thực của bạn đang được xử lý. Vui lòng đợi trong giây lát.',
       });
-
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          verificationTokenHash: tokenHash,
-          verificationTokenExpires: tokenExpires,
-          verificationSentAt: new Date(),
-        },
-      });
-    } catch (mailErr: any) {
-      console.error('Failed to resend verification email:', mailErr);
-      const isProductionOrDemo =
-        process.env.NODE_ENV === 'production' ||
-        process.env.APP_MODE === 'production' ||
-        process.env.APP_MODE === 'demo';
-
-      if (isProductionOrDemo || mailErr.message === 'SMTP_NOT_CONFIGURED') {
-        return res.status(503).json({
-          code: 'SMTP_NOT_CONFIGURED',
-          message: 'Gửi email xác thực thất bại. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
-        });
-      }
-      throw mailErr;
     }
 
-    const isMock = !mailProvider.hasSmtpConfig();
-    return res.status(200).json({
-      message: isMock
-        ? 'Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.'
-        : 'Yêu cầu đã được ghi nhận. Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.',
-    });
+    inFlightResends.add(normalizedEmail);
+
+    try {
+      const rawToken = crypto.randomBytes(32).toString('hex');
+      const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex');
+      const tokenExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
+
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      const verifyUrl = `${siteUrl}/verify-email?token=${rawToken}`;
+
+      try {
+        await mailProvider.sendMail({
+          to: normalizedEmail,
+          subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
+          text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
+          html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
+        });
+      } catch (mailErr: any) {
+        console.error('Failed to resend verification email:', mailErr);
+        const isProductionOrDemo =
+          process.env.NODE_ENV === 'production' ||
+          process.env.APP_MODE === 'production' ||
+          process.env.APP_MODE === 'demo';
+
+        if (mailErr.message === 'SMTP_NOT_CONFIGURED') {
+          return res.status(503).json({
+            code: 'SMTP_NOT_CONFIGURED',
+            message: 'Tính năng gửi email xác minh đang tạm thời chưa khả dụng. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
+          });
+        }
+
+        if (isProductionOrDemo || mailErr.message === 'EMAIL_DELIVERY_UNAVAILABLE') {
+          return res.status(503).json({
+            code: 'EMAIL_DELIVERY_UNAVAILABLE',
+            message: 'Chưa thể gửi email xác minh lúc này. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
+          });
+        }
+        throw mailErr;
+      }
+
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            verificationTokenHash: tokenHash,
+            verificationTokenExpires: tokenExpires,
+            verificationSentAt: new Date(),
+          },
+        });
+      } catch (dbErr: any) {
+        console.error('[MAIL_STATE_PERSIST_FAILURE] Failed to update verification token state in DB:', dbErr.message || dbErr);
+        const isProductionOrDemo =
+          process.env.NODE_ENV === 'production' ||
+          process.env.APP_MODE === 'production' ||
+          process.env.APP_MODE === 'demo';
+        if (isProductionOrDemo) {
+          return res.status(503).json({
+            code: 'EMAIL_DELIVERY_UNAVAILABLE',
+            message: 'Chưa thể gửi email xác minh lúc này. Vui lòng thử lại sau hoặc liên hệ Ban tổ chức để được hỗ trợ.',
+          });
+        }
+        throw dbErr;
+      }
+
+      const isMock = !mailProvider.hasSmtpConfig();
+      return res.status(200).json({
+        message: isMock
+          ? 'Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.'
+          : 'Yêu cầu đã được ghi nhận. Một liên kết xác thực mới đã được gửi tới hòm thư của bạn.',
+      });
+    } finally {
+      inFlightResends.delete(normalizedEmail);
+    }
   } catch (err: any) {
     console.error('Resend verification error:', err);
     return res.status(500).json({ message: 'Lỗi hệ thống khi gửi lại mã xác thực.' });

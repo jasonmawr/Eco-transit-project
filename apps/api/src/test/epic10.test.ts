@@ -1344,4 +1344,303 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       }
     });
   });
+
+  describe('P0.1 SMTP Error Classification & Resend Safety Integration Tests', () => {
+    it('P0.1-1. Missing/structurally invalid SMTP config registration check', async () => {
+      const email = 'p01-test-missing-config@ecotransit.vn';
+      const password = 'Password123';
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      (mailProvider as any).isConfigured = false;
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const res = await request(app).post('/api/auth/register').send({ email, password });
+        expect(res.status).toBe(503);
+        expect(res.body.code).toBe('SMTP_NOT_CONFIGURED');
+        expect(res.body.message).toContain('Tính năng gửi email xác minh đang tạm thời chưa khả dụng');
+
+        const user = await prisma.user.findUnique({ where: { email } });
+        expect(user).toBeNull();
+      } finally {
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        process.env.NODE_ENV = origNodeEnv;
+      }
+    });
+
+    it('P0.1-2. Registration connection timeout preserves account & recovery session', async () => {
+      const email = 'p01-test-timeout-reg@ecotransit.vn';
+      const password = 'Password123';
+      const originalSendMail = mailProvider.sendMail;
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      (mailProvider as any).isConfigured = true;
+
+      mailProvider.sendMail = async () => {
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+      };
+
+      const agent = request.agent(app);
+      try {
+        const res = await agent.post('/api/auth/register').send({ email, password });
+        expect(res.status).toBe(201);
+        expect(res.body.accountCreated).toBe(true);
+        expect(res.body.verificationEmailSent).toBe(false);
+        expect(res.body.recoveryAvailable).toBe(true);
+
+        const user = await prisma.user.findUnique({ where: { email } });
+        expect(user).not.toBeNull();
+        expect(user!.emailVerified).toBe(false);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.1-3. Runtime Gmail authentication failure maps to EMAIL_DELIVERY_UNAVAILABLE', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          throw new Error('Invalid login: 535-5.7.8 Username and Password not accepted.');
+        }
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+      } finally {
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.1-4. Runtime sender/recipient rejection maps to EMAIL_DELIVERY_UNAVAILABLE', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          throw new Error('554 5.7.1 <bad@example.com>: Sender address rejected: Access denied');
+        }
+      };
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+      } finally {
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.1-5. Resend with missing SMTP config returns SMTP_NOT_CONFIGURED', async () => {
+      const email = 'p01-test-missing-resend@ecotransit.vn';
+      const password = 'Password123';
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+
+      const agent = request.agent(app);
+      try {
+        await agent.post('/api/auth/register').send({ email, password });
+
+        const createdUser = await prisma.user.findUnique({ where: { email } });
+        await prisma.user.update({
+          where: { id: createdUser!.id },
+          data: { verificationSentAt: null },
+        });
+
+        (mailProvider as any).isConfigured = false;
+        const origNodeEnv = process.env.NODE_ENV;
+        process.env.NODE_ENV = 'production';
+
+        try {
+          const res = await agent.post('/api/auth/resend-verification').send({ email });
+          expect(res.status).toBe(503);
+          expect(res.body.code).toBe('SMTP_NOT_CONFIGURED');
+        } finally {
+          process.env.NODE_ENV = origNodeEnv;
+        }
+      } finally {
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.1-6. Resend with runtime transport failure does not overwrite token/cooldown', async () => {
+      const email = 'p01-test-fail-resend@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+      const initialSentAt = null;
+
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(503);
+        expect(res.body.code).toBe('EMAIL_DELIVERY_UNAVAILABLE');
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
+        expect(userAfter!.verificationSentAt).toBeNull();
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        process.env.NODE_ENV = origNodeEnv;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.1-7. Persist failure after accepted delivery preserves old token and fails safely', async () => {
+      const email = 'p01-test-persist-fail@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+
+      const originalSendMail = mailProvider.sendMail;
+      mailProvider.sendMail = async () => {
+        return { sent: true, isMock: true };
+      };
+
+      const originalUpdate = prisma.user.update;
+      (prisma.user as any).update = async () => {
+        throw new Error('Database connection lost');
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(503);
+        expect(res.body.code).toBe('EMAIL_DELIVERY_UNAVAILABLE');
+
+        (prisma.user as any).update = originalUpdate;
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        (prisma.user as any).update = originalUpdate;
+        process.env.NODE_ENV = origNodeEnv;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.1-8. Concurrency guard blocks rapid duplicate sends', async () => {
+      const email = 'p01-test-concurrency@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const originalSendMail = mailProvider.sendMail;
+      let sendCount = 0;
+      mailProvider.sendMail = async () => {
+        sendCount++;
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return { sent: true, isMock: true };
+      };
+
+      try {
+        const userInDb = await prisma.user.findUnique({ where: { email } });
+        await prisma.user.update({
+          where: { id: userInDb!.id },
+          data: { verificationSentAt: null },
+        });
+
+        const [res1, res2] = await Promise.all([
+          agent.post('/api/auth/resend-verification').send({ email }),
+          agent.post('/api/auth/resend-verification').send({ email }),
+        ]);
+
+        const statuses = [res1.status, res2.status];
+        expect(statuses).toContain(200);
+        expect(statuses).toContain(429);
+        expect(sendCount).toBe(1);
+      } finally {
+        mailProvider.sendMail = originalSendMail;
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.1-9. Successful resend sets verificationSentAt and blocks second request', async () => {
+      const email = 'p01-test-success-cooldown@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const userInDb = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: userInDb!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const res1 = await agent.post('/api/auth/resend-verification').send({ email });
+      expect(res1.status).toBe(200);
+
+      const res2 = await agent.post('/api/auth/resend-verification').send({ email });
+      expect(res2.status).toBe(429);
+      expect(res2.body.message).toContain('Bạn thao tác quá nhanh');
+
+      const u = await prisma.user.findUnique({ where: { email } });
+      if (u) {
+        await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+        await prisma.user.delete({ where: { id: u.id } });
+      }
+    });
+  });
 });
