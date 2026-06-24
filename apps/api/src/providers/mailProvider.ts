@@ -137,124 +137,223 @@ function classifyMailError(error: any): { category: string; hint?: string } {
 }
 
 export class MailProvider {
+  private providerType: 'smtp' | 'brevo_http' = 'smtp';
   private transporter: nodemailer.Transporter | null = null;
   private isConfigured = false;
 
   constructor() {
-    const host = process.env.SMTP_HOST;
-    const portStr = process.env.SMTP_PORT;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
-    const from = process.env.SMTP_FROM;
-
-    if (host && portStr && user && pass && from) {
-      const port = parseInt(portStr, 10);
-      if (isNaN(port) || port <= 0) {
-        this.isConfigured = false;
-        const isProductionOrDemo =
-          process.env.NODE_ENV === 'production' ||
-          process.env.APP_MODE === 'production' ||
-          process.env.APP_MODE === 'demo';
-        if (isProductionOrDemo) {
-          console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
-          console.warn('SMTP configuration is invalid. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
-        } else {
-          console.warn('SMTP configuration is invalid. MailProvider will run in MOCK mode.');
-        }
-      } else {
-        // Bounded but tolerant timeouts configured to prevent indefinite Express blocks
-        // while still providing enough margin for normal production mail transport routes.
-        const connectionTimeout = parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '15000', 10);
-        const greetingTimeout = parseInt(process.env.SMTP_GREETING_TIMEOUT || '15000', 10);
-        const socketTimeout = parseInt(process.env.SMTP_SOCKET_TIMEOUT || '30000', 10);
-
-        this.transporter = nodemailer.createTransport({
-          host,
-          port,
-          secure: port === 465,
-          auth: { user, pass },
-          connectionTimeout,
-          greetingTimeout,
-          socketTimeout,
-        });
-        this.isConfigured = true;
-      }
-    } else {
-      const isProductionOrDemo =
-        process.env.NODE_ENV === 'production' ||
-        process.env.APP_MODE === 'production' ||
-        process.env.APP_MODE === 'demo';
-      if (isProductionOrDemo) {
-        console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
-        console.warn('SMTP configuration is missing. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
-      } else {
-        console.warn('SMTP configuration is missing. MailProvider will run in MOCK mode.');
-      }
-    }
-  }
-
-  async sendMail(options: MailOptions): Promise<{ sent: boolean; isMock: boolean; info?: any }> {
-    const from = process.env.SMTP_FROM || 'no-reply@ecotransit.vn';
+    const providerEnv = process.env.MAIL_PROVIDER || 'smtp';
     const isProductionOrDemo =
       process.env.NODE_ENV === 'production' ||
       process.env.APP_MODE === 'production' ||
       process.env.APP_MODE === 'demo';
 
-    if (this.isConfigured && this.transporter) {
-      try {
-        const info = await this.transporter.sendMail({
-          from,
-          to: options.to,
-          subject: options.subject,
-          text: options.text,
-          html: options.html,
-        });
-        return { sent: true, isMock: false, info };
-      } catch (error: any) {
-        const { category, hint } = classifyMailError(error);
-        if (hint) {
-          console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category} hint=${hint}`);
+    if (providerEnv !== 'smtp' && providerEnv !== 'brevo_http') {
+      this.isConfigured = false;
+      if (isProductionOrDemo) {
+        console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
+        console.warn(`Unsupported MAIL_PROVIDER value: ${providerEnv}`);
+      } else {
+        console.warn(`Unsupported MAIL_PROVIDER value: ${providerEnv}. MailProvider will run in MOCK mode.`);
+      }
+      return;
+    }
+
+    this.providerType = providerEnv as 'smtp' | 'brevo_http';
+
+    if (this.providerType === 'smtp') {
+      const host = process.env.SMTP_HOST;
+      const portStr = process.env.SMTP_PORT;
+      const user = process.env.SMTP_USER;
+      const pass = process.env.SMTP_PASS;
+      const from = process.env.SMTP_FROM;
+
+      if (host && portStr && user && pass && from) {
+        const port = parseInt(portStr, 10);
+        if (isNaN(port) || port <= 0) {
+          this.isConfigured = false;
+          if (isProductionOrDemo) {
+            console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
+            console.warn('SMTP configuration is invalid. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
+          } else {
+            console.warn('SMTP configuration is invalid. MailProvider will run in MOCK mode.');
+          }
         } else {
-          console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category}`);
+          const connectionTimeout = parseInt(process.env.SMTP_CONNECTION_TIMEOUT || '15000', 10);
+          const greetingTimeout = parseInt(process.env.SMTP_GREETING_TIMEOUT || '15000', 10);
+          const socketTimeout = parseInt(process.env.SMTP_SOCKET_TIMEOUT || '30000', 10);
+
+          this.transporter = nodemailer.createTransport({
+            host,
+            port,
+            secure: port === 465,
+            auth: { user, pass },
+            connectionTimeout,
+            greetingTimeout,
+            socketTimeout,
+          });
+          this.isConfigured = true;
         }
-        if (!isProductionOrDemo) {
-          console.error(error);
+      } else {
+        if (isProductionOrDemo) {
+          console.error('[MAIL_TRANSPORT_FAILURE] phase=init category=CONFIGURATION_INVALID');
+          console.warn('SMTP configuration is missing. SMTP operations will fail with SMTP_NOT_CONFIGURED in production mode.');
+        } else {
+          console.warn('SMTP configuration is missing. MailProvider will run in MOCK mode.');
         }
-        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
       }
     } else {
-      // If we are in production or demo and SMTP is not configured, throw a clear operational error
-      if (isProductionOrDemo) {
+      const apiKey = process.env.BREVO_API_KEY;
+      const senderEmail = process.env.BREVO_SENDER_EMAIL;
+      const senderName = process.env.BREVO_SENDER_NAME;
+
+      if (apiKey && senderEmail && senderName) {
+        this.isConfigured = true;
+      } else {
+        this.isConfigured = false;
+        if (isProductionOrDemo) {
+          console.error('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=init category=CONFIGURATION_INVALID');
+          console.warn('Brevo configuration is invalid or missing.');
+        } else {
+          console.warn('Brevo configuration is missing. MailProvider will run in MOCK mode.');
+        }
+      }
+    }
+  }
+
+  async sendMail(options: MailOptions): Promise<{ sent: boolean; isMock: boolean; info?: any }> {
+    const isProductionOrDemo =
+      process.env.NODE_ENV === 'production' ||
+      process.env.APP_MODE === 'production' ||
+      process.env.APP_MODE === 'demo';
+
+    if (this.isConfigured) {
+      if (this.providerType === 'smtp') {
+        const from = process.env.SMTP_FROM || 'no-reply@ecotransit.vn';
+        if (this.transporter) {
+          try {
+            const info = await this.transporter.sendMail({
+              from,
+              to: options.to,
+              subject: options.subject,
+              text: options.text,
+              html: options.html,
+            });
+            return { sent: true, isMock: false, info };
+          } catch (error: any) {
+            const { category, hint } = classifyMailError(error);
+            if (hint) {
+              console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category} hint=${hint}`);
+            } else {
+              console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category}`);
+            }
+            if (!isProductionOrDemo) {
+              console.error(error);
+            }
+            throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+          }
+        }
+      } else {
+        let timeoutId: any;
+        try {
+          const controller = new AbortController();
+          timeoutId = setTimeout(() => controller.abort(), 10000);
+
+          const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method: 'POST',
+            headers: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+              'api-key': process.env.BREVO_API_KEY || '',
+            },
+            body: JSON.stringify({
+              sender: {
+                name: process.env.BREVO_SENDER_NAME,
+                email: process.env.BREVO_SENDER_EMAIL,
+              },
+              to: [
+                {
+                  email: options.to,
+                }
+              ],
+              subject: options.subject,
+              htmlContent: options.html,
+              textContent: options.text,
+            }),
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const status = response.status;
+            let category: 'AUTH_REJECTED' | 'SMTP_RESPONSE_REJECTED' = 'SMTP_RESPONSE_REJECTED';
+            if (status === 401 || status === 403) {
+              category = 'AUTH_REJECTED';
+            }
+            console.error(`[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=${category}`);
+            throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+          }
+
+          const data = await response.json().catch(() => ({}));
+          return { sent: true, isMock: false, info: data };
+        } catch (error: any) {
+          if (error.message === 'EMAIL_DELIVERY_UNAVAILABLE') {
+            throw error;
+          }
+
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+
+          let category = 'UNKNOWN_TRANSPORT_FAILURE';
+          if (error.name === 'AbortError' || error.code === 'ETIMEDOUT' || error.message.includes('timeout') || error.message.includes('abort')) {
+            category = 'CONNECTION_TIMEOUT';
+          }
+          console.error(`[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=${category}`);
+          if (!isProductionOrDemo) {
+            console.error(error);
+          }
+          throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+        }
+      }
+    }
+
+    // Default configuration failure behavior for production/demo if not configured
+    if (isProductionOrDemo) {
+      if (this.providerType === 'smtp') {
         console.error('[MAIL_TRANSPORT_FAILURE] phase=send category=CONFIGURATION_INVALID');
         throw new Error('SMTP_NOT_CONFIGURED');
+      } else {
+        console.error('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=CONFIGURATION_INVALID');
+        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
       }
-
-      // Mock mode for local development/testing only
-      console.log('--------------------------------------------------');
-      console.log(`[MOCK EMAIL SENT]`);
-      console.log(`To: ${options.to}`);
-      console.log(`Subject: ${options.subject}`);
-      console.log(`Text: ${options.text}`);
-      console.log('--------------------------------------------------');
-
-      // Write to a temporary file in the workspace root for Playwright tests
-      try {
-        const fs = await import('fs');
-        const path = await import('path');
-        const filepath = path.join(process.cwd(), 'last-mock-email.json');
-        fs.writeFileSync(filepath, JSON.stringify({
-          to: options.to,
-          subject: options.subject,
-          text: options.text,
-          html: options.html,
-          timestamp: Date.now()
-        }, null, 2));
-      } catch (err) {
-        console.error('Failed to write mock email file:', err);
-      }
-
-      return { sent: true, isMock: true };
     }
+
+    // Mock mode for local development/testing only
+    console.log('--------------------------------------------------');
+    console.log(`[MOCK EMAIL SENT]`);
+    console.log(`To: ${options.to}`);
+    console.log(`Subject: ${options.subject}`);
+    console.log(`Text: ${options.text}`);
+    console.log('--------------------------------------------------');
+
+    try {
+      const fs = await import('fs');
+      const path = await import('path');
+      const filepath = path.join(process.cwd(), 'last-mock-email.json');
+      fs.writeFileSync(filepath, JSON.stringify({
+        to: options.to,
+        subject: options.subject,
+        text: options.text,
+        html: options.html,
+        timestamp: Date.now()
+      }, null, 2));
+    } catch (err) {
+      console.error('Failed to write mock email file:', err);
+    }
+
+    return { sent: true, isMock: true };
   }
 
   hasSmtpConfig(): boolean {

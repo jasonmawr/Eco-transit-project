@@ -4,7 +4,7 @@ import { app } from '../app.js';
 import { prisma } from '../config/db.js';
 import fs from 'fs';
 import path from 'path';
-import { mailProvider } from '../providers/mailProvider.js';
+import { mailProvider, MailProvider } from '../providers/mailProvider.js';
 import argon2 from 'argon2';
 
 describe('EcoTransit Epic 10 Integration Tests', () => {
@@ -1930,6 +1930,421 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
           await prisma.userWallet.deleteMany({ where: { userId: u.id } });
           await prisma.user.delete({ where: { id: u.id } });
         }
+      }
+    });
+  });
+
+  describe('P0.4 Brevo HTTP Transactional Mail Provider Integration Tests', () => {
+    it('P0.4-1. MAIL_PROVIDER=brevo_http uses mocked fetch and does not instantiate SMTP', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'test_api_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      let fetchCalled = false;
+      globalThis.fetch = async (url: any, init: any) => {
+        fetchCalled = true;
+        expect(url).toBe('https://api.brevo.com/v3/smtp/email');
+        expect(init.method).toBe('POST');
+        expect(init.headers['api-key']).toBe('test_api_key');
+        return {
+          ok: true,
+          json: async () => ({ messageId: '123' })
+        } as any;
+      };
+
+      try {
+        const mailProv = new MailProvider();
+        const res = await mailProv.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        });
+        expect(res.sent).toBe(true);
+        expect(res.isMock).toBe(false);
+        expect(fetchCalled).toBe(true);
+        expect((mailProv as any).transporter).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+      }
+    });
+
+    it('P0.4-2. Successful mocked Brevo response returns success and permits normal cooldown/token persistence', async () => {
+      const email = 'p04-test-success-brevo@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'test_api_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => {
+        return {
+          ok: true,
+          json: async () => ({ messageId: '123' })
+        } as any;
+      };
+
+      // Re-instantiate the singleton or set properties
+      const originalProviderType = (mailProvider as any).providerType;
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      (mailProvider as any).providerType = 'brevo_http';
+      (mailProvider as any).isConfigured = true;
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(200);
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).not.toBe(initialTokenHash);
+        expect(userAfter!.verificationSentAt).not.toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+        (mailProvider as any).providerType = originalProviderType;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.4-3. Missing Brevo config produces controlled configuration failure', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = '';
+      process.env.BREVO_SENDER_EMAIL = '';
+      process.env.BREVO_SENDER_NAME = '';
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const originalConsoleError = console.error;
+      let loggedError = '';
+      console.error = (...args: any[]) => {
+        loggedError += args.join(' ') + '\n';
+      };
+
+      try {
+        const mailProv = new MailProvider();
+        expect((mailProv as any).isConfigured).toBe(false);
+
+        await expect(mailProv.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedError).toContain('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=init category=CONFIGURATION_INVALID');
+        expect(loggedError).toContain('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=CONFIGURATION_INVALID');
+        expect(loggedError).not.toContain('test_api_key');
+      } finally {
+        console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+      }
+    });
+
+    it('P0.4-4. Mocked auth failure maps to AUTH_REJECTED and suppresses traceback', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'invalid_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => {
+        return {
+          ok: false,
+          status: 401,
+          json: async () => ({ code: 'unauthorized', message: 'API key is invalid' })
+        } as any;
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const originalConsoleError = console.error;
+      let loggedError = '';
+      console.error = (...args: any[]) => {
+        loggedError += args.join(' ') + '\n';
+      };
+
+      try {
+        const mailProv = new MailProvider();
+        await expect(mailProv.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedError).toContain('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=AUTH_REJECTED');
+        expect(loggedError).not.toContain('API key is invalid');
+        expect(loggedError).not.toContain('invalid_key');
+      } finally {
+        console.error = originalConsoleError;
+        globalThis.fetch = originalFetch;
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+      }
+    });
+
+    it('P0.4-5. Mocked timeout or AbortError maps to CONNECTION_TIMEOUT', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'test_api_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => {
+        const err = new Error('The user aborted a request.');
+        err.name = 'AbortError';
+        throw err;
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const originalConsoleError = console.error;
+      let loggedError = '';
+      console.error = (...args: any[]) => {
+        loggedError += args.join(' ') + '\n';
+      };
+
+      try {
+        const mailProv = new MailProvider();
+        await expect(mailProv.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedError).toContain('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=CONNECTION_TIMEOUT');
+        expect(loggedError).not.toContain('The user aborted a request');
+      } finally {
+        console.error = originalConsoleError;
+        globalThis.fetch = originalFetch;
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+      }
+    });
+
+    it('P0.4-6. Mocked non-success provider response maps to SMTP_RESPONSE_REJECTED', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'test_api_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => {
+        return {
+          ok: false,
+          status: 400,
+          json: async () => ({ code: 'bad_request', message: 'Invalid payload' })
+        } as any;
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      const originalConsoleError = console.error;
+      let loggedError = '';
+      console.error = (...args: any[]) => {
+        loggedError += args.join(' ') + '\n';
+      };
+
+      try {
+        const mailProv = new MailProvider();
+        await expect(mailProv.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedError).toContain('[MAIL_TRANSPORT_FAILURE] provider=brevo_http phase=send category=SMTP_RESPONSE_REJECTED');
+        expect(loggedError).not.toContain('Invalid payload');
+      } finally {
+        console.error = originalConsoleError;
+        globalThis.fetch = originalFetch;
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+      }
+    });
+
+    it('P0.4-7. Failed resend in brevo_http mode preserves cooldown and token integrity', async () => {
+      const email = 'p04-test-failed-resend@ecotransit.vn';
+      const password = 'Password123';
+      const agent = request.agent(app);
+
+      await agent.post('/api/auth/register').send({ email, password });
+
+      const initialUser = await prisma.user.findUnique({ where: { email } });
+      await prisma.user.update({
+        where: { id: initialUser!.id },
+        data: { verificationSentAt: null },
+      });
+
+      const initialTokenHash = initialUser!.verificationTokenHash;
+
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'brevo_http';
+
+      const origApiKey = process.env.BREVO_API_KEY;
+      const origSenderEmail = process.env.BREVO_SENDER_EMAIL;
+      const origSenderName = process.env.BREVO_SENDER_NAME;
+
+      process.env.BREVO_API_KEY = 'test_api_key';
+      process.env.BREVO_SENDER_EMAIL = 'sender@ecotransit.vn';
+      process.env.BREVO_SENDER_NAME = 'EcoTransit Sender';
+
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = async () => {
+        return {
+          ok: false,
+          status: 500,
+          json: async () => ({})
+        } as any;
+      };
+
+      const originalProviderType = (mailProvider as any).providerType;
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      (mailProvider as any).providerType = 'brevo_http';
+      (mailProvider as any).isConfigured = true;
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        const res = await agent.post('/api/auth/resend-verification').send({ email });
+        expect(res.status).toBe(503);
+        expect(res.body.code).toBe('EMAIL_DELIVERY_UNAVAILABLE');
+        expect(res.body.cooldownRemaining).toBeUndefined();
+
+        const userAfter = await prisma.user.findUnique({ where: { email } });
+        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
+        expect(userAfter!.verificationSentAt).toBeNull();
+      } finally {
+        globalThis.fetch = originalFetch;
+        process.env.NODE_ENV = origNodeEnv;
+        process.env.MAIL_PROVIDER = origMailProvider;
+        process.env.BREVO_API_KEY = origApiKey;
+        process.env.BREVO_SENDER_EMAIL = origSenderEmail;
+        process.env.BREVO_SENDER_NAME = origSenderName;
+        (mailProvider as any).providerType = originalProviderType;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+
+        const u = await prisma.user.findUnique({ where: { email } });
+        if (u) {
+          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
+          await prisma.user.delete({ where: { id: u.id } });
+        }
+      }
+    });
+
+    it('P0.4-8. Existing smtp mode follows original safe mail behavior', async () => {
+      const origMailProvider = process.env.MAIL_PROVIDER;
+      process.env.MAIL_PROVIDER = 'smtp';
+
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      const originalProviderType = (mailProvider as any).providerType;
+
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).providerType = 'smtp';
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          return { messageId: 'smtp_123' };
+        }
+      };
+
+      try {
+        const res = await mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        });
+        expect(res.sent).toBe(true);
+        expect(res.isMock).toBe(false);
+      } finally {
+        process.env.MAIL_PROVIDER = origMailProvider;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+        (mailProvider as any).providerType = originalProviderType;
       }
     });
   });
