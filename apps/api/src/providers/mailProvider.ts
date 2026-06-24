@@ -7,12 +7,17 @@ export interface MailOptions {
   html: string;
 }
 
-function classifyMailError(error: any): string {
-  if (!error) return 'UNKNOWN_TRANSPORT_FAILURE';
+function classifySingleError(error: any): string | null {
+  if (!error) return null;
 
   const code = error.code ? String(error.code).toUpperCase() : '';
   const message = error.message ? String(error.message) : '';
   const messageUpper = message.toUpperCase();
+
+  // Existing normalized app errors must not be classified as genuine SMTP transport causes
+  if (message === 'EMAIL_DELIVERY_UNAVAILABLE' || message === 'SMTP_NOT_CONFIGURED') {
+    return null;
+  }
 
   if (code === 'EAUTH' || messageUpper.includes('AUTH') || messageUpper.includes('PASSWORD') || messageUpper.includes('USERNAME') || messageUpper.includes('ACCEPTED')) {
     return 'AUTH_REJECTED';
@@ -42,7 +47,93 @@ function classifyMailError(error: any): string {
     return 'SMTP_RESPONSE_REJECTED';
   }
 
-  return 'UNKNOWN_TRANSPORT_FAILURE';
+  // A generic SMTP 4xx/5xx response without unambiguous sender/recipient evidence must be SMTP_RESPONSE_REJECTED
+  if (error.responseCode) {
+    const rCode = parseInt(error.responseCode, 10);
+    if (rCode >= 400 && rCode < 600) {
+      if (rCode === 535) return 'AUTH_REJECTED';
+      // Do not classify sender or recipient rejection merely from a generic responseCode such as 550 or 554.
+      return 'SMTP_RESPONSE_REJECTED';
+    }
+  }
+
+  return null;
+}
+
+function getNestedErrors(error: any): any[] {
+  const seen = new Set<any>();
+  const list: any[] = [];
+
+  function traverse(err: any, depth: number) {
+    if (!err || depth > 5 || seen.has(err)) return;
+    seen.add(err);
+    if (err !== error) {
+      list.push(err);
+    }
+
+    if (err.cause) {
+      traverse(err.cause, depth + 1);
+    }
+    if (Array.isArray(err.errors)) {
+      for (const nested of err.errors) {
+        traverse(nested, depth + 1);
+      }
+    }
+  }
+
+  traverse(error, 0);
+  return list;
+}
+
+function classifyMailError(error: any): { category: string; hint?: string } {
+  if (!error) {
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'DIRECT_ERROR_NO_METADATA' };
+  }
+
+  // Helper to check if an error is already normalized
+  if (error instanceof Error && (error.message === 'EMAIL_DELIVERY_UNAVAILABLE' || error.message === 'SMTP_NOT_CONFIGURED')) {
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'ALREADY_NORMALIZED_ERROR' };
+  }
+
+  // 1. Direct classification
+  const directCategory = classifySingleError(error);
+  if (directCategory) {
+    return { category: directCategory };
+  }
+
+  // 2. Check nested causes
+  const nestedErrors = getNestedErrors(error);
+  let nestedCategory: string | null = null;
+  for (const nested of nestedErrors) {
+    const cat = classifySingleError(nested);
+    if (cat) {
+      nestedCategory = cat;
+      break;
+    }
+  }
+
+  if (nestedCategory) {
+    // Nested cause matched a category! We promote timeout/refused/tls/auth, or return hint NESTED_CAUSE_CLASSIFIED
+    if (nestedCategory === 'CONNECTION_TIMEOUT' || nestedCategory === 'CONNECTION_REFUSED' || nestedCategory === 'TLS_FAILURE' || nestedCategory === 'AUTH_REJECTED') {
+      return { category: nestedCategory };
+    }
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'NESTED_CAUSE_CLASSIFIED' };
+  }
+
+  // 3. Unclassified error hints
+  if (nestedErrors.length > 0) {
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'NESTED_CAUSE_UNCLASSIFIED' };
+  }
+
+  if (error.responseCode || error.response) {
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'DIRECT_ERROR_UNCLASSIFIED_RESPONSE' };
+  }
+
+  if (error.code) {
+    return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'DIRECT_ERROR_UNRECOGNIZED_CODE' };
+  }
+
+  return { category: 'UNKNOWN_TRANSPORT_FAILURE', hint: 'DIRECT_ERROR_NO_METADATA' };
 }
 
 export class MailProvider {
@@ -120,8 +211,15 @@ export class MailProvider {
         });
         return { sent: true, isMock: false, info };
       } catch (error: any) {
-        const category = classifyMailError(error);
-        console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category}`);
+        const { category, hint } = classifyMailError(error);
+        if (hint) {
+          console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category} hint=${hint}`);
+        } else {
+          console.error(`[MAIL_TRANSPORT_FAILURE] phase=send category=${category}`);
+        }
+        if (!isProductionOrDemo) {
+          console.error(error);
+        }
         throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
       }
     } else {

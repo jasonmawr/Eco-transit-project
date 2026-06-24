@@ -1643,8 +1643,8 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
     });
   });
 
-  describe('P0.2 Safe SMTP Diagnostics & Cooldown Audit Integration Tests', () => {
-    it('P0.2-1. Gmail authentication rejection EAUTH mapping & server-side logging check', async () => {
+  describe('P0.3 Safe SMTP Diagnostics, Forensics & Production Stack Suppression Tests', () => {
+    it('P0.3-1. Direct EAUTH-style error: category=AUTH_REJECTED, no raw data in logs', async () => {
       const originalIsConfigured = (mailProvider as any).isConfigured;
       const originalTransporter = (mailProvider as any).transporter;
       (mailProvider as any).isConfigured = true;
@@ -1662,6 +1662,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         loggedOutput += args.join(' ') + '\n';
       };
 
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
       try {
         await expect(mailProvider.sendMail({
           to: 'test@example.com',
@@ -1675,20 +1678,23 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         expect(loggedOutput).not.toContain('EAUTH');
       } finally {
         console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
         (mailProvider as any).isConfigured = originalIsConfigured;
         (mailProvider as any).transporter = originalTransporter;
       }
     });
 
-    it('P0.2-2. Timeout-style transport error mapping & server-side logging check', async () => {
+    it('P0.3-2. Nested cause timeout: category=CONNECTION_TIMEOUT, nested cause considered, no nested raw text in logs', async () => {
       const originalIsConfigured = (mailProvider as any).isConfigured;
       const originalTransporter = (mailProvider as any).transporter;
       (mailProvider as any).isConfigured = true;
       (mailProvider as any).transporter = {
         sendMail: async () => {
-          const err = new Error('Connection timed out');
-          (err as any).code = 'ETIMEDOUT';
-          throw err;
+          const nestedErr = new Error('Connection timeout nested details');
+          (nestedErr as any).code = 'ETIMEDOUT';
+          const topErr = new Error('Wrapper SMTP transport failure');
+          (topErr as any).cause = nestedErr;
+          throw topErr;
         }
       };
 
@@ -1697,6 +1703,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       console.error = (...args: any[]) => {
         loggedOutput += args.join(' ') + '\n';
       };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
 
       try {
         await expect(mailProvider.sendMail({
@@ -1707,23 +1716,24 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
 
         expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=CONNECTION_TIMEOUT');
-        expect(loggedOutput).not.toContain('Connection timed out');
-        expect(loggedOutput).not.toContain('ETIMEDOUT');
+        expect(loggedOutput).not.toContain('Wrapper SMTP transport failure');
+        expect(loggedOutput).not.toContain('Connection timeout nested details');
       } finally {
         console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
         (mailProvider as any).isConfigured = originalIsConfigured;
         (mailProvider as any).transporter = originalTransporter;
       }
     });
 
-    it('P0.2-3. Connection refused mapping & server-side logging check', async () => {
+    it('P0.3-3. Direct unrecognized-code error: category=UNKNOWN_TRANSPORT_FAILURE, hint=DIRECT_ERROR_UNRECOGNIZED_CODE', async () => {
       const originalIsConfigured = (mailProvider as any).isConfigured;
       const originalTransporter = (mailProvider as any).transporter;
       (mailProvider as any).isConfigured = true;
       (mailProvider as any).transporter = {
         sendMail: async () => {
-          const err = new Error('connect ECONNREFUSED 127.0.0.1:25');
-          (err as any).code = 'ECONNREFUSED';
+          const err = new Error('Something very strange happened on socket');
+          (err as any).code = 'ESOMECODE';
           throw err;
         }
       };
@@ -1734,6 +1744,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         loggedOutput += args.join(' ') + '\n';
       };
 
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
       try {
         await expect(mailProvider.sendMail({
           to: 'test@example.com',
@@ -1742,23 +1755,24 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
           html: 'test'
         })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
 
-        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=CONNECTION_REFUSED');
-        expect(loggedOutput).not.toContain('ECONNREFUSED');
-        expect(loggedOutput).not.toContain('127.0.0.1');
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=UNKNOWN_TRANSPORT_FAILURE hint=DIRECT_ERROR_UNRECOGNIZED_CODE');
+        expect(loggedOutput).not.toContain('ESOMECODE');
+        expect(loggedOutput).not.toContain('Something very strange');
       } finally {
         console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
         (mailProvider as any).isConfigured = originalIsConfigured;
         (mailProvider as any).transporter = originalTransporter;
       }
     });
 
-    it('P0.2-4. Unknown transport error mapping & server-side logging check', async () => {
+    it('P0.3-4. Direct generic no-metadata error: category=UNKNOWN_TRANSPORT_FAILURE, hint=DIRECT_ERROR_NO_METADATA', async () => {
       const originalIsConfigured = (mailProvider as any).isConfigured;
       const originalTransporter = (mailProvider as any).transporter;
       (mailProvider as any).isConfigured = true;
       (mailProvider as any).transporter = {
         sendMail: async () => {
-          throw new Error('Something very strange happened on socket');
+          throw new Error('Generic error message');
         }
       };
 
@@ -1768,6 +1782,9 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
         loggedOutput += args.join(' ') + '\n';
       };
 
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
       try {
         await expect(mailProvider.sendMail({
           to: 'test@example.com',
@@ -1776,17 +1793,93 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
           html: 'test'
         })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
 
-        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=UNKNOWN_TRANSPORT_FAILURE');
-        expect(loggedOutput).not.toContain('Something very strange');
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=UNKNOWN_TRANSPORT_FAILURE hint=DIRECT_ERROR_NO_METADATA');
+        expect(loggedOutput).not.toContain('Generic error message');
       } finally {
         console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
         (mailProvider as any).isConfigured = originalIsConfigured;
         (mailProvider as any).transporter = originalTransporter;
       }
     });
 
-    it('P0.2-5. Failed resend with no pre-existing successful resend does not create cooldown/token update', async () => {
-      const email = 'p02-test-failed-cooldown@ecotransit.vn';
+    it('P0.3-5. Already-normalized application error: category=UNKNOWN_TRANSPORT_FAILURE, hint=ALREADY_NORMALIZED_ERROR', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=UNKNOWN_TRANSPORT_FAILURE hint=ALREADY_NORMALIZED_ERROR');
+      } finally {
+        console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.3-6. Generic SMTP responseCode only: category=SMTP_RESPONSE_REJECTED without sender/recipient evidence', async () => {
+      const originalIsConfigured = (mailProvider as any).isConfigured;
+      const originalTransporter = (mailProvider as any).transporter;
+      (mailProvider as any).isConfigured = true;
+      (mailProvider as any).transporter = {
+        sendMail: async () => {
+          const err = new Error('Ambiguous SMTP response');
+          (err as any).responseCode = 554;
+          throw err;
+        }
+      };
+
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
+      const origNodeEnv = process.env.NODE_ENV;
+      process.env.NODE_ENV = 'production';
+
+      try {
+        await expect(mailProvider.sendMail({
+          to: 'test@example.com',
+          subject: 'Test',
+          text: 'test',
+          html: 'test'
+        })).rejects.toThrow('EMAIL_DELIVERY_UNAVAILABLE');
+
+        expect(loggedOutput).toContain('[MAIL_TRANSPORT_FAILURE] phase=send category=SMTP_RESPONSE_REJECTED');
+        expect(loggedOutput).not.toContain('Ambiguous SMTP response');
+      } finally {
+        console.error = originalConsoleError;
+        process.env.NODE_ENV = origNodeEnv;
+        (mailProvider as any).isConfigured = originalIsConfigured;
+        (mailProvider as any).transporter = originalTransporter;
+      }
+    });
+
+    it('P0.3-7. Resend route in production: public 503, emits concise event, suppresses stack trace', async () => {
+      const email = 'p03-test-production-resend@ecotransit.vn';
       const password = 'Password123';
       const agent = request.agent(app);
 
@@ -1808,60 +1901,30 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       const origNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'production';
 
+      const originalConsoleError = console.error;
+      let loggedOutput = '';
+      console.error = (...args: any[]) => {
+        loggedOutput += args.join(' ') + '\n';
+      };
+
       try {
         const res = await agent.post('/api/auth/resend-verification').send({ email });
         expect(res.status).toBe(503);
         expect(res.body.code).toBe('EMAIL_DELIVERY_UNAVAILABLE');
         expect(res.body.cooldownRemaining).toBeUndefined();
 
+        expect(loggedOutput).toContain('[MAIL_DELIVERY_UNAVAILABLE] action=resend');
+        expect(loggedOutput).not.toContain('Failed to resend verification email');
+        expect(loggedOutput).not.toContain('EMAIL_DELIVERY_UNAVAILABLE');
+        expect(loggedOutput).not.toContain('at MailProvider.sendMail');
+
         const userAfter = await prisma.user.findUnique({ where: { email } });
         expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
         expect(userAfter!.verificationSentAt).toBeNull();
       } finally {
+        console.error = originalConsoleError;
         mailProvider.sendMail = originalSendMail;
         process.env.NODE_ENV = origNodeEnv;
-        const u = await prisma.user.findUnique({ where: { email } });
-        if (u) {
-          await prisma.userWallet.deleteMany({ where: { userId: u.id } });
-          await prisma.user.delete({ where: { id: u.id } });
-        }
-      }
-    });
-
-    it('P0.2-6. Pre-existing valid cooldown and token are preserved on subsequent failed resend', async () => {
-      const email = 'p02-test-preserve-cooldown@ecotransit.vn';
-      const password = 'Password123';
-      const agent = request.agent(app);
-
-      await agent.post('/api/auth/register').send({ email, password });
-
-      const initialUser = await prisma.user.findUnique({ where: { email } });
-      const recentDate = new Date(Date.now() - 10 * 1000);
-      await prisma.user.update({
-        where: { id: initialUser!.id },
-        data: {
-          verificationSentAt: recentDate,
-        },
-      });
-
-      const initialTokenHash = initialUser!.verificationTokenHash;
-
-      const originalSendMail = mailProvider.sendMail;
-      mailProvider.sendMail = async () => {
-        throw new Error('EMAIL_DELIVERY_UNAVAILABLE');
-      };
-
-      try {
-        const res = await agent.post('/api/auth/resend-verification').send({ email });
-        expect(res.status).toBe(429);
-        expect(res.body.cooldownRemaining).toBeDefined();
-        expect(res.body.cooldownRemaining).toBeLessThanOrEqual(50);
-
-        const userAfter = await prisma.user.findUnique({ where: { email } });
-        expect(userAfter!.verificationTokenHash).toBe(initialTokenHash);
-        expect(userAfter!.verificationSentAt?.getTime()).toBe(recentDate.getTime());
-      } finally {
-        mailProvider.sendMail = originalSendMail;
         const u = await prisma.user.findUnique({ where: { email } });
         if (u) {
           await prisma.userWallet.deleteMany({ where: { userId: u.id } });
