@@ -1497,7 +1497,6 @@ describe('EcoTransit Epic 10 Integration Tests', () => {
       });
 
       const initialTokenHash = initialUser!.verificationTokenHash;
-      const initialSentAt = null;
 
       const originalSendMail = mailProvider.sendMail;
       mailProvider.sendMail = async () => {
