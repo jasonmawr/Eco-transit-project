@@ -22,6 +22,15 @@
 | TURNSTILE_SECRET_KEY | Optional anti-bot |
 | VOUCHER_PARTNER_API_BASE | P1/P2 only |
 | VOUCHER_PARTNER_API_KEY | P1/P2 only |
+| MAIL_PROVIDER | Selects mail delivery provider (`smtp` or `brevo_http`) |
+| SMTP_HOST | Hostname for SMTP provider |
+| SMTP_PORT | Port for SMTP provider |
+| SMTP_USER | SMTP username |
+| SMTP_PASS | SMTP password |
+| SMTP_FROM | Outgoing "from" address for SMTP provider |
+| BREVO_API_KEY | API Key for Brevo HTTP API |
+| BREVO_SENDER_EMAIL | Verified sender email for Brevo |
+| BREVO_SENDER_NAME | Display name for Brevo outgoing sender |
 
 ## Environment rules
 

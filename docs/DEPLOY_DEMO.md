@@ -72,6 +72,9 @@ Neon cung cấp CSDL PostgreSQL serverless tối ưu và kết nối ổn địn
    - `COOKIE_SAME_SITE`: `none`
    - `REDIS_ENABLED`: `false`
    - `UPLOAD_DIR`: `uploads/tickets`
+   - `MAIL_PROVIDER`: `brevo_http` hoặc `smtp` (mặc định nếu để trống)
+   - *(Nếu sử dụng `smtp`)* `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+   - *(Nếu sử dụng `brevo_http`)* `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`
 
 ### Bước 2.3. Triển Khai Frontend Next.js Trên Vercel
 1. Trên Vercel Dashboard, import dự án từ GitHub.

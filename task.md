@@ -1,34 +1,28 @@
-# P0-D/P0-E Remediation Task Tracker
+# EcoTransit Mail Integration & Diagnostics Task Tracker
 
-## P0-D — Metro Continuous Glide
-- [x] Rewrite animation engine with direct DOM RAF + animation guard
-- [x] Fix ResizeObserver to retarget instead of snap
-- [x] Fix motion profile (650ms–1150ms)
-- [x] Ensure single transform source of truth
-- [x] Verify rapid-retarget behavior (in tests)
+## P0.1 — Compile Fixes
+- [x] Remove unused cooldown test variables in `apps/api/src/test/epic10.test.ts`
+- [x] Verify API builds correctly with clean environment checks
 
-## P0-E — Workspace Height
-- [x] Add `data-testid="route-workspace"` to actionable area
-- [x] Compact HeroSection (remove min-h, reduce padding)
-- [x] Compact Hub height (72px track, preserve visuals)
-- [x] Reduce page layout padding
-- [x] Verify clientHeight ≥ 380px at 1366×768 (measured: 487px)
+## P0.2 — Safe SMTP Diagnostics & Cooldown Audit
+- [x] Audit frontend `AuthModal.tsx` resend cooldown activation logic
+- [x] Fix cooldown UI bug: restrict timer triggering strictly to HTTP 429 status code, avoiding false countdowns on 503 failures
+- [x] Design safe backend SMTP error diagnostics mapping connection, timeout, auth, TLS/SSL, and address errors
 
-## Tests
-- [x] Update epic10.spec.ts with intermediate motion assertions
-- [x] Update epic10.spec.ts with workspace height test
-- [x] Update capture_evidence.spec.ts for new evidence
-- [x] Run all test gates (tests passing, verification in progress)
+## P0.3 — Error Obfuscation & Nested Recursion
+- [x] Implement cycle-safe recursive error classifier (depth limit 5) to inspect `.cause` and `AggregateError.errors`
+- [x] Suppress raw developer error messages and stack traces in production/demo server logs
+- [x] Retain user-friendly public HTTP 503 Vietnamese copy
 
-## Regression Guards
-- [x] Two-car Metro visual (verified by E2E test & visual screenshots)
-- [x] No station collision (verified by collision E2E test with absolute 0px overlap on all elements including active station)
-- [x] Avatar attachment (verified by E2E tests, avatar renders on the train)
-- [x] Footer safety (verified by E2E test, footer is offset below scene-viewport)
-- [x] XanhWrap/Rewards not regressed (verified by E2E tests for both tabs passing)
-- [x] Multi-viewport check (verified by E2E responsive checks across 1366, 1440, 1920, and 390 viewports)
+## P0.4 — Brevo HTTPS Transporter Integration
+- [x] Add `MAIL_PROVIDER` selection model supporting `smtp` (default) and `brevo_http`
+- [x] Implement native `fetch` client to Brevo HTTPS API with 10s AbortController timeout
+- [x] Map Brevo specific responses (401/403 -> `AUTH_REJECTED`, timeouts, etc.) into unified diagnostics
+- [x] Mock network layer in unit tests to verify Brevo HTTPS failure paths and success responses
+- [x] Keep SMTP transporter fallback backward compatible
 
-## Final
-- [x] Commit by workstream (completed)
-- [x] Push to branch (completed)
-- [x] Final report (completed)
+## Verification & Deployment
+- [x] Verify local monorepo builds cleanly (`npm run build`)
+- [x] Run backend Vitest suite (all integration/unit tests pass)
+- [x] Run Playwright E2E browser tests (all 18 specs pass)
+- [x] Synchronize working tree and push to `main` for Render/Vercel auto-deploys

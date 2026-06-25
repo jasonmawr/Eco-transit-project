@@ -1,70 +1,66 @@
-# Walkthrough — EcoTransit RC2 Blocker A1/C1 Remediation
+# Walkthrough — EcoTransit Mail Provider Integration & Diagnostics Hotfixes
 
-This walkthrough details the implementation, verification, and visual evidence generated for the A1 Metro Journey and C1 Email verification UAT blockers.
-
----
-
-## Release Status Check
-```txt
-A1 Metro continuous glide: implemented and awaiting Owner re-test.
-C1 Email verification cooldown UX: implemented and awaiting Owner local re-test.
-Local mock verification flow: available for technical UAT only.
-External SMTP inbox delivery: BLOCKED until SMTP is configured and independently verified in the target environment.
-Integrated customer UAT: NOT OPEN.
-Merge / deploy / tag / migration: NOT AUTHORIZED.
-```
+This walkthrough details the design, implementation, and verification of the secure SMTP diagnostic classification model and the new Brevo HTTPS Transactional Mail provider.
 
 ---
 
-## 1. Scope of Remediation Completed
+## Release Status & Verification Summary
+- **Current Deployed SHA**: `9b5b2cbd3e9fe1bf42061e7d6bb467bf8c31fc56`
+- **Mail Selection Model**: Supported (`smtp` or `brevo_http` via the `MAIL_PROVIDER` environment variable)
+- **SMTP Diagnostics**: Active (nested error classification, bounded recursion)
+- **Brevo HTTPS Provider**: Implemented (network-mocked unit tests, clean HTTP error mapping)
+- **Stack Trace Obfuscation**: Completed (suppressed stack dumps/raw errors in production/demo server logs)
+- **Verification Gates**:
+  - `npm run build`: Clean build
+  - Vitest integration tests: Passed
+  - Playwright E2E browser tests: Passed (18 tests including `epic10.spec.ts` & `motion-lab.spec.ts`)
 
-### A1 Metro Journey
-- **Continuous Visual Glide**: Replaced state-driven CSS left/top coordinate transitions and RAF-based updates with a pure Web Animations API (WAAPI) engine.
-- **Single Source of Truth**: Left/top inline properties act only as static grid anchors. All dynamic translation is managed via WAAPI writing strictly to `transform: translate3d(x, y, 0)`.
-- **Direction Flip Control**: Extracted the horizontal scale flipping (`scaleX(-1)`) to the inner `.train-body` element, ensuring the outer train-position container is never corrupted or reset.
-- **Dynamic Geometry Measurement**: Eliminated static offset magic constants. Offsets are derived dynamically via track/berth element geometry bounding boxes.
-- **Interruption and Resize Safety**: Rapid clicks or resize events parse the current visual translation matrix dynamically from the DOM wrapper, cancel active animations cleanly, and schedule a new ease-in-out ease curve starting precisely from the current layout position.
+---
 
-### C1 Email Verification UX
-- **Native Dialogue Removal**: Completely eliminated native dialog popups (`alert`, `confirm`, `prompt`) across the client codebase.
-- **Branded Cooldown UX**: Replaced the alerts with styled alert boxes that match the EcoTransit branding palette (Electric Blue, Urban Beige, Vibrant Green). Added local timer ticks (`Gửi lại sau 00:XX`) to the resend verification buttons.
-- **Mock/SMTP Truthfulness**: Ensured resend endpoints returned in local mock mode do not claim actual email inbox delivery. Registration and resend APIs yield a test environment message:
+## 1. Scope of Work Completed
+
+### Mail Selection & Configuration API
+- Added `MAIL_PROVIDER` selector check in [mailProvider.ts](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/api/src/providers/mailProvider.ts).
+- Supported modes:
+  - `smtp`: Standard nodemailer transporter configured via `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, and `SMTP_FROM`.
+  - `brevo_http`: Standard fetch POST request to Brevo API with `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, and `BREVO_SENDER_NAME`.
+- Fail-safe checks validation ensures that if the required variables for the selected provider are missing, an appropriate classification (`SMTP_NOT_CONFIGURED` or `BREVO_NOT_CONFIGURED`) is triggered immediately, returning a user-friendly Vietnamese HTTP 503 error without creating inconsistent DB states.
+
+### Recursive Error Classification
+- SMTP and fetch errors can be nested inside `.cause` or `AggregateError.errors`.
+- Added a recursion-bounded analyzer (depth limit 5) to traverse nested causes and extract relevant classifications:
+  - `AUTH_REJECTED` (for SMTP login errors and Brevo 401/403)
+  - `CONNECTION_TIMEOUT` (for connection timeouts)
+  - `TLS_HANDSHAKE_FAILED` (for SSL/TLS problems)
+  - `SMTP_CONNECTION_REFUSED` (for refused sockets)
+  - `UNKNOWN_TRANSPORT_FAILURE` (default wrapper fallback)
+- These categories map to clear, safe logs while preventing user information leakage on public HTTP responses.
+
+### Stack Trace Obfuscation in Production & Demo
+- Rewrote API catch blocks for registration and resend-verification in [auth.ts](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/api/src/routes/auth.ts).
+- When `NODE_ENV === 'production'` or `APP_MODE === 'demo'`, raw stack traces and `Error` objects are never logged or exposed. Instead, clean logs are emitted:
   ```txt
-  Yêu cầu xác thực đã được tạo trong môi trường thử nghiệm.
+  [MAIL_DELIVERY_UNAVAILABLE] action=resend category=CONNECTION_TIMEOUT
   ```
-- **SMTP Production Safety Gate**: If SMTP configs are absent in production mode, registration/resend fails gracefully without writing inconsistent states. Hashed verification token storage in the DB was validated, securing tokens against accidental exposures.
+
+### Frontend Cooldown Fix
+- Modified [AuthModal.tsx](file:///f:/HAILEO/My%20Project/Ecotransit-project/apps/web/components/AuthModal.tsx).
+- Failed resend calls (returning 503 mail transport issues) will **not** trigger the 60-second cooldown timer. The timer is restricted solely to HTTP `429` (Too Many Requests/Spam block), allowing users to retry immediately once the backend resolves delivery issues.
 
 ---
 
-## 2. E2E Visual Evidence
+## 2. Validation Results
 
-### Mid-Transition Layout and Collision Check
-The metro glides smoothly across the lane without any collisions or layout overlap on active stations, badges, headers, or text nodes:
+### Vitest API & Integration Suite
+Verified connection failures, mock configurations, invalid mail providers, Brevo API success/failure mapping, and fallback constraints:
+```bash
+npx vitest run --fileParallelism=false
+```
+All integration tests passed successfully.
 
-![Metro giữa hành trình, không chồng lấp](evidence/epic10/06-real-metro-mid-transition-no-overlap.png)
-
-### Adjacent Station Journey Frame Sequence
-A frame-by-frame sample series demonstrating continuous visual translation (0ms to 1300ms) with cubic ease-in-out profile:
-
-![Chuỗi frame Metro giữa hai ga liền kề](evidence/epic10/07b-real-metro-adjacent-stations-frame-sequence.png)
-
----
-
-## 3. Validation Results
-
-### 1. Backend / Integration Unit Tests
-- **Vitest**: Passed 110 out of 110 unit and integration tests (self-test pass).
-
-### 2. Route Planner E2E Tests
-- Verified search actions, map rendering triggers, and rapid route selection behaviors.
-- **Playwright Execution**: Passed 10 out of 10 runs (2 tests repeated 5 times) (self-test pass).
-
-### 3. Epic 10 E2E Verification Tests
-- Asserted email verification token security, registration rate limits, resend cooldowns, avatar customizations, and responsive widths.
-- **Playwright Execution**: Passed 11 out of 11 tests (self-test pass).
-
----
-
-## 4. Microsoft Edge prefers-reduced-motion Runtime Condition
-- **Confirmed runtime condition**: Microsoft Edge evaluated `prefers-reduced-motion: reduce` as true during the affected Owner UAT session. This correctly activated the application's reduced-motion fallback.
-- **Configuration source**: Not conclusively identified in that UAT session.
+### Playwright E2E Suite
+Verified that authentication, avatar onboarding, and layout viewport rules run smoothly without regression:
+```bash
+npx playwright test
+```
+All 18 browser tests passed.

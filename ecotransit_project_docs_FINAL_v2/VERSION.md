@@ -1,9 +1,16 @@
-# EcoTransit Project Docs — FINAL v2.0
+# EcoTransit Project Docs — FINAL v2.1
 
-- **Version:** FINAL v2.0
-- **Date:** 2026-06-15
-- **Status:** Final baseline for coding agent implementation
-- **Scope status:** Complete for current customer brief, HCMC Metro benchmark, Taste Skill UI/UX gate, production-readiness, security, testing and delivery.
+- **Version:** FINAL v2.1
+- **Date:** 2026-06-25
+- **Status:** Release Candidate 2 - Verified diagnostic and mail provider hotfixes
+- **Scope status:** Complete with SMTP diagnostics, Brevo HTTPS Mail integration, error obfuscation rules, and Playwright E2E browser tests.
+
+## What changed from v2.0 (Mail & Diagnostic Hotfixes)
+
+1. **Provider Selection Model**: Added a configurable `MAIL_PROVIDER` environment variable allowing seamless switching between local mock, standard SMTP, and Brevo HTTPS transactional email delivery.
+2. **Harden Mail Diagnostics**: Added recursion-bounded error analyzer (depth limit 5) to safely classify incoming transport errors (`AggregateError` or nested `.cause`) without exposing stack traces in production/demo modes.
+3. **Frontend Cooldown Restoration**: Fixed false cooldown triggers by ensuring client UI countdowns are only initiated for HTTP 429 response codes, keeping failed resends (HTTP 503) safe from lockouts.
+4. **E2E Browser Test Integration**: Integrated Playwright browser-based verification suites verifying registration, email verification flows, responsive constraints, and Metro motion.
 
 ## What changed from v1
 

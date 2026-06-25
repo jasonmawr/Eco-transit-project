@@ -4,10 +4,10 @@ Tài liệu này đóng băng và liệt kê các giới hạn kỹ thuật củ
 
 ---
 
-## 1. Phương Pháp Xác Thực Phát Triển (NO-BROWSER Verification)
-- Trong suốt quá trình phát triển và kiểm thử, toàn bộ việc tích hợp hệ thống được xác thực bằng mã nguồn tĩnh (Static Audit), các bộ test tích hợp tự động (`npm run test`), và các lệnh gọi kiểm tra API thông qua PowerShell (`Invoke-WebRequest`).
-- Dự án không tích hợp các bộ công cụ tự động hóa trình duyệt như Playwright, Cypress, Puppeteer, hay Selenium, nhằm đảm bảo tốc độ build nhanh và tránh xung đột môi trường cục bộ.
-- Mọi kiểm thử giao diện trực quan cần được thực hiện thủ công bởi kiểm thử viên hoặc người vận hành theo bộ tài liệu hướng dẫn.
+## 1. Phương Pháp Xác Thực Phát Triển (Automated Browser & Integration Testing)
+- Hệ thống đã tích hợp bộ công cụ tự động hóa trình duyệt **Playwright** (`apps/web/tests/`) để thực hiện kiểm thử E2E giao diện người dùng (gồm: tính năng đăng ký, xác thực tài khoản, kiểm tra bộ đếm cooldown, hiệu ứng di chuyển tàu Metro Rail Stage, Onboarding Avatar và tính tương thích responsive).
+- Các kiểm thử tích hợp API backend được thực hiện tự động qua **Vitest** (`apps/api/src/test/`).
+- Mọi thay đổi mã nguồn đều đi kèm bộ test tự động tương ứng để chạy trực tiếp cục bộ (`npm run test` và `npx playwright test`) nhằm bảo vệ hệ thống khỏi lỗi regression.
 
 ## 2. Giới Hạn Môi Trường Lưu Trữ Tạm Thời (Render Ephemeral Storage)
 - Ứng dụng Backend API được lưu trữ trên Render Web Service (gói miễn phí).

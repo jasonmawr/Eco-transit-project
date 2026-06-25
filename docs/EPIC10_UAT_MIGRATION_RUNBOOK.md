@@ -34,12 +34,17 @@ Trong môi trường phát triển local hoặc testing (nơi `NODE_ENV` hoặc 
   - Raw verification token chỉ tồn tại duy nhất trong tệp tin `last-mock-email.json` đã được đưa vào `.gitignore` (nằm ngoài thư mục public).
   - API HTTP Response và browser console tuyệt đối không trả về hoặc ghi log token này.
 * **Production & Demo (enforcing NODE_ENV=production hoặc APP_MODE=demo)**:
-  - Bắt buộc phải cấu hình đầy đủ 5 biến môi trường SMTP: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
-  - Thiếu hoặc lỗi cấu hình SMTP sẽ trả về HTTP `503` với mã lỗi `SMTP_NOT_CONFIGURED`.
+  - Hệ thống hỗ trợ mô hình chọn lựa Provider qua biến môi trường `MAIL_PROVIDER`. Các giá trị hợp lệ gồm `smtp` hoặc `brevo_http` (nếu để trống sẽ mặc định là `smtp`).
+  - **Cấu hình SMTP (`MAIL_PROVIDER=smtp`)**: Yêu cầu cấu hình đầy đủ 5 biến môi trường: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+  - **Cấu hình Brevo HTTPS (`MAIL_PROVIDER=brevo_http`)**: Yêu cầu cấu hình đầy đủ 3 biến môi trường: `BREVO_API_KEY`, `BREVO_SENDER_EMAIL`, `BREVO_SENDER_NAME`.
+  - Nếu thiếu cấu hình cho Provider đã chọn hoặc giá trị `MAIL_PROVIDER` không hợp lệ, hệ thống sẽ trả về lỗi HTTP `503` với mã lỗi phân loại rõ ràng (ví dụ: `SMTP_NOT_CONFIGURED`, `BREVO_NOT_CONFIGURED`, `INVALID_MAIL_PROVIDER`).
+  - **Cơ chế phân loại lỗi & Giới hạn đệ quy**: Đối với các lỗi kết nối từ SMTP hoặc API, hệ thống thực hiện phân tách nguyên nhân lỗi đệ quy (tối đa 5 cấp) để phân loại chính xác các nhóm lỗi an toàn (`AUTH_REJECTED`, `CONNECTION_TIMEOUT`, `TLS_HANDSHAKE_FAILED`, v.v.) mà không làm rò rỉ chi tiết nhạy cảm ra ngoài.
+  - **Ẩn thông tin lỗi chi tiết và Stack Trace**: Trong chế độ production hoặc demo, mọi stack trace thô và chi tiết lỗi hệ thống của mail provider sẽ bị ẩn khỏi các log công khai để đảm bảo an ninh thông tin.
   - Không sinh ra bất kỳ tệp tin mock (`last-mock-email.json`), không ghi log token.
   - Luồng đăng ký mới sẽ rollback hoàn toàn (xóa user khỏi DB và hủy session).
   - Luồng gửi lại (resend) sẽ bảo toàn nguyên vẹn bản ghi user, session hiện tại và token state cũ trong database (không mutate state nửa chừng).
-  - **Lưu ý đặc biệt về APP_MODE=demo**: Chế độ `demo` được đối xử như một môi trường production-grade thực thụ về mặt an toàn SMTP. Mọi hành vi fallback mock email đều bị chặn cứng để tránh rò rỉ mã token trên các môi trường staging/public.
+  - **Lưu ý đặc biệt về APP_MODE=demo**: Chế độ `demo` được đối xử như một môi trường production-grade thực thụ về mặt an toàn Email. Mọi hành vi fallback mock email đều bị chặn cứng để tránh rò rỉ mã token trên các môi trường staging/public.
+  - **Xử lý Cooldown trên Frontend**: Khi việc gửi lại email thất bại (lỗi 503/500), UI sẽ không kích hoạt bộ đếm ngược cooldown giả (chỉ kích hoạt cooldown khi nhận mã lỗi 429).
 
 
 ### Luồng A: Xác thực tài khoản mới & Onboarding Avatar
