@@ -157,7 +157,7 @@ router.post('/tickets/upload', requireAuth, (req: Request, res: Response) => {
       if (config.GEMINI_API_KEY && (!isTestEnv || isMockApiKey)) {
         try {
           const base64Image = processedBuffer.toString('base64');
-          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${config.GEMINI_API_KEY}`;
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${config.GEMINI_API_KEY}`;
           const prompt = `Bạn là hệ thống AI phân tích và kiểm duyệt vé phương tiện công cộng xanh cho chiến dịch "Lướt khói chạm xanh".
 Hãy phân tích hình ảnh vé xe được cung cấp. Thực hiện các bước sau:
 1. Xác định xem hình ảnh này có phải là một chiếc vé xe buýt, vé tàu điện Metro, vé VinBus hoặc thẻ đi lại công cộng thật sự hay không (dạng giấy hoặc màn hình vé online đều được chấp nhận). Trả về isValid = true nếu đúng, ngược lại isValid = false.
