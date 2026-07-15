@@ -72,7 +72,15 @@ router.post('/chat', requireAuth, async (req: Request, res: Response) => {
     }
 
     // Format contents for Gemini API (role must be 'user' or 'model')
-    const contents = messages.map((msg: any) => ({
+    // Gemini generateContent API requires the conversation history to start with a 'user' turn.
+    const firstUserIdx = messages.findIndex((msg: any) => msg.role === 'user');
+    if (firstUserIdx === -1) {
+      return res.status(400).json({ message: 'Không tìm thấy câu hỏi từ người dùng.' });
+    }
+
+    const filteredMessages = messages.slice(firstUserIdx);
+
+    const contents = filteredMessages.map((msg: any) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }],
     }));
