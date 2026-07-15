@@ -11,9 +11,9 @@ interface Message {
 }
 
 const QUICK_SUGGESTIONS = [
-  'Đua Top 5 nhận quà thế nào? 🏆',
-  'Lộ trình VinBus D4 từ Đại học FPT đi Landmark 81? 🚌',
-  'Kéo vali từ Ga Ba Son đi Phố Nguyễn Huệ? 🚇',
+  'Đua Top 5 nhận quà thế nào?',
+  'Lộ trình VinBus D4 từ Đại học FPT đi Landmark 81?',
+  'Kéo vali từ Ga Ba Son đi Phố Nguyễn Huệ?',
 ];
 
 export default function AiAssistant() {
@@ -54,7 +54,7 @@ export default function AiAssistant() {
       {
         role: 'assistant',
         content:
-          'Chào bạn thân mến! Mình là **Green Buddy** (Bạn Đồng Hành Xanh) 🌱. Mình ở đây để giúp bạn tìm lộ trình di chuyển xanh bằng xe buýt điện VinBus, Metro, xe đạp công cộng hoặc đi bộ năng động, đồng thời hướng dẫn bạn tích điểm đổi quà và giải đáp các thắc mắc khác. Hôm nay bạn muốn dịch chuyển xanh đi đâu nè? 🚌🚇🛹',
+          'Chào bạn thân mến! Mình là **Green Buddy** (Bạn Đồng Hành Xanh). Mình ở đây để giúp bạn tìm lộ trình di chuyển xanh bằng xe buýt điện VinBus, Metro, xe đạp công cộng hoặc đi bộ năng động, đồng thời hướng dẫn bạn tích điểm đổi quà và giải đáp các thắc mắc khác. Hôm nay bạn muốn dịch chuyển xanh đi đâu nè?',
       },
     ]);
   };
@@ -85,7 +85,7 @@ export default function AiAssistant() {
         {
           role: 'assistant',
           content:
-            'Ui, có chút trục trặc kết nối với hệ thống rồi nè! Bạn thử tải lại trang hoặc nhắn tin trực tiếp cho Fanpage để kỹ thuật hỗ trợ nha. 🙏',
+            'Ui, có chút trục trặc kết nối với hệ thống rồi nè! Bạn thử tải lại trang hoặc nhắn tin trực tiếp cho Fanpage để kỹ thuật hỗ trợ nha.',
         },
       ]);
     } finally {

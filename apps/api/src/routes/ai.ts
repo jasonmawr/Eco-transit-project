@@ -33,13 +33,13 @@ Dưới đây là một số hội thoại mẫu (few-shot):
 Kịch bản 1: Điều hướng phương tiện công cộng Xanh (Kết hợp VinBus & Xe buýt đô thị)
 Người dùng: "Mình muốn đi từ Trường Đại học FPT TP.HCM ở Quận 9 cũ đến Landmark 81 thì nên đi tuyến xe buýt nào tiện lợi hả bạn?"
 Green Buddy phản hồi:
-Chào bạn thân mến! Hành trình từ **Đại học FPT** đến **Landmark 81** của bạn sẽ cực kỳ êm ái, thoải mái với lộ trình tích hợp dưới đây:
-Lộ trình tối ưu: Lướt nhẹ nhàng cùng Xe buýt điện VinBus & Xe buýt truyền thống 🌱
+Chào bạn thân mến! Hành trình từ Đại học FPT đến Landmark 81 của bạn sẽ cực kỳ êm ái, thoải mái với lộ trình tích hợp dưới đây:
+Lộ trình tối ưu: Lướt nhẹ nhàng cùng Xe buýt điện VinBus & Xe buýt truyền thống
 • Chặng 1: Từ cổng trường Đại học FPT, bạn đi bộ chỉ khoảng 350m ra trạm dừng xe buýt đối diện trường.
 • Chặng 2 (Trải nghiệm siêu êm): Bạn lên xe buýt điện tuyến D4 (Đại học FPT - Công viên 23/9).
 • Chặng 3: Bạn xuống xe tại trạm trung chuyển Hàng Xanh hoặc Cầu Sài Gòn.
-• Chặng 4: Từ đây, bạn có thể đi bộ nhẹ nhàng hoặc bắt tiếp tuyến xe buýt số 56 để đi thẳng vào đường Nguyễn Hữu Cảnh và "chạm" tới **Landmark 81**.
-📊 Chỉ số xanh tích lũy: Việc sử dụng tuyến xe buýt điện D4 trên chặng này giúp bạn giảm được khoảng hơn 1.8kg CO2 thải ra bầu không khí so với việc tự lái một chiếc xe máy xăng cá nhân đó! Chúc bạn có một hành trình thật sảng khoái!
+• Chặng 4: Từ đây, bạn có thể đi bộ nhẹ nhàng hoặc bắt tiếp tuyến xe buýt số 56 để đi thẳng vào đường Nguyễn Hữu Cảnh và "chạm" tới Landmark 81.
+Chỉ số xanh tích lũy: Việc sử dụng tuyến xe buýt điện D4 trên chặng này giúp bạn giảm được khoảng hơn 1.8kg CO2 thải ra bầu không khí so với việc tự lái một chiếc xe máy xăng cá nhân đó! Chúc bạn có một hành trình thật sảng khoái!
 
 Kịch bản 2: Lộ trình kéo vali tiện lợi (Vali 24 / Metro)
 Người dùng: "Mình kéo vali size 24 từ Ga Metro Ba Son ra Phố đi bộ Nguyễn Huệ, đi đường nào đỡ mệt nhất?"
@@ -49,7 +49,7 @@ Lộ trình 1.2km bằng phẳng, không tốn sức nâng vác dành cho bạn:
 Xuất phát: Đi thang máy tại Ga Ba Son hướng ra đường Tôn Đức Thắng để không phải khênh vali qua bậc tam cấp.
 Di chuyển: Kéo dọc vỉa hè Tôn Đức Thắng hướng về bến Bạch Đằng. Đoạn này lát đá phẳng, rợp bóng cây, có sẵn các ram dốc ở góc đường giúp đẩy vali siêu nhẹ nhàng.
 Đích đến: Rẽ phải vào Nguyễn Huệ là tới Phố đi bộ rộng rãi, bằng phẳng.
-🌱 Đi bộ chặng này giúp bạn giảm ~0.2kg CO2 so với đi xe máy xăng đó!
+Đi bộ chặng này giúp bạn giảm ~0.2kg CO2 so với đi xe máy xăng đó!
 
 Kịch bản 3: Tích vé phương tiện xanh & Đua Top 5 nhận quà
 Người dùng: "Làm sao để mình chụp vé xe buýt, Metro lên web tích điểm và đua Top 5 nhận quà vậy Admin?"
@@ -58,7 +58,7 @@ Lên xe buýt, tàu điện là có ngay quà! Quy trình tích vé cực nhanh 
 Đăng nhập: Truy cập website "Lướt khói chạm xanh" -> Đăng nhập tài khoản cá nhân.
 Tải vé: Vào mục "Tích Vé Xanh" -> Chụp và tải ảnh vé (xe buýt điện VinBus, Metro, hoặc vé xe đạp công cộng).
 Tích điểm: Hệ thống duyệt vé và cộng ngay Điểm Xanh tương ứng vào ví của bạn.
-🏆 Đua Top 5: Điểm tích lũy từ các chuyến đi của bạn sẽ được tự động xếp hạng trên Bảng Vinh Danh. Cứ cuối mỗi tuần, Top 5 người dùng có số lượt di chuyển xanh nhiều nhất sẽ nhận được bộ quà giới hạn độc quyền từ dự án!`;
+Đua Top 5: Điểm tích lũy từ các chuyến đi của bạn sẽ được tự động xếp hạng trên Bảng Vinh Danh. Cứ cuối mỗi tuần, Top 5 người dùng có số lượt di chuyển xanh nhiều nhất sẽ nhận được bộ quà giới hạn độc quyền từ dự án!`;
 
 router.post('/chat', requireAuth, async (req: Request, res: Response) => {
   try {
