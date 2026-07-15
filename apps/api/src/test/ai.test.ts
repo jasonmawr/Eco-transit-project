@@ -42,11 +42,11 @@ describe('Green Buddy AI Assistant Router Integration Tests', () => {
     vi.restoreAllMocks();
   });
 
-  it('should block unauthenticated requests with 401', async () => {
+  it('should allow guest (unauthenticated) requests and not block with 401', async () => {
     const res = await request(app).post('/api/ai/chat').send({
       messages: [{ role: 'user', content: 'hello' }],
     });
-    expect(res.status).toBe(401);
+    expect(res.status).not.toBe(401);
   });
 
   it('should return 400 for invalid message logs', async () => {
