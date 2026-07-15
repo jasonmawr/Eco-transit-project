@@ -2,24 +2,21 @@
 const nextConfig = {
   outputFileTracing: false,
   async rewrites() {
-    // Only apply API proxy rewrites in development to avoid hardcoding localhost in production
-    if (process.env.NODE_ENV === 'development') {
-      return [
-        {
-          source: '/healthz',
-          destination: 'http://localhost:3001/healthz',
-        },
-        {
-          source: '/readyz',
-          destination: 'http://localhost:3001/readyz',
-        },
-        {
-          source: '/api/:path*',
-          destination: 'http://localhost:3001/api/:path*',
-        },
-      ];
-    }
-    return [];
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    return [
+      {
+        source: '/healthz',
+        destination: `${apiBaseUrl}/healthz`,
+      },
+      {
+        source: '/readyz',
+        destination: `${apiBaseUrl}/readyz`,
+      },
+      {
+        source: '/api/:path*',
+        destination: `${apiBaseUrl}/api/:path*`,
+      },
+    ];
   },
 };
 

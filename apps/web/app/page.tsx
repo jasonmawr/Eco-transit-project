@@ -15,6 +15,7 @@ import CampaignHub from '../components/CampaignHub';
 import XanhWrapSection from '../components/XanhWrapSection';
 import GuidesSection from '../components/GuidesSection';
 import { apiFetch } from '../lib/api';
+import AiAssistant from '../components/AiAssistant';
 
 const SCENE_ORDER = ['route', 'stations', 'tickets', 'rewards', 'xanhwrap', 'guides', 'admin'];
 
@@ -186,30 +187,25 @@ export default function Home() {
         })
       };
     }
-    // High-performance premium 3D page flip (right-to-left on forward direction)
+    // High-performance premium 2D slide & fade transition (optimized for GPU hardware acceleration)
     return {
       initial: (dir: number) => ({
-        rotateY: dir > 0 ? 80 : -80,
+        x: dir > 0 ? '15%' : '-15%',
         opacity: 0,
-        scale: 0.95,
-        transformOrigin: dir > 0 ? 'right center' : 'left center',
       }),
       animate: {
-        rotateY: 0,
+        x: 0,
         opacity: 1,
-        scale: 1,
         transition: {
-          duration: 0.75,
-          ease: [0.16, 1, 0.3, 1] // Custom easeOutExpo
+          duration: 0.45,
+          ease: [0.16, 1, 0.3, 1] // easeOutExpo
         }
       },
       exit: (dir: number) => ({
-        rotateY: dir > 0 ? -80 : 80,
+        x: dir > 0 ? '-15%' : '15%',
         opacity: 0,
-        scale: 0.95,
-        transformOrigin: dir > 0 ? 'left center' : 'right center',
         transition: {
-          duration: 0.65,
+          duration: 0.35,
           ease: [0.16, 1, 0.3, 1]
         }
       })
@@ -384,6 +380,9 @@ export default function Home() {
           window.location.reload();
         }}
       />
+
+      {/* Floating AI Assistant Chatbot */}
+      <AiAssistant />
 
     </div>
   );

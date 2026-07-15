@@ -21,7 +21,12 @@ export class ApiError extends Error {
 }
 
 export function getApiBaseUrl(): string {
-  // 1. Check if the environment variable is explicitly defined (prioritize BASE_URL)
+  // Client-side: use relative path to allow Next.js rewrites to proxy requests (same-origin cookies)
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+
+  // Server-side (during SSR or build): check if the environment variable is explicitly defined
   if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL.trim();
   }
@@ -29,7 +34,7 @@ export function getApiBaseUrl(): string {
     return process.env.NEXT_PUBLIC_API_URL.trim();
   }
 
-  // 2. Default fallback for local development (both client and SSR)
+  // Default fallback for local development
   return 'http://localhost:3001';
 }
 

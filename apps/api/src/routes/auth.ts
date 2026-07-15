@@ -326,13 +326,34 @@ router.post('/verify-email', async (req: Request, res: Response) => {
       delete req.session.unverifiedUserEmail;
     }
 
+    const userDto: UserDTO = {
+      id: updatedUser.id,
+      email: updatedUser.email,
+      role: updatedUser.role as UserRole,
+      pointsBalanceCache: updatedUser.pointsBalanceCache,
+      emailVerified: updatedUser.emailVerified,
+      avatarConfig: updatedUser.avatarConfig,
+      createdAt: updatedUser.createdAt,
+    };
+
+    // Regenerate session before setting authenticated user (Session Fixation Safeguard)
+    await new Promise<void>((resolve, reject) => {
+      req.session.regenerate((err) => {
+        if (err) {
+          console.error('Session regeneration failed on verification auto-login:', err);
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // Bind session
+    req.session.user = userDto;
+
     return res.status(200).json({
       message: 'Xác thực email thành công! Chào mừng bạn gia nhập chiến dịch xanh.',
-      user: {
-        id: updatedUser.id,
-        email: updatedUser.email,
-        emailVerified: true,
-      },
+      user: userDto,
     });
   } catch (err: any) {
     console.error('Verify email error:', err);

@@ -18,4 +18,5 @@ export const config = {
   COOKIE_SECURE: process.env.COOKIE_SECURE === 'true' || (process.env.NODE_ENV === 'production' && process.env.COOKIE_SECURE !== 'false') || (process.env.APP_MODE === 'demo' && process.env.COOKIE_SECURE !== 'false'),
   COOKIE_SAME_SITE: (process.env.COOKIE_SAME_SITE || ((process.env.NODE_ENV === 'production' || process.env.APP_MODE === 'demo') ? 'none' : 'lax')) as 'lax' | 'none' | 'strict',
   UPLOAD_DIR: process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads', 'tickets'),
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY || '',
 };

@@ -143,27 +143,149 @@ router.post('/tickets/upload', requireAuth, (req: Request, res: Response) => {
       const targetFilePath = path.join(uploadDir, filename);
       await fs.promises.writeFile(targetFilePath, processedBuffer);
 
-      // Mock OCR simulation
-      const mockOcrText = `MOCK OCR: Vé ${type === 'metro' ? 'Metro' : type === 'bus' ? 'Xe buýt' : type === 'ebus' ? 'Xe buýt điện' : 'Di chuyển'} - ${routeLabel || 'Tuyến xanh'}. Phân tích ngày: ${new Date().toLocaleDateString('vi-VN')}`;
+      let ocrText = '';
+      let extractedType = type;
+      let extractedDate: Date | null = tripDate ? new Date(tripDate) : null;
+      let confidenceScore = 1.0;
+      let serialNumber = '';
+      let isTicketValid = true;
+      let ocrStatus = 'completed';
+
+      const isTestEnv = process.env.NODE_ENV === 'test';
+      const isMockApiKey = config.GEMINI_API_KEY === 'mock-api-key';
+
+      if (config.GEMINI_API_KEY && (!isTestEnv || isMockApiKey)) {
+        try {
+          const base64Image = processedBuffer.toString('base64');
+          const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${config.GEMINI_API_KEY}`;
+          const prompt = `Bạn là hệ thống AI phân tích và kiểm duyệt vé phương tiện công cộng xanh cho chiến dịch "Lướt khói chạm xanh".
+Hãy phân tích hình ảnh vé xe được cung cấp. Thực hiện các bước sau:
+1. Xác định xem hình ảnh này có phải là một chiếc vé xe buýt, vé tàu điện Metro, vé VinBus hoặc thẻ đi lại công cộng thật sự hay không (dạng giấy hoặc màn hình vé online đều được chấp nhận). Trả về isValid = true nếu đúng, ngược lại isValid = false.
+2. Trích xuất loại phương tiện:
+   - "metro": nếu là tàu điện đô thị (Metro Bến Thành - Suối Tiên, MRT...).
+   - "bus": nếu là xe buýt đô thị thường.
+   - "ebus": nếu là xe buýt điện VinBus.
+   - "other": các loại vé/thẻ khác.
+3. Trích xuất mã số vé / số sê-ri / số hóa đơn độc nhất in trên vé. Nếu không có số sê-ri rõ ràng, hãy tạo một chuỗi mã định danh duy nhất bằng cách kết hợp thông tin văn bản đọc được trên vé (ví dụ: ngày giờ + tuyến đường + mã số khác). Mã định danh này được sử dụng để kiểm tra trùng lặp và chống gian lận.
+4. Trích xuất ngày đi trên vé (định dạng YYYY-MM-DD). Nếu không tìm thấy, trả về null.
+5. Đánh giá mức độ tin cậy của phân tích (từ 0.0 đến 1.0).
+
+Bạn phải trả về câu trả lời ở định dạng JSON duy nhất như sau:
+{
+  "isValid": true,
+  "type": "metro" | "bus" | "ebus" | "other",
+  "serialNumber": "chuỗi mã vé trích xuất",
+  "tripDate": "YYYY-MM-DD" hoặc null,
+  "confidenceScore": 0.95,
+  "ocrText": "Toàn bộ văn bản trích xuất được từ vé"
+}`;
+
+          const geminiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    { text: prompt },
+                    {
+                      inlineData: {
+                        mimeType: 'image/jpeg',
+                        data: base64Image,
+                      },
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                responseMimeType: 'application/json',
+              },
+            }),
+          });
+
+          if (geminiResponse.ok) {
+            const geminiData: any = await geminiResponse.json();
+            const jsonText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (jsonText) {
+              const result = JSON.parse(jsonText.trim());
+              isTicketValid = typeof result.isValid === 'boolean' ? result.isValid : true;
+              extractedType = result.type || type;
+              ocrText = result.ocrText || '';
+              confidenceScore = typeof result.confidenceScore === 'number' ? result.confidenceScore : 0.8;
+              serialNumber = (result.serialNumber || '').trim();
+              if (result.tripDate) {
+                const parsedDate = new Date(result.tripDate);
+                if (!isNaN(parsedDate.getTime())) {
+                  extractedDate = parsedDate;
+                }
+              }
+            }
+          } else {
+            console.error('Gemini API returned error status:', geminiResponse.status);
+            ocrStatus = 'failed';
+            ocrText = 'Lỗi kết nối Gemini API.';
+          }
+        } catch (geminiErr) {
+          console.error('Gemini ticket OCR analysis failed:', geminiErr);
+          ocrStatus = 'failed';
+          ocrText = 'Lỗi phân tích tự động từ Gemini AI.';
+          confidenceScore = 0.5;
+        }
+      } else {
+        ocrText = `MOCK OCR: Vé ${type === 'metro' ? 'Metro' : type === 'bus' ? 'Xe buýt' : type === 'ebus' ? 'Xe buýt điện' : 'Di chuyển'} - ${routeLabel || 'Tuyến xanh'}. Phân tích ngày: ${new Date().toLocaleDateString('vi-VN')}`;
+        ocrStatus = 'mocked';
+      }
+
+      // 1. If not a valid ticket, reject upload with 400
+      if (config.GEMINI_API_KEY && !isTicketValid) {
+        if (fs.existsSync(targetFilePath)) {
+          fs.unlinkSync(targetFilePath);
+        }
+        return res.status(400).json({
+          message: 'Tệp tải lên không được nhận diện là vé phương tiện công cộng xanh hợp lệ. Vui lòng chụp rõ nét vé xe của bạn.',
+        });
+      }
+
+      // 2. Check for duplicate serial number in DB (fraud prevention)
+      if (serialNumber) {
+        const duplicateTicket = await prisma.ticket.findFirst({
+          where: {
+            ocrText: {
+              contains: `SERIAL:${serialNumber}`,
+            },
+          },
+        });
+
+        if (duplicateTicket) {
+          if (fs.existsSync(targetFilePath)) {
+            fs.unlinkSync(targetFilePath);
+          }
+          return res.status(409).json({
+            message: 'Mã số vé này đã được tải lên hệ thống trước đó bởi một người dùng khác. Vui lòng không sử dụng lại vé để tích điểm.',
+          });
+        }
+      }
+
+      const finalOcrText = `SERIAL:${serialNumber}\nGEMINI OCR:\n${ocrText || 'Không có văn bản.'}`;
 
       // 5. Save Ticket to DB
       const ticket = await prisma.ticket.create({
         data: {
           userId: sessionUser.id,
           status: 'pending',
-          type,
+          type: extractedType,
           stationId: stationId || null,
           routeLabel: routeLabel || null,
           amount: amount || null,
-          tripDate: tripDate ? new Date(tripDate) : null,
+          tripDate: extractedDate,
           originalFileName: originalName,
           mimeType: 'image/jpeg',
           sizeBytes: processedBuffer.length,
           imagePath: targetFilePath,
           duplicateHash: contentHash,
-          ocrStatus: 'mocked',
-          ocrText: mockOcrText,
-          confidenceScore: 0.88,
+          ocrStatus: ocrStatus as any,
+          ocrText: finalOcrText,
+          confidenceScore,
         },
       });
 

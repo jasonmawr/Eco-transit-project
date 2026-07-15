@@ -549,7 +549,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                   <input
                     ref={fileInputRef}
                     type="file"
-                    accept=".jpg,.jpeg,.png,.webp"
+                    accept="image/*"
                     className="hidden"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
