@@ -22,6 +22,7 @@ import {
   EyeOff,
   BarChart3
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 interface User {
   id: string;
@@ -62,6 +63,11 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [successMsg, setSuccessMsg] = useState<string>('');
   const [brokenTickets, setBrokenTickets] = useState<Record<string, boolean>>({});
+
+  const [mounted, setMounted] = useState<boolean>(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Analytics sub-modals states (Yêu cầu mới)
   const [showUsersModal, setShowUsersModal] = useState<boolean>(false);
@@ -664,16 +670,64 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { title: 'Reviews Chờ Duyệt', value: stats.pendingReviewsCount, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-                  { title: 'Vé Chờ Kiểm Duyệt', value: stats.pendingTicketsCount, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-                  { title: 'Voucher Active', value: stats.activeVouchersCount, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-                  { title: 'Voucher Hết Hàng', value: stats.outOfStockVouchersCount, color: 'text-red-600 bg-red-50 border-red-200' },
-                  { title: 'Voucher Hết Hạn', value: stats.expiredVouchersCount, color: 'text-rose-600 bg-rose-50 border-rose-200' },
-                  { title: 'Lượt Đổi Quà', value: stats.recentRedemptionsCount, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-                  { title: 'Tổng Điểm Phát Hành', value: stats.totalPointsIssued, color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10' },
-                  { title: 'Tổng Điểm Tiêu Thụ', value: stats.totalPointsSpent, color: 'text-orange-600 bg-orange-50 border-orange-200' },
+                  { 
+                    title: 'Reviews Chờ Duyệt', 
+                    value: stats.pendingReviewsCount, 
+                    color: 'text-amber-600 bg-amber-50 border-amber-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('reviews')
+                  },
+                  { 
+                    title: 'Vé Chờ Kiểm Duyệt', 
+                    value: stats.pendingTicketsCount, 
+                    color: 'text-blue-600 bg-blue-50 border-blue-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('tickets')
+                  },
+                  { 
+                    title: 'Voucher Active', 
+                    value: stats.activeVouchersCount, 
+                    color: 'text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: 'Voucher Hết Hàng', 
+                    value: stats.outOfStockVouchersCount, 
+                    color: 'text-red-600 bg-red-50 border-red-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: 'Voucher Hết Hạn', 
+                    value: stats.expiredVouchersCount, 
+                    color: 'text-rose-600 bg-rose-50 border-rose-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: 'Lượt Đổi Quà', 
+                    value: stats.recentRedemptionsCount, 
+                    color: 'text-indigo-600 bg-indigo-50 border-indigo-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: 'Tổng Điểm Phát Hành', 
+                    value: stats.totalPointsIssued, 
+                    color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => {
+                      document.getElementById('recent-audit-logs-card')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  },
+                  { 
+                    title: 'Tổng Điểm Tiêu Thụ', 
+                    value: stats.totalPointsSpent, 
+                    color: 'text-orange-600 bg-orange-50 border-orange-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => {
+                      document.getElementById('recent-audit-logs-card')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  },
                 ].map((card, idx) => (
-                  <div key={idx} className={`p-4 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring ${card.color}`}>
+                  <div 
+                    key={idx} 
+                    onClick={card.onClick}
+                    className={`p-4 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring transition-all active:scale-95 duration-150 ${card.color}`}
+                  >
                     <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-eco-muted/70">{card.title}</span>
                     <span className="text-2xl sm:text-3xl font-black mt-2 font-mono">{card.value}</span>
                   </div>
@@ -681,7 +735,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               </div>
 
               {/* Short Audit Log Timeline */}
-              <div className="border border-eco-mint rounded-2xl p-5 bg-white">
+              <div id="recent-audit-logs-card" className="border border-eco-mint rounded-2xl p-5 bg-white">
                 <h3 className="text-sm font-extrabold text-eco-ink uppercase tracking-wider mb-4 border-b border-eco-mint pb-2">
                   🕵️ Hoạt động kiểm trị gần đây
                 </h3>
@@ -1909,9 +1963,9 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
         </div>
       )}
 
-      {/* MODAL 1: DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG */}
-      {showUsersModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+      {/* MODAL 1: DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG (RENDER PORTAL DƯỚI BODY) */}
+      {mounted && showUsersModal && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white border border-eco-mint rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
             
             {/* Modal Header */}
@@ -1943,14 +1997,14 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 flex-1 overflow-y-auto space-y-4">
+            <div className="p-5 flex-grow overflow-y-auto">
               {modalLoading ? (
                 <div className="py-10 text-center">
                   <RefreshCw className="w-6 h-6 animate-spin text-eco-primary mx-auto mb-2" />
                   <p className="text-xs text-eco-muted font-bold">Đang tải danh sách người dùng...</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto px-1">
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-eco-mint text-eco-muted font-bold">
@@ -1997,12 +2051,13 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {/* MODAL 2: DANH SÁCH HÓA ĐƠN LỘ TRÌNH ĐÃ TẠO */}
-      {showRoutesModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+      {/* MODAL 2: DANH SÁCH HÓA ĐƠN LỘ TRÌNH ĐÃ TẠO (RENDER PORTAL DƯỚI BODY) */}
+      {mounted && showRoutesModal && createPortal(
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4 animate-fade-in">
           <div className="bg-white border border-eco-mint rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
             
             {/* Modal Header */}
@@ -2034,14 +2089,14 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
             </div>
 
             {/* Modal Content */}
-            <div className="p-5 flex-1 overflow-y-auto space-y-4">
+            <div className="p-5 flex-grow overflow-y-auto">
               {modalLoading ? (
                 <div className="py-10 text-center">
                   <RefreshCw className="w-6 h-6 animate-spin text-eco-primary mx-auto mb-2" />
                   <p className="text-xs text-eco-muted font-bold">Đang tải danh sách lộ trình...</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto px-1">
                   <table className="w-full text-left text-xs">
                     <thead>
                       <tr className="border-b border-eco-mint text-eco-muted font-bold">
@@ -2086,7 +2141,8 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </section>
