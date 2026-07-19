@@ -1081,4 +1081,49 @@ router.get('/analytics', async (_req: Request, res: Response) => {
   }
 });
 
+// 17. GET /api/admin/users - List all users in system
+router.get('/users', async (_req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        pointsBalanceCache: true,
+        createdAt: true,
+      },
+    });
+    return res.status(200).json(users);
+  } catch (err: any) {
+    console.error('Fetch admin users error:', err);
+    return res.status(500).json({ message: 'Lỗi tải danh sách người dùng.' });
+  }
+});
+
+// 18. GET /api/admin/routes-all - List recent route bills
+router.get('/routes-all', async (_req: Request, res: Response) => {
+  try {
+    const routes = await prisma.timeBill.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: {
+        id: true,
+        originLabel: true,
+        destinationLabel: true,
+        routeTitle: true,
+        durationMinutes: true,
+        distanceKm: true,
+        greenScore: true,
+        createdAt: true,
+        nickname: true,
+      },
+    });
+    return res.status(200).json(routes);
+  } catch (err: any) {
+    console.error('Fetch admin routes error:', err);
+    return res.status(500).json({ message: 'Lỗi tải danh sách lộ trình.' });
+  }
+});
+
 export default router;

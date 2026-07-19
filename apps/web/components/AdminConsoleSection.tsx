@@ -63,6 +63,43 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
   const [successMsg, setSuccessMsg] = useState<string>('');
   const [brokenTickets, setBrokenTickets] = useState<Record<string, boolean>>({});
 
+  // Analytics sub-modals states (Yêu cầu mới)
+  const [showUsersModal, setShowUsersModal] = useState<boolean>(false);
+  const [usersList, setUsersList] = useState<any[]>([]);
+  const [userSearchQuery, setUserSearchQuery] = useState<string>('');
+  
+  const [showRoutesModal, setShowRoutesModal] = useState<boolean>(false);
+  const [routesList, setRoutesList] = useState<any[]>([]);
+  const [routeSearchQuery, setRouteSearchQuery] = useState<string>('');
+  
+  const [modalLoading, setModalLoading] = useState<boolean>(false);
+
+  const openUsersListModal = async () => {
+    setShowUsersModal(true);
+    setModalLoading(true);
+    try {
+      const data = await apiFetch('/api/admin/users');
+      setUsersList(data || []);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi tải danh sách thành viên.');
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  const openRoutesListModal = async () => {
+    setShowRoutesModal(true);
+    setModalLoading(true);
+    try {
+      const data = await apiFetch('/api/admin/routes-all');
+      setRoutesList(data || []);
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi tải danh sách lộ trình.');
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   // Inline forms
   const [showPlaceForm, setShowPlaceForm] = useState<boolean>(false);
   const [placeFormMode, setPlaceFormMode] = useState<'create' | 'edit'>('create');
@@ -1766,14 +1803,52 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               {/* Stats Cards Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {[
-                  { title: 'Tổng Lượt Truy Cập (Views)', value: analyticsData.totalPageViews, color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10' },
-                  { title: 'Khách Duy Nhất (Unique IPs)', value: analyticsData.uniqueVisitors, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
-                  { title: 'Tài Khoản Người Dùng', value: analyticsData.totalUsers, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
-                  { title: 'Hóa Đơn Lộ Trình Đã Tạo', value: analyticsData.totalRouteSearches, color: 'text-blue-600 bg-blue-50 border-blue-200' },
-                  { title: 'Vé Xanh Tải Lên (Duyệt/Tổng)', value: `${analyticsData.ticketStats.verified}/${analyticsData.ticketStats.total}`, color: 'text-amber-600 bg-amber-50 border-amber-200' },
-                  { title: 'Số Voucher Đã Đổi', value: analyticsData.totalRedemptions, color: 'text-rose-600 bg-rose-50 border-rose-200' },
+                  { 
+                    title: 'Tổng Lượt Truy Cập (Views)', 
+                    value: analyticsData.totalPageViews, 
+                    color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10 cursor-pointer',
+                    onClick: () => {
+                      document.getElementById('recent-access-logs-table')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  },
+                  { 
+                    title: 'Khách Duy Nhất (Unique IPs)', 
+                    value: analyticsData.uniqueVisitors, 
+                    color: 'text-indigo-600 bg-indigo-50 border-indigo-200 cursor-pointer',
+                    onClick: () => {
+                      document.getElementById('recent-access-logs-table')?.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  },
+                  { 
+                    title: 'Tài Khoản Người Dùng', 
+                    value: analyticsData.totalUsers, 
+                    color: 'text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: openUsersListModal
+                  },
+                  { 
+                    title: 'Hóa Đơn Lộ Trình Đã Tạo', 
+                    value: analyticsData.totalRouteSearches, 
+                    color: 'text-blue-600 bg-blue-50 border-blue-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: openRoutesListModal
+                  },
+                  { 
+                    title: 'Vé Xanh Tải Lên (Duyệt/Tổng)', 
+                    value: `${analyticsData.ticketStats.verified}/${analyticsData.ticketStats.total}`, 
+                    color: 'text-amber-600 bg-amber-50 border-amber-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('tickets')
+                  },
+                  { 
+                    title: 'Số Voucher Đã Đổi', 
+                    value: analyticsData.totalRedemptions, 
+                    color: 'text-rose-600 bg-rose-50 border-rose-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
                 ].map((card, idx) => (
-                  <div key={idx} className={`p-4.5 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring ${card.color}`}>
+                  <div 
+                    key={idx} 
+                    onClick={card.onClick}
+                    className={`p-4.5 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring transition-all active:scale-95 duration-150 ${card.color}`}
+                  >
                     <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-eco-muted/70">{card.title}</span>
                     <span className="text-2xl sm:text-3xl font-black mt-2 font-mono">{card.value}</span>
                   </div>
@@ -1781,7 +1856,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               </div>
 
               {/* Access Logs Timeline */}
-              <div className="border border-eco-mint rounded-2xl p-5 bg-white">
+              <div id="recent-access-logs-table" className="border border-eco-mint rounded-2xl p-5 bg-white">
                 <h3 className="text-sm font-extrabold text-eco-ink uppercase tracking-wider mb-4 border-b border-eco-mint pb-2">
                   📈 Nhật ký truy cập gần đây (Thời gian thực)
                 </h3>
@@ -1831,6 +1906,186 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
             </div>
           )}
 
+        </div>
+      )}
+
+      {/* MODAL 1: DANH SÁCH TÀI KHOẢN NGƯỜI DÙNG */}
+      {showUsersModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-eco-mint rounded-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="p-5 border-b border-eco-mint flex items-center justify-between bg-eco-soft/30">
+              <div className="flex items-center space-x-2">
+                <span className="text-xl">👥</span>
+                <div>
+                  <h3 className="text-md font-black uppercase text-eco-ink">Thành viên EcoTransit ({usersList.length})</h3>
+                  <p className="text-[10px] text-eco-muted">Danh sách tài khoản đăng ký trên hệ thống</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowUsersModal(false)}
+                className="p-1.5 hover:bg-eco-mint rounded-full text-eco-muted hover:text-eco-ink transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Search Box */}
+            <div className="p-4 border-b border-eco-mint bg-white">
+              <input 
+                type="text" 
+                placeholder="Tìm kiếm tài khoản bằng email..." 
+                value={userSearchQuery}
+                onChange={(e) => setUserSearchQuery(e.target.value)}
+                className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl px-4 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-eco-primary"
+              />
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 flex-1 overflow-y-auto space-y-4">
+              {modalLoading ? (
+                <div className="py-10 text-center">
+                  <RefreshCw className="w-6 h-6 animate-spin text-eco-primary mx-auto mb-2" />
+                  <p className="text-xs text-eco-muted font-bold">Đang tải danh sách người dùng...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-eco-mint text-eco-muted font-bold">
+                        <th className="pb-2">Email</th>
+                        <th className="pb-2">Vai trò</th>
+                        <th className="pb-2 text-center">Số dư Điểm</th>
+                        <th className="pb-2 text-right">Ngày tham gia</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-eco-mint/30">
+                      {usersList
+                        .filter(u => u.email.toLowerCase().includes(userSearchQuery.toLowerCase()))
+                        .map((u) => (
+                          <tr key={u.id} className="hover:bg-eco-soft/20">
+                            <td className="py-3 font-semibold text-eco-ink font-mono">{u.email}</td>
+                            <td className="py-3">
+                              <span className={`px-2 py-0.5 rounded text-[9px] font-black ${
+                                u.role === 'ADMIN' 
+                                  ? 'bg-red-50 text-red-700 border border-red-200' 
+                                  : u.role === 'MODERATOR' 
+                                    ? 'bg-blue-50 text-blue-700 border border-blue-200' 
+                                    : 'bg-eco-mint text-eco-primary'
+                              }`}>
+                                {u.role}
+                              </span>
+                            </td>
+                            <td className="py-3 text-center font-extrabold text-eco-primary font-mono">{u.pointsBalanceCache}</td>
+                            <td className="py-3 text-right text-eco-muted">{formatDate(u.createdAt)}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4.5 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
+              <button 
+                onClick={() => setShowUsersModal(false)}
+                className="px-5 py-2 bg-eco-primary text-white text-xs font-bold rounded-xl hover:bg-eco-primaryDeep transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: DANH SÁCH HÓA ĐƠN LỘ TRÌNH ĐÃ TẠO */}
+      {showRoutesModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white border border-eco-mint rounded-3xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden animate-scale-up">
+            
+            {/* Modal Header */}
+            <div className="p-5 border-b border-eco-mint flex items-center justify-between bg-eco-soft/30">
+              <div className="flex items-center space-x-2">
+                <span className="text-xl">🗺️</span>
+                <div>
+                  <h3 className="text-md font-black uppercase text-eco-ink">Lộ trình xanh đã tạo ({routesList.length})</h3>
+                  <p className="text-[10px] text-eco-muted">Danh sách các lộ trình được người dùng tìm kiếm gần đây</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setShowRoutesModal(false)}
+                className="p-1.5 hover:bg-eco-mint rounded-full text-eco-muted hover:text-eco-ink transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Search Box */}
+            <div className="p-4 border-b border-eco-mint bg-white">
+              <input 
+                type="text" 
+                placeholder="Tìm kiếm theo điểm đi / điểm đến / biệt danh..." 
+                value={routeSearchQuery}
+                onChange={(e) => setRouteSearchQuery(e.target.value)}
+                className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl px-4 py-2.5 text-xs focus:outline-none focus:ring-1 focus:ring-eco-primary"
+              />
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-5 flex-1 overflow-y-auto space-y-4">
+              {modalLoading ? (
+                <div className="py-10 text-center">
+                  <RefreshCw className="w-6 h-6 animate-spin text-eco-primary mx-auto mb-2" />
+                  <p className="text-xs text-eco-muted font-bold">Đang tải danh sách lộ trình...</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-eco-mint text-eco-muted font-bold">
+                        <th className="pb-2">Biệt danh</th>
+                        <th className="pb-2">Điểm xuất phát</th>
+                        <th className="pb-2">Điểm kết thúc</th>
+                        <th className="pb-2 text-center">Thời gian đi</th>
+                        <th className="pb-2 text-center">Điểm Xanh</th>
+                        <th className="pb-2 text-right">Tạo lúc</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-eco-mint/30">
+                      {routesList
+                        .filter(r => 
+                          r.originLabel.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          r.destinationLabel.toLowerCase().includes(routeSearchQuery.toLowerCase()) ||
+                          (r.nickname || 'Ẩn danh').toLowerCase().includes(routeSearchQuery.toLowerCase())
+                        )
+                        .map((r) => (
+                          <tr key={r.id} className="hover:bg-eco-soft/20">
+                            <td className="py-3 font-semibold text-eco-ink">{r.nickname || 'Ẩn danh'}</td>
+                            <td className="py-3 max-w-[150px] truncate" title={r.originLabel}>{r.originLabel}</td>
+                            <td className="py-3 max-w-[150px] truncate" title={r.destinationLabel}>{r.destinationLabel}</td>
+                            <td className="py-3 text-center">{r.durationMinutes} phút</td>
+                            <td className="py-3 text-center font-extrabold text-emerald-600 font-mono">+{r.greenScore || 0}</td>
+                            <td className="py-3 text-right text-eco-muted">{formatDate(r.createdAt)}</td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-4.5 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
+              <button 
+                onClick={() => setShowRoutesModal(false)}
+                className="px-5 py-2 bg-eco-primary text-white text-xs font-bold rounded-xl hover:bg-eco-primaryDeep transition-colors"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
