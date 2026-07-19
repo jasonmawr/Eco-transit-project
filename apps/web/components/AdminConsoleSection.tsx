@@ -1901,7 +1901,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                   <div 
                     key={idx} 
                     onClick={card.onClick}
-                    className={`p-4.5 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring transition-all active:scale-95 duration-150 ${card.color}`}
+                    className={`p-5 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring transition-all active:scale-95 duration-150 ${card.color}`}
                   >
                     <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-eco-muted/70">{card.title}</span>
                     <span className="text-2xl sm:text-3xl font-black mt-2 font-mono">{card.value}</span>
@@ -2042,7 +2042,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4.5 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
+            <div className="p-4 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
               <button 
                 onClick={() => setShowUsersModal(false)}
                 className="px-5 py-2 bg-eco-primary text-white text-xs font-bold rounded-xl hover:bg-eco-primaryDeep transition-colors"
@@ -2132,7 +2132,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4.5 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
+            <div className="p-4 border-t border-eco-mint bg-eco-soft/20 flex justify-end">
               <button 
                 onClick={() => setShowRoutesModal(false)}
                 className="px-5 py-2 bg-eco-primary text-white text-xs font-bold rounded-xl hover:bg-eco-primaryDeep transition-colors"
