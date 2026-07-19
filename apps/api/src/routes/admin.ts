@@ -996,4 +996,88 @@ router.get('/audit-logs', async (req: Request, res: Response) => {
   }
 });
 
+// 16. GET /api/admin/analytics - Detailed visitor statistics
+router.get('/analytics', async (_req: Request, res: Response) => {
+  try {
+    const [
+      totalPageViews,
+      uniqueVisitorsGroup,
+      totalUsers,
+      totalRouteSearches,
+      totalTickets,
+      totalRedemptions,
+      recentLogs,
+    ] = await Promise.all([
+      prisma.visitorLog.count(),
+      prisma.visitorLog.groupBy({
+        by: ['ipHash'],
+      }),
+      prisma.user.count(),
+      prisma.timeBill.count(), // number of created timebills = route planning sessions
+      prisma.ticket.count(),
+      prisma.voucherRedemption.count(),
+      prisma.visitorLog.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 20,
+      }),
+    ]);
+
+    const uniqueVisitors = uniqueVisitorsGroup.length;
+
+    // Aggregates for tickets by status
+    const ticketsGroup = await prisma.ticket.groupBy({
+      by: ['status'],
+      _count: { _all: true },
+    });
+    
+    const ticketStats = {
+      pending: ticketsGroup.find(t => t.status === 'pending')?._count._all || 0,
+      verified: ticketsGroup.find(t => t.status === 'verified')?._count._all || 0,
+      rejected: ticketsGroup.find(t => t.status === 'rejected')?._count._all || 0,
+      total: totalTickets,
+    };
+
+    // Access logs scrubbed for user-agent simplification
+    const simplifiedLogs = recentLogs.map((log: any) => {
+      let device = 'Máy tính';
+      const ua = log.userAgent || '';
+      if (/mobile|android|iphone|ipad|phone/i.test(ua)) {
+        device = 'Điện thoại';
+      } else if (/tablet|ipad/i.test(ua)) {
+        device = 'Máy tính bảng';
+      }
+      
+      let browser = 'Chrome';
+      if (/firefox/i.test(ua)) {
+        browser = 'Firefox';
+      } else if (/safari/i.test(ua) && !/chrome/i.test(ua)) {
+        browser = 'Safari';
+      } else if (/edge|edg/i.test(ua)) {
+        browser = 'Edge';
+      }
+
+      return {
+        id: log.id,
+        path: log.path,
+        device,
+        browser,
+        createdAt: log.createdAt,
+      };
+    });
+
+    return res.status(200).json({
+      totalPageViews,
+      uniqueVisitors,
+      totalUsers,
+      totalRouteSearches,
+      ticketStats,
+      totalRedemptions,
+      recentAccessLogs: simplifiedLogs,
+    });
+  } catch (err: any) {
+    console.error('Fetch admin analytics error:', err);
+    return res.status(500).json({ message: 'Lỗi tải số liệu thống kê truy cập.' });
+  }
+});
+
 export default router;

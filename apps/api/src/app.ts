@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
 import { config } from './config/index.js';
 import { sessionMiddleware } from './config/session.js';
 import healthRouter from './routes/health.js';
@@ -16,6 +17,7 @@ import adminRouter from './routes/admin.js';
 import timeBillsRouter from './routes/timeBills.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import aiRouter from './routes/ai.js';
+import analyticsRouter from './routes/analytics.js';
 
 const app = express();
 
@@ -27,6 +29,15 @@ const app = express();
 // This prevents header spoofing attacks while ensuring correct client IP resolution for rate limiting,
 // geo-ip logic, and correct HTTPS/Secure session cookie transmission over proxy tunnels.
 app.set('trust proxy', 1);
+
+// HTTP Security Headers Middleware
+app.use((_req, res, next) => {
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Strict CORS check
 app.use(
@@ -65,6 +76,48 @@ app.use(express.urlencoded({ extended: true }));
 // 3. Session Middleware
 app.use(sessionMiddleware);
 
+// Skip rate limiting in test environment
+const skipTestEnv = () => process.env.NODE_ENV === 'test' || process.env.VITEST === 'true' || process.env.SKIP_RATE_LIMIT === 'true';
+
+// Define Rate Limiters
+const globalLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  limit: 200, // Limit each IP to 200 requests per minute
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip: skipTestEnv,
+  message: {
+    message: 'Bạn đã gửi quá nhiều yêu cầu trong thời gian ngắn. Vui lòng thử lại sau.'
+  }
+});
+
+const authLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  limit: 10, // Limit each IP to 10 requests per minute for register/login/resend
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip: skipTestEnv,
+  message: {
+    message: 'Bạn đã thử đăng ký hoặc đăng nhập quá nhiều lần. Vui lòng thử lại sau 1 phút.'
+  }
+});
+
+const aiLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  limit: 20, // Limit each IP to 20 chat messages per minute
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  skip: skipTestEnv,
+  message: {
+    message: 'Hệ thống trợ lý AI đang nhận được nhiều yêu cầu từ bạn. Vui lòng đợi một chút rồi tiếp tục trò chuyện nhé.'
+  }
+});
+
+// Apply Rate Limiters
+app.use('/api', globalLimiter);
+app.use('/api/auth', authLimiter);
+app.use('/api/ai', aiLimiter);
+
 // 4. Mount Routes
 app.use('/api', healthRouter);
 app.use('/', healthRouter); // Root level health check mount
@@ -81,6 +134,7 @@ app.use('/api', timeBillsRouter);
 app.use('/api', leaderboardRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/admin', adminRouter);
+app.use('/api', analyticsRouter);
 
 // 5. Global Error Handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

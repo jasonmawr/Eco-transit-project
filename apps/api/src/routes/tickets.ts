@@ -286,6 +286,7 @@ Bạn phải trả về câu trả lời ở định dạng JSON duy nhất như
           ocrStatus: ocrStatus as any,
           ocrText: finalOcrText,
           confidenceScore,
+          base64DataFallback: processedBuffer.toString('base64'),
         },
       });
 
@@ -390,6 +391,11 @@ router.get('/tickets/thumbnail/:id', requireAuth, async (req: Request, res: Resp
     }
 
     if (!fs.existsSync(absoluteFilePath)) {
+      if (ticket.base64DataFallback) {
+        const imgBuffer = Buffer.from(ticket.base64DataFallback, 'base64');
+        res.setHeader('Content-Type', ticket.mimeType || 'image/jpeg');
+        return res.end(imgBuffer);
+      }
       return res.status(404).json({ message: 'Tệp hình ảnh không tồn tại trên hệ thống.' });
     }
 

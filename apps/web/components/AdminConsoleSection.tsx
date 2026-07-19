@@ -19,7 +19,8 @@ import {
   AlertCircle, 
   RefreshCw,
   Eye,
-  EyeOff
+  EyeOff,
+  BarChart3
 } from 'lucide-react';
 
 interface User {
@@ -36,10 +37,11 @@ interface AdminConsoleProps {
 
 export default function AdminConsoleSection({ user, onLoginClick }: AdminConsoleProps) {
   // Core admin tab navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'tickets' | 'places' | 'guides' | 'vouchers' | 'audit_logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'tickets' | 'places' | 'guides' | 'vouchers' | 'audit_logs' | 'analytics'>('overview');
   
   // Data lists
   const [stats, setStats] = useState<any>(null);
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [reviews, setReviews] = useState<any[]>([]);
   const [tickets, setTickets] = useState<any[]>([]);
   const [places, setPlaces] = useState<any[]>([]);
@@ -179,6 +181,9 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
       } else if (tabName === 'audit_logs') {
         const data = await apiFetch('/api/admin/audit-logs');
         setAuditLogs(data || []);
+      } else if (tabName === 'analytics') {
+        const data = await apiFetch('/api/admin/analytics');
+        setAnalyticsData(data);
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi tải dữ liệu kiểm duyệt.');
@@ -581,6 +586,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
           { id: 'guides', label: '📖 Cẩm nang', icon: BookOpen },
           { id: 'vouchers', label: '🎁 Vouchers', icon: Gift },
           { id: 'audit_logs', label: '🕵️ Nhật ký kiểm toán', icon: FileText },
+          { id: 'analytics', label: '📈 Thống kê truy cập', icon: BarChart3 },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -1750,6 +1756,67 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                 ) : (
                   <p className="text-xs text-eco-muted py-10 text-center">Chưa có vết kiểm toán nào được ghi nhận.</p>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB 8: ANALYTICS (YÊU CẦU MỚI) */}
+          {activeTab === 'analytics' && analyticsData && (
+            <div className="space-y-8 animate-fade-in">
+              {/* Stats Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {[
+                  { title: 'Tổng Lượt Truy Cập (Views)', value: analyticsData.totalPageViews, color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10' },
+                  { title: 'Khách Duy Nhất (Unique IPs)', value: analyticsData.uniqueVisitors, color: 'text-indigo-600 bg-indigo-50 border-indigo-200' },
+                  { title: 'Tài Khoản Người Dùng', value: analyticsData.totalUsers, color: 'text-emerald-600 bg-emerald-50 border-emerald-200' },
+                  { title: 'Hóa Đơn Lộ Trình Đã Tạo', value: analyticsData.totalRouteSearches, color: 'text-blue-600 bg-blue-50 border-blue-200' },
+                  { title: 'Vé Xanh Tải Lên (Duyệt/Tổng)', value: `${analyticsData.ticketStats.verified}/${analyticsData.ticketStats.total}`, color: 'text-amber-600 bg-amber-50 border-amber-200' },
+                  { title: 'Số Voucher Đã Đổi', value: analyticsData.totalRedemptions, color: 'text-rose-600 bg-rose-50 border-rose-200' },
+                ].map((card, idx) => (
+                  <div key={idx} className={`p-4.5 border rounded-2xl flex flex-col justify-between shadow-sm hover-spring ${card.color}`}>
+                    <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-eco-muted/70">{card.title}</span>
+                    <span className="text-2xl sm:text-3xl font-black mt-2 font-mono">{card.value}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Access Logs Timeline */}
+              <div className="border border-eco-mint rounded-2xl p-5 bg-white">
+                <h3 className="text-sm font-extrabold text-eco-ink uppercase tracking-wider mb-4 border-b border-eco-mint pb-2">
+                  📈 Nhật ký truy cập gần đây (Thời gian thực)
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-eco-mint text-eco-muted font-bold">
+                        <th className="py-2">Trang truy cập</th>
+                        <th className="py-2">Thiết bị</th>
+                        <th className="py-2">Trình duyệt</th>
+                        <th className="py-2 text-right">Thời gian</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-eco-mint/50">
+                      {analyticsData.recentAccessLogs && analyticsData.recentAccessLogs.length > 0 ? (
+                        analyticsData.recentAccessLogs.map((log: any) => (
+                          <tr key={log.id} className="hover:bg-eco-soft/40 transition-colors">
+                            <td className="py-2.5 font-semibold text-eco-primary font-mono">{log.path}</td>
+                            <td className="py-2.5">{log.device}</td>
+                            <td className="py-2.5">
+                              <span className="bg-eco-mint text-eco-primary px-2 py-0.5 rounded text-[10px] font-bold">
+                                {log.browser}
+                              </span>
+                            </td>
+                            <td className="py-2.5 text-right text-eco-muted">{formatDate(log.createdAt)}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="py-6 text-center text-eco-muted">Chưa có lượt truy cập nào được ghi nhận.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}

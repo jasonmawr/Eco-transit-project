@@ -42,3 +42,7 @@ apps/api/last-mock-email.json
 
 # compiler build cache
 *.tsbuildinfo
+
+# local playwright browsers path
+.playwright-browsers/
+
