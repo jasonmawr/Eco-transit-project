@@ -311,3 +311,15 @@ model TimeBill {
   createdAt              DateTime @default(now())
   expiresAt              DateTime?
 }
+
+model VisitorLog {
+  id        String   @id @default(uuid())
+  ipHash    String
+  userAgent String?
+  path      String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([ipHash])
+}
+

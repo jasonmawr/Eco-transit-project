@@ -80,8 +80,20 @@ export default function Home() {
     }
   };
 
+  const trackVisit = async () => {
+    try {
+      await apiFetch('/api/analytics/track', {
+        method: 'POST',
+        body: JSON.stringify({ path: '/' }),
+      });
+    } catch (err) {
+      // Fail silently to avoid breaking UI on network issues
+    }
+  };
+
   useEffect(() => {
     checkHealth();
+    trackVisit();
   }, []);
 
   // Detect responsive styling & accessibility requirements
