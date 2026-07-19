@@ -1061,6 +1061,7 @@ router.get('/analytics', async (_req: Request, res: Response) => {
         path: log.path,
         device,
         browser,
+        userEmail: log.userEmail || 'Khách vãng lai',
         createdAt: log.createdAt,
       };
     });

@@ -165,6 +165,34 @@ describe('Production-Ready Features Integration Tests', () => {
       expect(logs[0].ipHash.length).toBe(64); // SHA-256 length is 64 hex characters
     });
 
+    it('should record user session details (userId & userEmail) when user is logged in', async () => {
+      await prisma.visitorLog.deleteMany({});
+
+      // Set admin role & login first
+      await prisma.user.update({
+        where: { id: testUser.id },
+        data: { role: 'ADMIN' },
+      });
+      await userAgent.post('/api/auth/login').send({
+        email: 'prod-tester@ecotransit.vn',
+        password: 'Password123',
+      });
+
+      // Send track request with session agent
+      const trackRes = await userAgent
+        .post('/api/analytics/track')
+        .send({ path: '/dashboard-page' });
+
+      expect(trackRes.status).toBe(200);
+
+      // Verify user fields in DB
+      const logs = await prisma.visitorLog.findMany({});
+      expect(logs.length).toBe(1);
+      expect(logs[0].path).toBe('/dashboard-page');
+      expect(logs[0].userId).toBe(testUser.id);
+      expect(logs[0].userEmail).toBe('prod-tester@ecotransit.vn');
+    });
+
     it('should block non-admins from accessing admin analytics statistics', async () => {
       // 1. Guest request
       const resGuest = await request(app).get('/api/admin/analytics');

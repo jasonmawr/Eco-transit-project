@@ -22,11 +22,16 @@ router.post('/analytics/track', async (req: Request, res: Response) => {
     const ipHash = crypto.createHash('sha256').update(ipStr).digest('hex');
     const userAgent = req.headers['user-agent'] || null;
 
+    const userId = req.session?.user?.id || null;
+    const userEmail = req.session?.user?.email || null;
+
     await prisma.visitorLog.create({
       data: {
         ipHash,
         userAgent,
         path: path || '/',
+        userId,
+        userEmail,
       },
     });
 

@@ -1790,6 +1790,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                     <thead>
                       <tr className="border-b border-eco-mint text-eco-muted font-bold">
                         <th className="py-2">Trang truy cập</th>
+                        <th className="py-2">Người dùng</th>
                         <th className="py-2">Thiết bị</th>
                         <th className="py-2">Trình duyệt</th>
                         <th className="py-2 text-right">Thời gian</th>
@@ -1800,6 +1801,15 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                         analyticsData.recentAccessLogs.map((log: any) => (
                           <tr key={log.id} className="hover:bg-eco-soft/40 transition-colors">
                             <td className="py-2.5 font-semibold text-eco-primary font-mono">{log.path}</td>
+                            <td className="py-2.5">
+                              {log.userEmail !== 'Khách vãng lai' ? (
+                                <span className="bg-eco-primary/10 text-eco-primary px-2 py-1 rounded text-[10px] font-extrabold border border-eco-primary/20">
+                                  👤 {log.userEmail}
+                                </span>
+                              ) : (
+                                <span className="text-eco-muted/70 italic text-[11px]">Khách vãng lai</span>
+                              )}
+                            </td>
                             <td className="py-2.5">{log.device}</td>
                             <td className="py-2.5">
                               <span className="bg-eco-mint text-eco-primary px-2 py-0.5 rounded text-[10px] font-bold">
@@ -1811,7 +1821,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="py-6 text-center text-eco-muted">Chưa có lượt truy cập nào được ghi nhận.</td>
+                          <td colSpan={5} className="py-6 text-center text-eco-muted">Chưa có lượt truy cập nào được ghi nhận.</td>
                         </tr>
                       )}
                     </tbody>

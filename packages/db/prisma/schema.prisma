@@ -317,6 +317,8 @@ model VisitorLog {
   ipHash    String
   userAgent String?
   path      String
+  userId    String?
+  userEmail String?
   createdAt DateTime @default(now())
 
   @@index([createdAt])
