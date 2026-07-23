@@ -278,6 +278,18 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     setDownloadingImages(true);
 
     try {
+      // Preload official BTC logo strip image
+      const logoImg = new Image();
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.src = '/images/xanhwrap-brand-logos.png';
+      await new Promise((resolve) => {
+        if (logoImg.complete) resolve(true);
+        else {
+          logoImg.onload = () => resolve(true);
+          logoImg.onerror = () => resolve(false);
+        }
+      });
+
       const createSquareCanvas = (part: 1 | 2): HTMLCanvasElement => {
         const canvas = document.createElement('canvas');
         canvas.width = 1920;
@@ -307,11 +319,20 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
         if (part === 1) {
           // PART 1: TOP HALF MASTER
-          // 4. Top Brand Header Bar Logos (Đã bỏ dòng 20 NĂM ĐẤT NƯỚC)
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-          ctx.font = '900 30px "Space Mono", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.fillText('FPT UNIVERSITY   |   COMMUNICATION TECHNOLOGY   |   LUOT KHOI CHAM XANH', 960, 80);
+          // 4. Top Brand Header Bar - Official BTC 4-Logo Strip Image
+          if (logoImg.complete && logoImg.naturalWidth > 0) {
+            ctx.save();
+            ctx.globalCompositeOperation = 'screen';
+            const targetW = 1450;
+            const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
+            ctx.drawImage(logoImg, (1920 - targetW) / 2, 40, targetW, targetH);
+            ctx.restore();
+          } else {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.font = '900 30px "Space Mono", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('FPT UNIVERSITY   |   COMMUNICATION TECHNOLOGY   |   LUOT KHOI CHAM XANH', 960, 80);
+          }
 
           // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH"
           ctx.save();
@@ -373,7 +394,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.stroke();
           ctx.setLineDash([]);
 
-          // Metadata row: Đã thay thế NGƯỜI LƯỚT CHẶNG thành Tên biệt danh của người dùng gõ
+          // Metadata row: Hiển thị tên biệt danh người dùng điền lúc đầu
           ctx.textAlign = 'left';
           ctx.font = '800 38px "Space Mono", monospace';
           ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 900);
@@ -886,11 +907,13 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
           <div className="bg-[#84D0FF] p-3 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
             
-            {/* Header Brand Logos Row (Đã bỏ dòng 20 NĂM ĐẤT NƯỚC theo yêu cầu) */}
-            <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black text-white/90 uppercase font-mono tracking-wider border-b border-white/30 pb-2">
-              <span>FPT UNIVERSITY</span>
-              <span>COMMUNICATION TECHNOLOGY</span>
-              <span className="text-[#0054A6] bg-white/80 px-1.5 py-0.5 rounded font-black">LƯỚT KHÓI CHẠM XANH</span>
+            {/* Header Brand Logos Row (Hiển thị dải logo chuẩn đồ họa từ BTC) */}
+            <div className="flex justify-center items-center border-b border-white/30 pb-2.5">
+              <img 
+                src="/images/xanhwrap-brand-logos.png" 
+                alt="Bộ Logo Ban Tổ Chức" 
+                className="h-7 sm:h-11 w-auto object-contain mix-blend-screen opacity-95"
+              />
             </div>
 
             {/* Master Header Title & Slanted Slogan Logo */}
