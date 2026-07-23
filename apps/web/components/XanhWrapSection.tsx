@@ -322,15 +322,15 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
           if (logoImg.complete && logoImg.naturalWidth > 0) {
             ctx.save();
-            const targetW = 1200;
+            const targetW = 1050;
             const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
-            ctx.drawImage(logoImg, (1920 - targetW) / 2, 45, targetW, targetH);
+            ctx.drawImage(logoImg, (1920 - targetW) / 2, 35, targetW, targetH);
             ctx.restore();
           }
 
-          // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH"
+          // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Positioned clearly to the left and below logo bar with 0 overlap)
           ctx.save();
-          ctx.translate(220, 210);
+          ctx.translate(160, 275);
           ctx.rotate((-12 * Math.PI) / 180);
           
           ctx.fillStyle = '#0054A6';
