@@ -322,42 +322,44 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
           if (logoImg.complete && logoImg.naturalWidth > 0) {
             ctx.save();
-            const targetW = 1050;
+            const targetW = 950;
             const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
             ctx.drawImage(logoImg, (1920 - targetW) / 2, 35, targetW, targetH);
             ctx.restore();
           }
 
-          // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Positioned clearly to the left and below logo bar with 0 overlap)
+          // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Có dấu tiếng Việt 100%, font sans-serif sắc nét, position y=310)
           ctx.save();
-          ctx.translate(160, 275);
+          ctx.translate(140, 310);
           ctx.rotate((-12 * Math.PI) / 180);
           
           ctx.fillStyle = '#0054A6';
-          ctx.font = '900 64px "Space Mono", sans-serif';
-          ctx.fillText('LUOT', 0, 0);
+          ctx.font = '900 58px "Inter", "Arial", sans-serif';
+          ctx.fillText('LƯỚT', 0, 0);
 
           ctx.fillStyle = '#8CC63F';
           ctx.beginPath();
-          ctx.roundRect(140, -55, 230, 75, [16]);
+          ctx.roundRect(175, -52, 230, 72, [16]);
           ctx.fill();
+
           ctx.fillStyle = '#FFFFFF';
-          ctx.fillText('KHOI', 160, 0);
+          ctx.font = '900 58px "Inter", "Arial", sans-serif';
+          ctx.fillText('KHÓI', 195, 0);
 
           ctx.fillStyle = '#0054A6';
-          ctx.font = '900 52px "Space Mono", sans-serif';
-          ctx.fillText('CHAM XANH', 0, 60);
+          ctx.font = '900 48px "Inter", "Arial", sans-serif';
+          ctx.fillText('CHẠM XANH', 0, 60);
           ctx.restore();
 
           // 6. Title Text: "MỘT NGÀY LÁI XE BẠN LẤY LẠI ĐƯỢC BAO NHIÊU THỜI GIAN?"
           ctx.fillStyle = '#0054A6';
           ctx.textAlign = 'center';
-          ctx.font = '900 86px "Space Mono", sans-serif';
+          ctx.font = '900 82px "Inter", "Arial", sans-serif';
           ctx.fillText('MỘT NGÀY LÁI XE', 960, 360);
-          ctx.font = '800 68px "Space Mono", sans-serif';
-          ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 450);
-          ctx.font = '900 86px "Space Mono", sans-serif';
-          ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 540);
+          ctx.font = '800 64px "Inter", "Arial", sans-serif';
+          ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 445);
+          ctx.font = '900 82px "Inter", "Arial", sans-serif';
+          ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 530);
 
           // 7. Realistic Leaf Top-Right of Receipt Paper Corner
           drawLeaf(ctx, 1640, 660, 140, 15);
