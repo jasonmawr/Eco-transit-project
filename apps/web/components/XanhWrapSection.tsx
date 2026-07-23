@@ -228,13 +228,12 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     }
   };
 
-  // Helper drawing realistic leaf graphics on canvas (Chiếc lá xanh mềm mại có cuống chuẩn 100%)
+  // Helper drawing realistic leaf graphics on canvas
   const drawLeaf = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, angleDeg: number) => {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate((angleDeg * Math.PI) / 180);
     
-    // Thân lá / Cuống lá dài uốn cong mềm mại
     ctx.strokeStyle = '#2E963D';
     ctx.lineWidth = Math.max(3, size * 0.08);
     ctx.lineCap = 'round';
@@ -243,7 +242,6 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     ctx.quadraticCurveTo(size * 0.1, 0, size * 0.9, -size * 0.7);
     ctx.stroke();
 
-    // Phiến lá dạng hình giọt nước / hình tim bầu ngược bám góc cuống
     ctx.fillStyle = '#39B54A';
     ctx.beginPath();
     ctx.moveTo(0, 0);
@@ -251,7 +249,6 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     ctx.bezierCurveTo(size * 0.8, -size * 0.9, size * 0.7, -size * 0.3, 0, 0);
     ctx.fill();
 
-    // Gân lá chính giữa
     ctx.strokeStyle = '#1D6829';
     ctx.lineWidth = Math.max(2, size * 0.04);
     ctx.beginPath();
@@ -310,11 +307,11 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
         if (part === 1) {
           // PART 1: TOP HALF MASTER
-          // 4. Top Brand Header Bar Logos
+          // 4. Top Brand Header Bar Logos (Đã bỏ dòng 20 NĂM ĐẤT NƯỚC)
           ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-          ctx.font = '900 28px "Space Mono", sans-serif';
+          ctx.font = '900 30px "Space Mono", sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText('FPT Education   |   FPT UNIVERSITY 20 NAM   |   COMMUNICATION TECHNOLOGY   |   LUOT KHOI CHAM XANH', 960, 80);
+          ctx.fillText('FPT UNIVERSITY   |   COMMUNICATION TECHNOLOGY   |   LUOT KHOI CHAM XANH', 960, 80);
 
           // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH"
           ctx.save();
@@ -376,10 +373,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.stroke();
           ctx.setLineDash([]);
 
-          // Metadata row
+          // Metadata row: Đã thay thế NGƯỜI LƯỚT CHẶNG thành Tên biệt danh của người dùng gõ
           ctx.textAlign = 'left';
-          ctx.font = '700 38px "Space Mono", monospace';
-          ctx.fillText('NGƯỜI LƯỚT CHẶNG', 330, 900);
+          ctx.font = '800 38px "Space Mono", monospace';
+          ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 900);
           ctx.textAlign = 'right';
           ctx.fillText(resultReceipt.recordDate || '2026-07-23', 1590, 900);
 
@@ -889,10 +886,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
           <div className="bg-[#84D0FF] p-3 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
             
-            {/* Header Brand Logos Row */}
+            {/* Header Brand Logos Row (Đã bỏ dòng 20 NĂM ĐẤT NƯỚC theo yêu cầu) */}
             <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black text-white/90 uppercase font-mono tracking-wider border-b border-white/30 pb-2">
               <span>FPT UNIVERSITY</span>
-              <span className="hidden xs:inline">20 NĂM ĐẤT NƯỚC</span>
+              <span>COMMUNICATION TECHNOLOGY</span>
               <span className="text-[#0054A6] bg-white/80 px-1.5 py-0.5 rounded font-black">LƯỚT KHÓI CHẠM XANH</span>
             </div>
 
@@ -940,10 +937,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                   </p>
                 </div>
 
-                {/* Metadata Row */}
+                {/* Metadata Row: Hiển thị tên biệt danh người dùng điền lúc đầu */}
                 <div className="flex justify-between items-center text-[10px] sm:text-xs font-extrabold">
-                  <span>NGƯỜI LƯỚT CHẶNG</span>
-                  <span>{resultReceipt.recordDate || '2026-07-23'}</span>
+                  <span className="truncate pr-2">NGƯỜI LƯỚT CHẶNG: <strong>{resultReceipt.nickname.toUpperCase()}</strong></span>
+                  <span className="shrink-0">{resultReceipt.recordDate || '2026-07-23'}</span>
                 </div>
 
                 {/* Green Pill Identity Badge (#8CC63F) */}
