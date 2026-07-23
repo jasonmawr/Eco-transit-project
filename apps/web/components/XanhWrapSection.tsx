@@ -887,37 +887,37 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           </div>
 
           {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
-          <div className="bg-[#84D0FF] p-6 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-6 relative overflow-hidden">
+          <div className="bg-[#84D0FF] p-3 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
             
             {/* Header Brand Logos Row */}
-            <div className="flex items-center justify-between text-[10px] font-black text-white/90 uppercase font-mono tracking-wider border-b border-white/30 pb-2">
+            <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-black text-white/90 uppercase font-mono tracking-wider border-b border-white/30 pb-2">
               <span>FPT UNIVERSITY</span>
-              <span>20 NĂM ĐẤT NƯỚC</span>
-              <span className="text-[#0054A6] bg-white/80 px-2 py-0.5 rounded font-black">LƯỚT KHÓI CHẠM XANH</span>
+              <span className="hidden xs:inline">20 NĂM ĐẤT NƯỚC</span>
+              <span className="text-[#0054A6] bg-white/80 px-1.5 py-0.5 rounded font-black">LƯỚT KHÓI CHẠM XANH</span>
             </div>
 
             {/* Master Header Title & Slanted Slogan Logo */}
             <div className="relative text-center space-y-1 text-[#0054A6]">
               {/* Slanted Logo Badge */}
-              <div className="absolute -left-2 -top-2 transform -rotate-12 bg-white/90 border-2 border-[#0054A6] px-2.5 py-1 rounded-xl shadow-md text-left text-[11px] leading-tight">
+              <div className="absolute -left-1 -top-3 transform -rotate-12 scale-75 sm:scale-100 origin-top-left bg-white/90 border-2 border-[#0054A6] px-2 py-1 rounded-xl shadow-md text-left text-[10px] leading-tight">
                 <span className="font-black text-[#0054A6] block">LƯỚT</span>
                 <span className="font-black bg-[#8CC63F] text-white px-1 rounded inline-block">KHÓI</span>
                 <span className="font-black text-[#0054A6] block">CHẠM XANH</span>
               </div>
 
-              <h2 className="text-2xl sm:text-4xl font-black font-mono uppercase tracking-tight text-[#0054A6]">
+              <h2 className="text-xl sm:text-4xl font-black font-mono uppercase tracking-tight text-[#0054A6] pt-1">
                 MỘT NGÀY LÁI XE
               </h2>
-              <p className="text-sm sm:text-xl font-extrabold font-mono text-[#0054A6]">
+              <p className="text-xs sm:text-xl font-extrabold font-mono text-[#0054A6]">
                 BẠN LẤY LẠI ĐƯỢC
               </p>
-              <h3 className="text-xl sm:text-3xl font-black font-mono uppercase text-[#0054A6]">
+              <h3 className="text-lg sm:text-3xl font-black font-mono uppercase text-[#0054A6]">
                 BAO NHIÊU THỜI GIAN?
               </h3>
             </div>
 
             {/* Cream Receipt Paper with Solid Blue Frame Backing */}
-            <div className="bg-[#0054A6] p-2.5 rounded-3xl shadow-2xl relative">
+            <div className="bg-[#0054A6] p-1.5 sm:p-2.5 rounded-3xl shadow-2xl relative">
               
               {/* Top-Right Realistic Leaf Stick Graphics */}
               <div className="absolute -top-7 -right-1 z-20 pointer-events-none transform rotate-12">
@@ -928,40 +928,40 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
               </div>
 
               {/* Inner Cream Paper (#FFF7E3) */}
-              <div className="bg-[#FFF7E3] rounded-2xl p-6 sm:p-8 space-y-5 text-[#1C480C] font-mono relative overflow-hidden">
+              <div className="bg-[#FFF7E3] rounded-2xl p-4 sm:p-8 space-y-4 sm:space-y-5 text-[#1C480C] font-mono relative overflow-hidden">
                 
                 {/* Header Title */}
-                <div className="text-center border-b-2 border-dashed border-[#1C480C] pb-4 space-y-1">
-                  <h3 className="text-xl sm:text-2xl font-black tracking-widest text-[#1C480C]">
+                <div className="text-center border-b-2 border-dashed border-[#1C480C] pb-3 sm:pb-4 space-y-0.5">
+                  <h3 className="text-lg sm:text-2xl font-black tracking-widest text-[#1C480C]">
                     X A N H W R A P
                   </h3>
-                  <p className="text-xs font-bold text-[#1C480C]/80 uppercase">
+                  <p className="text-[10px] sm:text-xs font-bold text-[#1C480C]/80 uppercase">
                     PHIẾU HOÀN THỜI GIAN
                   </p>
                 </div>
 
                 {/* Metadata Row */}
-                <div className="flex justify-between items-center text-xs font-extrabold">
+                <div className="flex justify-between items-center text-[10px] sm:text-xs font-extrabold">
                   <span>NGƯỜI LƯỚT CHẶNG</span>
                   <span>{resultReceipt.recordDate || '2026-07-23'}</span>
                 </div>
 
                 {/* Green Pill Identity Badge (#8CC63F) */}
-                <div className="bg-[#8CC63F] text-[#1C480C] py-3.5 px-6 rounded-full text-center shadow-md">
-                  <h4 className="text-xl sm:text-2xl font-black tracking-wider uppercase">
+                <div className="bg-[#8CC63F] text-[#1C480C] py-2.5 px-4 sm:py-3.5 sm:px-6 rounded-full text-center shadow-md">
+                  <h4 className="text-base sm:text-2xl font-black tracking-wider uppercase">
                     {resultReceipt.assignedLabelName}
                   </h4>
                 </div>
 
                 {/* Legs Table Breakdown */}
-                <div className="border-t-2 border-b-2 border-dashed border-[#1C480C] py-4 space-y-2.5">
+                <div className="border-t-2 border-b-2 border-dashed border-[#1C480C] py-3 space-y-2">
                   {(resultReceipt.legsJson || []).map((leg: XanhWrapLeg, i: number) => (
-                    <div key={i} className="flex justify-between items-center text-xs font-bold font-mono">
-                      <span className="truncate pr-2">
+                    <div key={i} className="flex justify-between items-center text-[10px] sm:text-xs font-bold font-mono">
+                      <span className="truncate pr-1">
                         {leg.depart_time} {leg.from.toUpperCase()} → {leg.to.toUpperCase()}
                       </span>
-                      <span className="shrink-0 font-bold">
-                        {leg.distance_km}KM &nbsp;&nbsp;&nbsp; {leg.duration_min}'
+                      <span className="shrink-0 font-bold ml-1">
+                        {leg.distance_km}KM &nbsp; {leg.duration_min}'
                       </span>
                     </div>
                   ))}
