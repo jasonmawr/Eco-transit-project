@@ -18,6 +18,7 @@ import timeBillsRouter from './routes/timeBills.js';
 import leaderboardRouter from './routes/leaderboard.js';
 import aiRouter from './routes/ai.js';
 import analyticsRouter from './routes/analytics.js';
+import { xanhwrapRouter } from './routes/xanhwrap.js';
 
 const app = express();
 
@@ -135,6 +136,7 @@ app.use('/api', leaderboardRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api', analyticsRouter);
+app.use('/api/xanhwrap', xanhwrapRouter);
 
 // 5. Global Error Handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

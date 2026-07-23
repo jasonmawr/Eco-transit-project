@@ -20,7 +20,9 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
-  BarChart3
+  BarChart3,
+  Sparkles,
+  Download
 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 
@@ -38,7 +40,7 @@ interface AdminConsoleProps {
 
 export default function AdminConsoleSection({ user, onLoginClick }: AdminConsoleProps) {
   // Core admin tab navigation
-  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'tickets' | 'places' | 'guides' | 'vouchers' | 'audit_logs' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reviews' | 'tickets' | 'places' | 'guides' | 'vouchers' | 'audit_logs' | 'analytics' | 'xanhwrap'>('overview');
   
   // Data lists
   const [stats, setStats] = useState<any>(null);
@@ -50,6 +52,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
   const [vouchers, setVouchers] = useState<any[]>([]);
   const [auditLogs, setAuditLogs] = useState<any[]>([]);
   const [stations, setStations] = useState<any[]>([]);
+  const [xanhwrapSubmissions, setXanhwrapSubmissions] = useState<any[]>([]);
 
   // Filtering states
   const [reviewFilter, setReviewFilter] = useState<string>('pending');
@@ -57,6 +60,9 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
   const [placeFilter, setPlaceFilter] = useState<string>('all');
   const [guideFilter, setGuideFilter] = useState<string>('all');
   const [voucherFilter, setVoucherFilter] = useState<string>('all');
+  const [xanhwrapStatusFilter, setXanhwrapStatusFilter] = useState<string>('all');
+  const [xanhwrapLuckySearch, setXanhwrapLuckySearch] = useState<string>('');
+  const [xanhwrapTextSearch, setXanhwrapTextSearch] = useState<string>('');
 
   // Loading & error handling
   const [loading, setLoading] = useState<boolean>(false);
@@ -227,6 +233,9 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
       } else if (tabName === 'analytics') {
         const data = await apiFetch('/api/admin/analytics');
         setAnalyticsData(data);
+      } else if (tabName === 'xanhwrap') {
+        const data = await apiFetch(`/api/admin/xanhwrap/submissions?status=${xanhwrapStatusFilter}&luckyNumber=${xanhwrapLuckySearch}&search=${xanhwrapTextSearch}`);
+        setXanhwrapSubmissions(data || []);
       }
     } catch (err: any) {
       setErrorMsg(err.message || 'Lỗi tải dữ liệu kiểm duyệt.');
@@ -240,7 +249,29 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
     if (user && (user.role === 'ADMIN' || user.role === 'MODERATOR')) {
       fetchTabContent(activeTab);
     }
-  }, [activeTab, reviewFilter, ticketFilter, placeFilter, guideFilter, voucherFilter]);
+  }, [activeTab, reviewFilter, ticketFilter, placeFilter, guideFilter, voucherFilter, xanhwrapStatusFilter, xanhwrapLuckySearch, xanhwrapTextSearch]);
+
+  // XanhWrap Submission Moderation Action
+  const handleModerateXanhwrap = async (id: string, status: 'valid' | 'rejected') => {
+    try {
+      setLoading(true);
+      const res = await apiFetch(`/api/admin/xanhwrap/submissions/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status, rejectionReason: status === 'rejected' ? 'Bài nộp không đúng quy lệ hoặc link lỗi' : undefined }),
+      });
+      setSuccessMsg(`Đã cập nhật bài dự thi ${res.nickname} sang ${status === 'valid' ? 'Hợp lệ' : 'Bị loại'}.`);
+      fetchTabContent('xanhwrap');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Lỗi duyệt bài dự thi XanhWrap.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleExportXanhwrapCSV = () => {
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    window.open(`${backendUrl}/api/admin/xanhwrap/export-csv`, '_blank');
+  };
 
   // UGC Review Moderation Action
   const handleModerateReview = async (reviewId: string, decision: 'approved' | 'rejected') => {
@@ -630,6 +661,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
           { id: 'vouchers', label: '🎁 Vouchers', icon: Gift },
           { id: 'audit_logs', label: '🕵️ Nhật ký kiểm toán', icon: FileText },
           { id: 'analytics', label: '📈 Thống kê truy cập', icon: BarChart3 },
+          { id: 'xanhwrap', label: '🎫 Minigame XanhWrap', icon: Sparkles },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -1951,6 +1983,168 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                       ) : (
                         <tr>
                           <td colSpan={5} className="py-6 text-center text-eco-muted">Chưa có lượt truy cập nào được ghi nhận.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 9: MINIGAME XANHWRAP (QUẢN LÝ CHO BTC) */}
+          {activeTab === 'xanhwrap' && (
+            <div className="space-y-6 animate-fade-in">
+              
+              {/* Filter & Action Toolbar */}
+              <div className="bg-eco-soft/40 border border-eco-mint p-4 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <select
+                    value={xanhwrapStatusFilter}
+                    onChange={(e) => setXanhwrapStatusFilter(e.target.value)}
+                    className="bg-white border border-eco-primary/20 rounded-xl px-3 py-1.5 text-xs font-bold text-eco-ink focus:outline-none focus:ring-1 focus:ring-eco-primary"
+                  >
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="pending">⏳ Đang chờ duyệt</option>
+                    <option value="valid">✅ Hợp lệ (Đã duyệt)</option>
+                    <option value="rejected">❌ Bị loại</option>
+                  </select>
+
+                  <input
+                    type="number"
+                    placeholder="Số may mắn..."
+                    value={xanhwrapLuckySearch}
+                    onChange={(e) => setXanhwrapLuckySearch(e.target.value)}
+                    className="w-28 bg-white border border-eco-primary/20 rounded-xl px-3 py-1.5 text-xs font-mono font-bold focus:outline-none focus:ring-1 focus:ring-eco-primary"
+                  />
+
+                  <input
+                    type="text"
+                    placeholder="Tìm biệt danh / suy nghĩ / mã..."
+                    value={xanhwrapTextSearch}
+                    onChange={(e) => setXanhwrapTextSearch(e.target.value)}
+                    className="bg-white border border-eco-primary/20 rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-eco-primary"
+                  />
+                </div>
+
+                <button
+                  onClick={handleExportXanhwrapCSV}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all flex items-center justify-center space-x-1.5 shrink-0"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Xuất CSV Báo Cáo BTC</span>
+                </button>
+              </div>
+
+              {/* Submissions Table */}
+              <div className="border border-eco-mint rounded-2xl p-5 bg-white space-y-4">
+                <div className="flex items-center justify-between border-b border-eco-mint pb-3">
+                  <h3 className="text-xs font-black uppercase tracking-wider text-eco-ink flex items-center space-x-2">
+                    <Sparkles className="w-4 h-4 text-eco-primary" />
+                    <span>Danh Sách Bài Dự Thi ({xanhwrapSubmissions.length} lượt nộp)</span>
+                  </h3>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead>
+                      <tr className="border-b border-eco-mint text-eco-muted font-bold">
+                        <th className="py-2">Mã XN / Biệt danh</th>
+                        <th className="py-2">Nhãn Danh Tính</th>
+                        <th className="py-2 text-center">Số may mắn</th>
+                        <th className="py-2 text-center">Hành trình</th>
+                        <th className="py-2">Suy nghĩ / Bài đăng MXH</th>
+                        <th className="py-2 text-center">Trạng thái</th>
+                        <th className="py-2 text-right">Thao tác BTC</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-eco-mint/50">
+                      {xanhwrapSubmissions && xanhwrapSubmissions.length > 0 ? (
+                        xanhwrapSubmissions.map((sub: any) => (
+                          <tr key={sub.id} className="hover:bg-eco-soft/40 transition-colors">
+                            <td className="py-3">
+                              <div className="font-bold text-eco-primary font-mono">{sub.confirmationCode || 'Chưa nộp link'}</div>
+                              <div className="text-eco-ink font-semibold text-[11px]">{sub.nickname}</div>
+                              <span className="text-[10px] text-eco-muted">{sub.recordDate}</span>
+                            </td>
+
+                            <td className="py-3">
+                              <span className={`px-2.5 py-1 rounded text-[10px] font-black uppercase inline-block ${
+                                sub.labelGroup === 'green' ? 'bg-[#0E5140] text-[#00E08A]' : 'bg-[#2C2C2A] text-[#F5F1E8]'
+                              }`}>
+                                {sub.assignedLabelName}
+                              </span>
+                            </td>
+
+                            <td className="py-3 text-center">
+                              <span className="bg-amber-50 text-amber-800 border border-amber-200 px-2 py-1 rounded text-xs font-black font-mono">
+                                #{sub.luckyNumber}
+                              </span>
+                            </td>
+
+                            <td className="py-3 text-center font-mono text-[11px]">
+                              <div>{sub.totalKm} km</div>
+                              <div className="text-emerald-600 font-bold">{sub.handsFreeMin}m rảnh tay</div>
+                              {sub.needsReview && (
+                                <span className="bg-red-50 text-red-600 text-[9px] px-1.5 py-0.5 rounded font-black border border-red-200">
+                                  🚩 Cần soi
+                                </span>
+                              )}
+                            </td>
+
+                            <td className="py-3 max-w-xs">
+                              <p className="text-[11px] italic text-eco-ink line-clamp-2" title={sub.reflection}>
+                                "{sub.reflection}"
+                              </p>
+                              {sub.postUrl ? (
+                                <a
+                                  href={sub.postUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline text-[10px] font-bold truncate block mt-1"
+                                >
+                                  🔗 {sub.postUrl}
+                                </a>
+                              ) : (
+                                <span className="text-[10px] text-eco-muted italic">Chưa dán link bài đăng</span>
+                              )}
+                            </td>
+
+                            <td className="py-3 text-center">
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-black ${
+                                sub.status === 'valid'
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                                  : sub.status === 'rejected'
+                                    ? 'bg-red-100 text-red-800 border border-red-200'
+                                    : 'bg-amber-100 text-amber-800 border border-amber-200'
+                              }`}>
+                                {sub.status === 'valid' ? '✅ Hợp lệ' : sub.status === 'rejected' ? '❌ Bị loại' : '⏳ Đang chờ'}
+                              </span>
+                            </td>
+
+                            <td className="py-3 text-right">
+                              <div className="flex items-center justify-end space-x-1">
+                                <button
+                                  onClick={() => handleModerateXanhwrap(sub.id, 'valid')}
+                                  disabled={loading || sub.status === 'valid'}
+                                  className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold rounded shadow-sm disabled:opacity-30"
+                                >
+                                  Duyệt
+                                </button>
+                                <button
+                                  onClick={() => handleModerateXanhwrap(sub.id, 'rejected')}
+                                  disabled={loading || sub.status === 'rejected'}
+                                  className="px-2 py-1 bg-red-600 hover:bg-red-700 text-white text-[10px] font-bold rounded shadow-sm disabled:opacity-30"
+                                >
+                                  Loại
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={7} className="py-8 text-center text-eco-muted">Chưa có bài dự thi nào khớp với bộ lọc.</td>
                         </tr>
                       )}
                     </tbody>

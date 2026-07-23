@@ -27,6 +27,7 @@ model User {
   reviews                  UGCReview[]
   wallet                   UserWallet?
   timeBills                TimeBill[]
+  xanhWrapReceipts         XanhWrapReceipt[]
 }
 
 model Session {
@@ -323,5 +324,43 @@ model VisitorLog {
 
   @@index([createdAt])
   @@index([ipHash])
+}
+
+model XanhWrapReceipt {
+  id                String    @id @default(uuid())
+  sessionId         String?
+  userId            String?
+  user              User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  nickname          String
+  recordDate        String    // Format "YYYY-MM-DD"
+  reflection        String
+  luckyNumber       Int
+  legsJson          Json      // Mảng 2-8 chặng
+  totalKm           Float
+  totalMin          Int
+  transitMin        Int
+  handsFreeMin      Int
+  co2SavedGrams     Int
+  assignedLabel     String    // Mã nhãn (ví dụ: "retired_driver")
+  assignedLabelName String    // Tên nhãn (ví dụ: "TAY LÁI VỀ HƯU")
+  labelGroup        String    // "green" hoặc "standard"
+  metricValue       Int
+  daysPerYear       Int
+  episodesPerYear   Int
+  needsReview       Boolean   @default(false)
+  
+  // Link Submission
+  postUrl           String?   @unique
+  confirmationCode  String?   @unique
+  status            String    @default("pending") // "pending", "valid", "rejected"
+  rejectionReason   String?
+  submittedAt       DateTime?
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([assignedLabel])
+  @@index([luckyNumber])
+  @@index([createdAt])
 }
 

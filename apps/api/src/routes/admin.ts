@@ -1126,4 +1126,113 @@ router.get('/routes-all', async (_req: Request, res: Response) => {
   }
 });
 
+// 19. GET /api/admin/xanhwrap/submissions - List all XanhWrap contest submissions
+router.get('/xanhwrap/submissions', async (req: Request, res: Response) => {
+  try {
+    const { status, luckyNumber, search } = req.query;
+
+    const whereClause: any = {};
+    
+    if (status && status !== 'all') {
+      whereClause.status = String(status);
+    }
+
+    if (luckyNumber) {
+      const num = parseInt(String(luckyNumber), 10);
+      if (!isNaN(num)) {
+        whereClause.luckyNumber = num;
+      }
+    }
+
+    if (search) {
+      const q = String(search).trim();
+      whereClause.OR = [
+        { nickname: { contains: q, mode: 'insensitive' } },
+        { reflection: { contains: q, mode: 'insensitive' } },
+        { confirmationCode: { contains: q, mode: 'insensitive' } },
+        { postUrl: { contains: q, mode: 'insensitive' } },
+      ];
+    }
+
+    const submissions = await prisma.xanhWrapReceipt.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+    });
+
+    return res.status(200).json(submissions);
+  } catch (err: any) {
+    console.error('Fetch XanhWrap submissions error:', err);
+    return res.status(500).json({ message: 'Lỗi tải danh sách bài dự thi XanhWrap.' });
+  }
+});
+
+// 20. PATCH /api/admin/xanhwrap/submissions/:id - Approve or reject a submission
+router.patch('/xanhwrap/submissions/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body;
+
+    if (!['valid', 'rejected', 'pending'].includes(status)) {
+      return res.status(400).json({ message: 'Trạng thái không hợp lệ. Phải là valid, rejected hoặc pending.' });
+    }
+
+    const updated = await prisma.xanhWrapReceipt.update({
+      where: { id },
+      data: {
+        status,
+        rejectionReason: status === 'rejected' ? (rejectionReason || 'Bài đăng không hợp lệ hoặc thiếu thông tin') : null,
+      },
+    });
+
+    // Record audit log
+    await prisma.auditLog.create({
+      data: {
+        actorUserId: (req as any).user?.id || null,
+        actorRole: (req as any).user?.role || 'ADMIN',
+        action: 'UPDATE_XANHWRAP_SUBMISSION',
+        entityType: 'XanhWrapReceipt',
+        entityId: id,
+        summary: `Cập nhật trạng thái bài dự thi ${updated.nickname} (${updated.confirmationCode || id}) sang ${status}`,
+      },
+    });
+
+    return res.status(200).json(updated);
+  } catch (err: any) {
+    console.error('Update XanhWrap submission error:', err);
+    return res.status(500).json({ message: 'Lỗi cập nhật trạng thái bài dự thi.' });
+  }
+});
+
+// 21. GET /api/admin/xanhwrap/export-csv - Export CSV of submissions
+router.get('/xanhwrap/export-csv', async (_req: Request, res: Response) => {
+  try {
+    const submissions = await prisma.xanhWrapReceipt.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    let csvContent = 'STT,MaXacNhan,BietDanh,SoMayMan,NhanDanhTinh,NgayGhiNhan,QuangDuongKm,PhutKhongLai,LinkBaiDang,SuyNghi,TrangThai,NgayNop\n';
+
+    submissions.forEach((item, index) => {
+      const code = item.confirmationCode || 'ChuaNop';
+      const nick = `"${(item.nickname || '').replace(/"/g, '""')}"`;
+      const label = `"${(item.assignedLabelName || '').replace(/"/g, '""')}"`;
+      const link = `"${(item.postUrl || '').replace(/"/g, '""')}"`;
+      const reflection = `"${(item.reflection || '').replace(/"/g, '""')}"`;
+      const date = item.recordDate || '';
+      const submittedAt = item.submittedAt ? item.submittedAt.toISOString() : '';
+
+      csvContent += `${index + 1},${code},${nick},${item.luckyNumber},${label},${date},${item.totalKm},${item.handsFreeMin},${link},${reflection},${item.status},${submittedAt}\n`;
+    });
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="XanhWrap_Minigame_Submissions.csv"');
+    return res.status(200).send('\uFEFF' + csvContent); // BOM for Excel UTF-8
+  } catch (err: any) {
+    console.error('Export XanhWrap CSV error:', err);
+    return res.status(500).json({ message: 'Lỗi xuất CSV bài dự thi.' });
+  }
+});
+
 export default router;
+
