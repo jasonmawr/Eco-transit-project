@@ -25,42 +25,38 @@ export interface XanhWrapLabelDef {
   description: string;
 }
 
+// Danh sách địa điểm gợi ý chuẩn theo Phường / Xã / Khu vực dân cư TP.HCM năm 2026
 export const SUGGESTED_LOCATIONS: string[] = [
-  'Q1 (Quận 1)',
-  'Q. Thủ Đức',
+  'P. Bến Thành',
   'P. Thảo Điền',
-  'Q. Bình Thạnh',
-  'Q7 (Phú Mỹ Hưng)',
-  'Q. Gò Vấp',
-  'Q3 (Quận 3)',
-  'Q. Tân Bình',
-  'Q. Phú Nhuận',
-  'Q12 (Quận 12)',
-  'Q5 (Quận 5)',
-  'Q10 (Quận 10)',
-  'Q8 (Quận 8)',
-  'Q. Bình Tân',
-  'H. Hóc Môn',
-  'H. Củ Chi',
-  'H. Nhà Bè',
-  'Trường ĐH FPT (Q9)',
+  'P. Linh Trung (Thủ Đức)',
+  'P. Hàng Xanh',
+  'P. Phú Mỹ Hưng',
+  'P. Gia Định',
+  'P. Tân Định',
+  'P. An Phú',
+  'P. Tân Thuận',
+  'P. Hiệp Bình Chánh',
+  'P. Phú Hữu (Q9)',
+  'P. Quang Trung',
+  'P. An Đông',
+  'P. Thủ Thiêm',
+  'Trường ĐH FPT',
   'Nhà riêng',
   'Công ty / Văn phòng'
 ];
 
 export const XANHWRAP_PRESETS: XanhWrapPreset[] = [
-  { id: 'thuduc_q1', label: 'Thủ Đức → Q1', from: 'Thủ Đức', to: 'Q1', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
-  { id: 'q1_thaodien', label: 'Q1 → Thảo Điền', from: 'Q1', to: 'Thảo Điền', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
-  { id: 'thaodien_q1', label: 'Thảo Điền → Q1', from: 'Thảo Điền', to: 'Q1', distance_km: 8, duration_min: 28, transit_line: 'Metro số 1' },
-  { id: 'q1_binhthanh', label: 'Q1 → B.Thạnh', from: 'Q1', to: 'B.Thạnh', distance_km: 6, duration_min: 30, transit_line: 'Buýt 150' },
-  { id: 'binhthanh_nha', label: 'B.Thạnh → Nhà', from: 'B.Thạnh', to: 'Nhà', distance_km: 11, duration_min: 45, transit_line: 'Buýt số 03' },
-  { id: 'nha_fpt', label: 'Nhà → ĐH FPT', from: 'Nhà', to: 'Trường ĐH FPT', distance_km: 15, duration_min: 35, transit_line: 'Metro số 1' },
-  { id: 'q7_q1', label: 'Q7 → Q1', from: 'Q7 (Phú Mỹ Hưng)', to: 'Q1', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
-  { id: 'q1_q7', label: 'Q1 → Q7', from: 'Q1', to: 'Q7 (Phú Mỹ Hưng)', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
-  { id: 'govap_q3', label: 'Gò Vấp → Q3', from: 'Gò Vấp', to: 'Q3', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
-  { id: 'tanbinh_q1', label: 'Tân Bình → Q1', from: 'Tân Bình', to: 'Q1', distance_km: 6.5, duration_min: 22, transit_line: 'Buýt số 04' },
-  { id: 'q12_q1', label: 'Q12 → Q1', from: 'Q12', to: 'Q1', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
-  { id: 'binhtan_q5', label: 'Bình Tân → Q5', from: 'Bình Tân', to: 'Q5', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
+  { id: 'linhtrung_benthanh', label: 'P. Linh Trung → P. Bến Thành', from: 'P. Linh Trung', to: 'P. Bến Thành', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
+  { id: 'benthanh_thaodien', label: 'P. Bến Thành → P. Thảo Điền', from: 'P. Bến Thành', to: 'P. Thảo Điền', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
+  { id: 'thaodien_benthanh', label: 'P. Thảo Điền → P. Bến Thành', from: 'P. Thảo Điền', to: 'P. Bến Thành', distance_km: 8, duration_min: 28, transit_line: 'Metro số 1' },
+  { id: 'benthanh_hangxanh', label: 'P. Bến Thành → P. Hàng Xanh', from: 'P. Bến Thành', to: 'P. Hàng Xanh', distance_km: 6, duration_min: 30, transit_line: 'Buýt 150' },
+  { id: 'hangxanh_nha', label: 'P. Hàng Xanh → Nhà', from: 'P. Hàng Xanh', to: 'Nhà', distance_km: 11, duration_min: 45, transit_line: 'Buýt số 03' },
+  { id: 'nha_fpt', label: 'Nhà → Trường ĐH FPT', from: 'Nhà', to: 'Trường ĐH FPT', distance_km: 15, duration_min: 35, transit_line: 'Metro số 1' },
+  { id: 'phumyhung_benthanh', label: 'P. Phú Mỹ Hưng → P. Bến Thành', from: 'P. Phú Mỹ Hưng', to: 'P. Bến Thành', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
+  { id: 'giadinh_tandinh', label: 'P. Gia Định → P. Tân Định', from: 'P. Gia Định', to: 'P. Tân Định', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
+  { id: 'quangtrung_benthanh', label: 'P. Quang Trung → P. Bến Thành', from: 'P. Quang Trung', to: 'P. Bến Thành', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
+  { id: 'andong_mientay', label: 'P. An Đông → P. Bến Xe Miền Tây', from: 'P. An Đông', to: 'P. Bến Xe Miền Tây', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
 ];
 
 export const ALL_LABELS: XanhWrapLabelDef[] = [

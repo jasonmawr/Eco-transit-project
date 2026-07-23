@@ -35,8 +35,8 @@ export default function XanhWrapSection() {
 
   // Legs array (Min 2, Max 8)
   const [legs, setLegs] = useState<XanhWrapLeg[]>([
-    { from: 'Thủ Đức', to: 'Q1', depart_time: '07:00', mode: 'metro', distance_km: 14, duration_min: 52, transit_line: 'Metro số 1' },
-    { from: 'Q1', to: 'Thảo Điền', depart_time: '12:15', mode: 'metro', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
+    { from: 'P. Linh Trung', to: 'P. Bến Thành', depart_time: '07:00', mode: 'metro', distance_km: 14, duration_min: 52, transit_line: 'Metro số 1' },
+    { from: 'P. Bến Thành', to: 'P. Thảo Điền', depart_time: '12:15', mode: 'metro', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
   ]);
 
   // Loading & Step states
