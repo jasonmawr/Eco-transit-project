@@ -25,23 +25,64 @@ export interface XanhWrapLabelDef {
   description: string;
 }
 
-// Danh sách địa điểm gợi ý chuẩn theo Phường / Xã / Khu vực dân cư TP.HCM năm 2026
+// Danh sách gợi ý mở rộng bao phủ hơn 50 Phường/Xã/Khu vực tiêu biểu toàn TP.HCM (Năm 2026)
 export const SUGGESTED_LOCATIONS: string[] = [
+  // Trục Metro 1 & Trung tâm
   'P. Bến Thành',
-  'P. Thảo Điền',
-  'P. Linh Trung (Thủ Đức)',
-  'P. Hàng Xanh',
-  'P. Phú Mỹ Hưng',
-  'P. Gia Định',
+  'P. Bến Nghé',
+  'P. Phạm Ngũ Lão',
   'P. Tân Định',
+  'P. Đa Kao',
+  'P. Võ Thị Sáu',
+  'P. Thảo Điền',
   'P. An Phú',
-  'P. Tân Thuận',
-  'P. Hiệp Bình Chánh',
-  'P. Phú Hữu (Q9)',
-  'P. Quang Trung',
-  'P. An Đông',
   'P. Thủ Thiêm',
-  'Trường ĐH FPT',
+  'P. Bình An',
+  'P. Phước Long A',
+  'P. Phước Long B',
+  'P. Linh Chiểu',
+  'P. Linh Trung',
+  'P. Tân Phú (Thủ Đức)',
+  
+  // Trục Đông & Nam Sài Gòn
+  'P. Phú Hữu',
+  'P. Long Thạnh Mỹ',
+  'P. Tân Thuận Đông',
+  'P. Tân Thuận Tây',
+  'P. Tân Phong (Phú Mỹ Hưng)',
+  'P. Tân Quy',
+  'P. Phú Thuận',
+  'X. Phước Kiển (Nhà Bè)',
+  'X. Hiệp Phước',
+  
+  // Trục Bắc & Tây Sài Gòn
+  'P. Hàng Xanh',
+  'P. Gia Định',
+  'P. Ward 1 (Bình Thạnh)',
+  'P. Chánh Hưng',
+  'P. An Lạc',
+  'P. Bình Trị Đông',
+  'P. Tân Tạo',
+  'P. Quang Trung',
+  'P. An Hội',
+  'P. Trung Mỹ Tây',
+  'P. Tân Thới Hiệp',
+  'P. An Đông',
+  'P. Chợ Lớn',
+  'P. Phú Thọ',
+  'P. Bảy Hiền (Tân Bình)',
+  'P. Hòa Thạnh',
+  'X. Hóc Môn',
+  'X. Củ Chi',
+  'X. Bình Chánh',
+  
+  // Địa điểm đặc thù
+  'Trường ĐH FPT (Q9)',
+  'ĐH Bách Khoa TP.HCM',
+  'ĐH Quốc Gia TP.HCM',
+  'Sân bay Tân Sơn Nhất',
+  'Bến xe Miền Đông',
+  'Bến xe Miền Tây',
   'Nhà riêng',
   'Công ty / Văn phòng'
 ];
@@ -51,12 +92,12 @@ export const XANHWRAP_PRESETS: XanhWrapPreset[] = [
   { id: 'benthanh_thaodien', label: 'P. Bến Thành → P. Thảo Điền', from: 'P. Bến Thành', to: 'P. Thảo Điền', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
   { id: 'thaodien_benthanh', label: 'P. Thảo Điền → P. Bến Thành', from: 'P. Thảo Điền', to: 'P. Bến Thành', distance_km: 8, duration_min: 28, transit_line: 'Metro số 1' },
   { id: 'benthanh_hangxanh', label: 'P. Bến Thành → P. Hàng Xanh', from: 'P. Bến Thành', to: 'P. Hàng Xanh', distance_km: 6, duration_min: 30, transit_line: 'Buýt 150' },
-  { id: 'hangxanh_nha', label: 'P. Hàng Xanh → Nhà', from: 'P. Hàng Xanh', to: 'Nhà', distance_km: 11, duration_min: 45, transit_line: 'Buýt số 03' },
-  { id: 'nha_fpt', label: 'Nhà → Trường ĐH FPT', from: 'Nhà', to: 'Trường ĐH FPT', distance_km: 15, duration_min: 35, transit_line: 'Metro số 1' },
-  { id: 'phumyhung_benthanh', label: 'P. Phú Mỹ Hưng → P. Bến Thành', from: 'P. Phú Mỹ Hưng', to: 'P. Bến Thành', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
+  { id: 'hangxanh_nha', label: 'P. Hàng Xanh → Nhà', from: 'P. Hàng Xanh', to: 'Nhà riêng', distance_km: 11, duration_min: 45, transit_line: 'Buýt số 03' },
+  { id: 'nha_fpt', label: 'Nhà → Trường ĐH FPT', from: 'Nhà riêng', to: 'Trường ĐH FPT (Q9)', distance_km: 15, duration_min: 35, transit_line: 'Metro số 1' },
+  { id: 'phumyhung_benthanh', label: 'P. Tân Phong (Phú Mỹ Hưng) → P. Bến Thành', from: 'P. Tân Phong (Phú Mỹ Hưng)', to: 'P. Bến Thành', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
   { id: 'giadinh_tandinh', label: 'P. Gia Định → P. Tân Định', from: 'P. Gia Định', to: 'P. Tân Định', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
   { id: 'quangtrung_benthanh', label: 'P. Quang Trung → P. Bến Thành', from: 'P. Quang Trung', to: 'P. Bến Thành', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
-  { id: 'andong_mientay', label: 'P. An Đông → P. Bến Xe Miền Tây', from: 'P. An Đông', to: 'P. Bến Xe Miền Tây', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
+  { id: 'andong_mientay', label: 'P. An Đông → Bến xe Miền Tây', from: 'P. An Đông', to: 'Bến xe Miền Tây', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
 ];
 
 export const ALL_LABELS: XanhWrapLabelDef[] = [
