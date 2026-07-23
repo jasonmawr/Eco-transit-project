@@ -278,7 +278,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     setDownloadingImages(true);
 
     try {
-      // Preload official BTC logo strip image
+      // Preload official BTC transparent PNG logo strip image
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
       logoImg.src = '/images/xanhwrap-brand-logos.png';
@@ -319,19 +319,13 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
         if (part === 1) {
           // PART 1: TOP HALF MASTER
-          // 4. Top Brand Header Bar - Official BTC 4-Logo Strip Image
+          // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
           if (logoImg.complete && logoImg.naturalWidth > 0) {
             ctx.save();
-            ctx.globalCompositeOperation = 'screen';
-            const targetW = 1450;
+            const targetW = 1200;
             const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
-            ctx.drawImage(logoImg, (1920 - targetW) / 2, 40, targetW, targetH);
+            ctx.drawImage(logoImg, (1920 - targetW) / 2, 45, targetW, targetH);
             ctx.restore();
-          } else {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-            ctx.font = '900 30px "Space Mono", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('FPT UNIVERSITY   |   COMMUNICATION TECHNOLOGY   |   LUOT KHOI CHAM XANH', 960, 80);
           }
 
           // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH"
@@ -907,12 +901,12 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
           <div className="bg-[#84D0FF] p-3 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
             
-            {/* Header Brand Logos Row (Hiển thị dải logo chuẩn đồ họa từ BTC) */}
-            <div className="flex justify-center items-center border-b border-white/30 pb-2.5">
+            {/* Header Brand Logos Row (Hiển thị dải logo chuẩn đồ họa PNG trong suốt từ BTC) */}
+            <div className="flex justify-center items-center border-b border-white/30 pb-2.5 pt-1">
               <img 
                 src="/images/xanhwrap-brand-logos.png" 
                 alt="Bộ Logo Ban Tổ Chức" 
-                className="h-7 sm:h-11 w-auto object-contain mix-blend-screen opacity-95"
+                className="h-6 sm:h-9 max-w-full w-auto object-contain opacity-95"
               />
             </div>
 
