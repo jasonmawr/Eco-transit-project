@@ -25,37 +25,43 @@ export interface XanhWrapLabelDef {
   description: string;
 }
 
+// Bộ địa điểm gợi ý Phường / Quận / Khu vực phổ biến TP.HCM
+export const SUGGESTED_LOCATIONS: string[] = [
+  'Q1 (Quận 1)',
+  'Q. Thủ Đức',
+  'P. Thảo Điền',
+  'Q. Bình Thạnh',
+  'Q7 (Phú Mỹ Hưng)',
+  'Q. Gò Vấp',
+  'Q3 (Quận 3)',
+  'Q. Tân Bình',
+  'Q. Phú Nhuận',
+  'Q12 (Quận 12)',
+  'Q5 (Quận 5)',
+  'Q10 (Quận 10)',
+  'Q8 (Quận 8)',
+  'Q. Bình Tân',
+  'H. Hóc Môn',
+  'H. Củ Chi',
+  'H. Nhà Bè',
+  'Trường ĐH FPT (Q9)',
+  'Nhà riêng',
+  'Công ty / Văn phòng'
+];
+
 export const XANHWRAP_PRESETS: XanhWrapPreset[] = [
-  { id: 'thuduc_q1', label: 'Thủ Đức → Quận 1', from: 'Ga Thủ Đức', to: 'Ga Bến Thành', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
-  { id: 'q1_thuduc', label: 'Quận 1 → Thủ Đức', from: 'Ga Bến Thành', to: 'Ga Thủ Đức', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
-  { id: 'q7_q1', label: 'Quận 7 → Quận 1', from: 'KĐT Phú Mỹ Hưng', to: 'Chợ Bến Thành', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
-  { id: 'q1_q7', label: 'Quận 1 → Quận 7', from: 'Chợ Bến Thành', to: 'KĐT Phú Mỹ Hưng', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
-  { id: 'govap_q3', label: 'Gò Vấp → Quận 3', from: 'Công viên Gia Định', to: 'Hồ Con Rùa', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
-  { id: 'q3_govap', label: 'Quận 3 → Gò Vấp', from: 'Hồ Con Rùa', to: 'Công viên Gia Định', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
-  { id: 'binhthanh_q1', label: 'Bình Thạnh → Quận 1', from: 'Hàng Xanh', to: 'Nhà hát Thành phố', distance_km: 4.5, duration_min: 18, transit_line: 'Buýt 150' },
-  { id: 'q1_binhthanh', label: 'Quận 1 → Bình Thạnh', from: 'Nhà hát Thành phố', to: 'Hàng Xanh', distance_km: 4.5, duration_min: 18, transit_line: 'Buýt 150' },
-  { id: 'tanbinh_q1', label: 'Tân Bình → Quận 1', from: 'Công viên Hoàng Văn Thụ', to: 'Ga Ba Son', distance_km: 6.5, duration_min: 22, transit_line: 'Buýt số 04' },
-  { id: 'q1_tanbinh', label: 'Quận 1 → Tân Bình', from: 'Ga Ba Son', to: 'Công viên Hoàng Văn Thụ', distance_km: 6.5, duration_min: 22, transit_line: 'Buýt số 04' },
-  { id: 'q12_q1', label: 'Quận 12 → Quận 1', from: 'Công viên Phần mềm Quang Trung', to: 'Ga Bến Thành', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
-  { id: 'q1_q12', label: 'Quận 1 → Quận 12', from: 'Ga Bến Thành', to: 'Công viên Phần mềm Quang Trung', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
-  { id: 'binhtan_q5', label: 'Bình Tân → Quận 5', from: 'Bến xe Miền Tây', to: 'Chợ An Đông', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
-  { id: 'q5_binhtan', label: 'Quận 5 → Bình Tân', from: 'Chợ An Đông', to: 'Bến xe Miền Tây', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
-  { id: 'thaodien_q1', label: 'Thảo Điền → Quận 1', from: 'Ga Thảo Điền', to: 'Ga Nhà hát TP', distance_km: 6, duration_min: 15, transit_line: 'Metro số 1' },
-  { id: 'q1_thaodien', label: 'Quận 1 → Thảo Điền', from: 'Ga Nhà hát TP', to: 'Ga Thảo Điền', distance_km: 6, duration_min: 15, transit_line: 'Metro số 1' },
-  { id: 'q2_q7', label: 'Quận 2 → Quận 7', from: 'Thủ Thiêm', to: 'Cầu Phú Mỹ - Q7', distance_km: 10, duration_min: 30, transit_line: 'Buýt số 88' },
-  { id: 'q7_q2', label: 'Quận 7 → Quận 2', from: 'Cầu Phú Mỹ - Q7', to: 'Thủ Thiêm', distance_km: 10, duration_min: 30, transit_line: 'Buýt số 88' },
-  { id: 'hocmon_q10', label: 'Hóc Môn → Quận 10', from: 'Chợ Hóc Môn', to: 'ĐH Bách Khoa TP.HCM', distance_km: 18, duration_min: 50, transit_line: 'Buýt số 13' },
-  { id: 'q10_hocmon', label: 'Quận 10 → Hóc Môn', from: 'ĐH Bách Khoa TP.HCM', to: 'Chợ Hóc Môn', distance_km: 18, duration_min: 50, transit_line: 'Buýt số 13' },
-  { id: 'phunhuan_q1', label: 'Phú Nhuận → Quận 1', from: 'Ngã tư Phú Nhuận', to: 'Ga Ba Son', distance_km: 4, duration_min: 15, transit_line: 'Buýt số 03' },
-  { id: 'q1_phunhuan', label: 'Quận 1 → Phú Nhuận', from: 'Ga Ba Son', to: 'Ngã tư Phú Nhuận', distance_km: 4, duration_min: 15, transit_line: 'Buýt số 03' },
-  { id: 'binhchanh_q8', label: 'Bình Chánh → Quận 8', from: 'Cầu Bình Điền', to: 'Chợ Rạch Ông', distance_km: 12, duration_min: 40, transit_line: 'Buýt số 22' },
-  { id: 'q8_binhchanh', label: 'Quận 8 → Bình Chánh', from: 'Chợ Rạch Ông', to: 'Cầu Bình Điền', distance_km: 12, duration_min: 40, transit_line: 'Buýt số 22' },
-  { id: 'nhabe_q7', label: 'Nhà Bè → Quận 7', from: 'Cầu Phước Lộc', to: 'Lotte Mart Quận 7', distance_km: 8.5, duration_min: 28, transit_line: 'Buýt số 72' },
-  { id: 'q7_nhabe', label: 'Quận 7 → Nhà Bè', from: 'Lotte Mart Quận 7', to: 'Cầu Phước Lộc', distance_km: 8.5, duration_min: 28, transit_line: 'Buýt số 72' },
-  { id: 'cuchi_q12', label: 'Củ Chi → Quận 12', from: 'Bến xe Củ Chi', to: 'Bến xe An Sương', distance_km: 22, duration_min: 55, transit_line: 'Buýt số 79' },
-  { id: 'q12_cuchi', label: 'Quận 12 → Củ Chi', from: 'Bến xe An Sương', to: 'Bến xe Củ Chi', distance_km: 22, duration_min: 55, transit_line: 'Buýt số 79' },
-  { id: 'thuduc_q7', label: 'Thủ Đức → Quận 7', from: 'Khu Công Nghệ Cao', to: 'ĐH Tôn Đức Thắng', distance_km: 16, duration_min: 45, transit_line: 'Buýt 56 + Buýt 34' },
-  { id: 'q7_thuduc', label: 'Quận 7 → Thủ Đức', from: 'ĐH Tôn Đức Thắng', to: 'Khu Công Nghệ Cao', distance_km: 16, duration_min: 45, transit_line: 'Buýt 56 + Buýt 34' },
+  { id: 'thuduc_q1', label: 'Thủ Đức → Q1', from: 'Thủ Đức', to: 'Q1', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
+  { id: 'q1_thaodien', label: 'Q1 → Thảo Điền', from: 'Q1', to: 'Thảo Điền', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
+  { id: 'thaodien_q1', label: 'Thảo Điền → Q1', from: 'Thảo Điền', to: 'Q1', distance_km: 8, duration_min: 28, transit_line: 'Metro số 1' },
+  { id: 'q1_binhthanh', label: 'Q1 → B.Thạnh', from: 'Q1', to: 'B.Thạnh', distance_km: 6, duration_min: 30, transit_line: 'Buýt 150' },
+  { id: 'binhthanh_nha', label: 'B.Thạnh → Nhà', from: 'B.Thạnh', to: 'Nhà', distance_km: 11, duration_min: 45, transit_line: 'Buýt số 03' },
+  { id: 'nha_fpt', label: 'Nhà → ĐH FPT', from: 'Nhà', to: 'Trường ĐH FPT', distance_km: 15, duration_min: 35, transit_line: 'Metro số 1' },
+  { id: 'q7_q1', label: 'Q7 → Q1', from: 'Q7 (Phú Mỹ Hưng)', to: 'Q1', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
+  { id: 'q1_q7', label: 'Q1 → Q7', from: 'Q1', to: 'Q7 (Phú Mỹ Hưng)', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
+  { id: 'govap_q3', label: 'Gò Vấp → Q3', from: 'Gò Vấp', to: 'Q3', distance_km: 8, duration_min: 30, transit_line: 'Buýt số 18' },
+  { id: 'tanbinh_q1', label: 'Tân Bình → Q1', from: 'Tân Bình', to: 'Q1', distance_km: 6.5, duration_min: 22, transit_line: 'Buýt số 04' },
+  { id: 'q12_q1', label: 'Q12 → Q1', from: 'Q12', to: 'Q1', distance_km: 15, duration_min: 45, transit_line: 'Buýt số 62' },
+  { id: 'binhtan_q5', label: 'Bình Tân → Q5', from: 'Bình Tân', to: 'Q5', distance_km: 9, duration_min: 35, transit_line: 'Buýt số 10' },
 ];
 
 export const ALL_LABELS: XanhWrapLabelDef[] = [
@@ -110,32 +116,26 @@ export function assignXanhWrapLabel(legs: XanhWrapLeg[]): XanhWrapLabelDef {
   const publicLegs = legs.filter(l => ['bus', 'metro'].includes(l.mode));
   const publicRatio = publicLegs.length / legs.length;
 
-  // #1 KHÔNG KHÓI TUYỆT ĐỐI: 100% bus/metro & totalKm >= 20
   if (publicRatio === 1 && totalKm >= 20) {
     return ALL_LABELS.find(l => l.code === 'no_smoke_absolute')!;
   }
 
-  // #2 TAY LÁI VỀ HƯU: 100% bus/metro
   if (publicRatio === 1) {
     return ALL_LABELS.find(l => l.code === 'retired_driver')!;
   }
 
-  // #3 RA GA NHƯ VỀ NHÀ: >= 60% bus/metro
   if (publicRatio >= 0.6) {
     return ALL_LABELS.find(l => l.code === 'station_regular')!;
   }
 
-  // #4 TẬP TÀNH BỎ XE: >= 1 leg bus/metro
   if (publicLegs.length >= 1) {
     return ALL_LABELS.find(l => l.code === 'quitting_rookie')!;
   }
 
-  // #5 TRÙM CUỐI XA LỘ: totalKm >= 35
   if (totalKm >= 35) {
     return ALL_LABELS.find(l => l.code === 'highway_boss')!;
   }
 
-  // #6 CÚ ĐÊM CHÍNH HIỆU: any leg depart_time >= 21:00
   const hasNightLeg = legs.some(l => {
     if (!l.depart_time || !l.depart_time.includes(':')) return false;
     const h = parseInt(l.depart_time.split(':')[0], 10);
@@ -145,7 +145,6 @@ export function assignXanhWrapLabel(legs: XanhWrapLeg[]): XanhWrapLabelDef {
     return ALL_LABELS.find(l => l.code === 'night_owl')!;
   }
 
-  // #7 TEAM 5 GIỜ SÁNG: first leg depart_time < 06:30
   if (legs[0]?.depart_time) {
     const [h, m] = legs[0].depart_time.split(':').map(Number);
     if ((h * 60 + m) < (6 * 60 + 30)) {
@@ -153,52 +152,43 @@ export function assignXanhWrapLabel(legs: XanhWrapLeg[]): XanhWrapLabelDef {
     }
   }
 
-  // #8 SPEEDRUN THÀNH PHỐ: legs.length >= 6
   if (legs.length >= 6) {
     return ALL_LABELS.find(l => l.code === 'city_speedrun')!;
   }
 
-  // #9 CHIẾN THẦN GIỜ CAO ĐIỂM: >= 2 legs in rush hour
   const rushHourLegsCount = legs.filter(l => isRushHour(l.depart_time)).length;
   if (rushHourLegsCount >= 2) {
     return ALL_LABELS.find(l => l.code === 'rush_hour_god')!;
   }
 
-  // #10 KẸT XE LÀ BẠN THÂN: avg speed < 18 km/h
   const avgSpeed = totalMin > 0 ? (totalKm / (totalMin / 60)) : 25;
   if (avgSpeed < 18) {
     return ALL_LABELS.find(l => l.code === 'traffic_bestie')!;
   }
 
-  // #11 CỘT SỐNG THÉP: >= 150 min motorbike
   const motorbikeMins = legs.filter(l => l.mode === 'motorbike').reduce((sum, l) => sum + (l.duration_min || 0), 0);
   if (motorbikeMins >= 150) {
     return ALL_LABELS.find(l => l.code === 'steel_spine')!;
   }
 
-  // #12 XE ÔM CỦA CHÍNH MÌNH: >= 4 legs
   if (legs.length >= 4) {
     return ALL_LABELS.find(l => l.code === 'self_driver')!;
   }
 
-  // #13 CON LẮC HAI ĐẦU: exactly 2 legs & totalKm >= 12
   if (legs.length === 2 && totalKm >= 12) {
     return ALL_LABELS.find(l => l.code === 'two_end_pendulum')!;
   }
 
-  // #14 DÂN NỘI ĐÔ XỊN: all legs < 5km
   const allShort = legs.every(l => l.distance_km < 5);
   if (allShort) {
     return ALL_LABELS.find(l => l.code === 'downtown_native')!;
   }
 
-  // #15 NGƯỜI CỦA GIỜ VÀNG: no legs in rush hour
   const noRushHour = legs.every(l => !isRushHour(l.depart_time));
   if (noRushHour) {
     return ALL_LABELS.find(l => l.code === 'golden_hour')!;
   }
 
-  // #16 Fallback: NHÂN VIÊN KIỂU MẪU
   return ALL_LABELS.find(l => l.code === 'model_employee')!;
 }
 
@@ -206,12 +196,10 @@ export function calculateXanhWrapStats(legs: XanhWrapLeg[]) {
   const totalKm = parseFloat(legs.reduce((acc, l) => acc + (l.distance_km || 0), 0).toFixed(1));
   const totalMin = legs.reduce((acc, l) => acc + (l.duration_min || 0), 0);
 
-  // handsFreeMin: bus, metro, ride_hailing
   const handsFreeMin = legs
     .filter(l => ['bus', 'metro', 'ride_hailing'].includes(l.mode))
     .reduce((sum, l) => sum + (l.duration_min || 0), 0);
 
-  // transitMin: public transit legs or estimated time
   const transitMin = legs.reduce((sum, l) => {
     if (['bus', 'metro'].includes(l.mode)) {
       return sum + l.duration_min;

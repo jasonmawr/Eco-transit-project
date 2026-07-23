@@ -22,7 +22,8 @@ import {
   XanhWrapLeg, 
   XANHWRAP_PRESETS, 
   ALL_LABELS,
-  XanhWrapLabelDef
+  XanhWrapLabelDef,
+  SUGGESTED_LOCATIONS
 } from '../lib/xanhwrapCore';
 
 export default function XanhWrapSection() {
@@ -34,8 +35,8 @@ export default function XanhWrapSection() {
 
   // Legs array (Min 2, Max 8)
   const [legs, setLegs] = useState<XanhWrapLeg[]>([
-    { from: 'Ga Thủ Đức', to: 'Ga Bến Thành', depart_time: '07:15', mode: 'metro', distance_km: 14, duration_min: 32, transit_line: 'Metro số 1' },
-    { from: 'Ga Bến Thành', to: 'KĐT Phú Mỹ Hưng', depart_time: '17:30', mode: 'bus', distance_km: 7, duration_min: 25, transit_line: 'Buýt số 34' },
+    { from: 'Thủ Đức', to: 'Q1', depart_time: '07:00', mode: 'metro', distance_km: 14, duration_min: 52, transit_line: 'Metro số 1' },
+    { from: 'Q1', to: 'Thảo Điền', depart_time: '12:15', mode: 'metro', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
   ]);
 
   // Loading & Step states
@@ -573,10 +574,11 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đi</label>
+                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đi (Phường/Quận/Khu vực)</label>
                       <input
                         type="text"
-                        placeholder="Ga Thủ Đức..."
+                        list="suggested-locations"
+                        placeholder="Thủ Đức, Q1, Thảo Điền, Nhà..."
                         value={leg.from}
                         onChange={(e) => handleLegChange(idx, 'from', e.target.value)}
                         className="w-full bg-eco-soft/40 border border-eco-primary/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-eco-primary"
@@ -585,10 +587,11 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đến</label>
+                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đến (Phường/Quận/Khu vực)</label>
                       <input
                         type="text"
-                        placeholder="Ga Bến Thành..."
+                        list="suggested-locations"
+                        placeholder="Q1, B.Thạnh, Nhà..."
                         value={leg.to}
                         onChange={(e) => handleLegChange(idx, 'to', e.target.value)}
                         className="w-full bg-eco-soft/40 border border-eco-primary/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-eco-primary"
@@ -662,6 +665,13 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
               ))}
             </div>
           </div>
+
+          {/* Datalist gợi ý Phường / Quận / Địa điểm */}
+          <datalist id="suggested-locations">
+            {SUGGESTED_LOCATIONS.map((loc, i) => (
+              <option key={i} value={loc} />
+            ))}
+          </datalist>
 
           {/* Submit Button */}
           <button
