@@ -481,7 +481,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.textAlign = 'left';
           ctx.fillText('NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG', 330, yPos);
           ctx.textAlign = 'right';
-          const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin;
+          const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin;
           const pubHours = Math.floor(pubMins / 60);
           const pubMinsRem = pubMins % 60;
           ctx.fillText(`${pubHours > 0 ? pubHours + 'H ' : ''}${pubMinsRem}'`, 1590, yPos);
@@ -498,10 +498,8 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.font = '900 50px "Space Mono", sans-serif';
           ctx.fillText('HOÀN LẠI CHO BẠN', 390, yPos + 85);
 
-          const savedMin = Math.max(0, resultReceipt.totalMin - pubMins);
-          const savedHours = Math.floor(savedMin / 60);
-          const savedMinsRem = savedMin % 60;
-          const savedText = savedHours > 0 ? `${savedHours}H ${savedMinsRem}'` : `${savedMinsRem}'`;
+          // Sửa lỗi: Thời gian hoàn lại chính là pubMins (số phút rảnh tay/đi công cộng, VD: 75')
+          const savedText = `${pubMins}'`;
 
           ctx.fillStyle = '#FFFFFF';
           ctx.font = '900 115px "Space Mono", sans-serif';
@@ -971,10 +969,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                   <div className="flex justify-between items-center text-emerald-900">
                     <span>NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG</span>
                     <span>
-                      {Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin) / 60) > 0 
-                        ? `${Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin) / 60)}H ` 
+                      {Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.totalMin) / 60) > 0 
+                        ? `${Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.totalMin) / 60)}H ` 
                         : ''
-                      }{(resultReceipt.handsFreeMin || resultReceipt.transitMin) % 60}'
+                      }{(resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.totalMin) % 60}'
                     </span>
                   </div>
                 </div>
@@ -984,10 +982,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                   <span className="text-xs font-black uppercase tracking-wider block">HOÀN LẠI CHO BẠN</span>
                   <div className="flex items-baseline justify-between">
                     <span className="text-3xl sm:text-5xl font-black text-white drop-shadow-sm">
-                      {Math.floor(Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) / 60) > 0 
-                        ? `${Math.floor(Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) / 60)}H ` 
-                        : ''
-                      }{Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) % 60}'
+                      {(resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin)}'
                     </span>
                     <span className="text-sm font-black uppercase tracking-wider">MỖI NGÀY</span>
                   </div>
