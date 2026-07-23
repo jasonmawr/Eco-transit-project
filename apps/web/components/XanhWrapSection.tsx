@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { getApiBaseUrl } from '../lib/api';
 import { 
   Copy, 
@@ -12,17 +12,11 @@ import {
   Plus, 
   Trash2, 
   ExternalLink,
-  Sparkles,
-  MapPin,
-  Clock,
-  Navigation
+  Sparkles
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { 
   XanhWrapLeg, 
   XANHWRAP_PRESETS, 
-  ALL_LABELS,
-  XanhWrapLabelDef,
   SUGGESTED_LOCATIONS
 } from '../lib/xanhwrapCore';
 
@@ -235,7 +229,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     }
   };
 
-  // Generate and Download 2 Square JPG receipt images via HTML5 Canvas
+  // Generate and Download 2 Square JPG receipt images via HTML5 Canvas (Matching Official BTC Visual 100%)
   const handleDownloadSquareImages = async () => {
     if (!resultReceipt) return;
     setDownloadingImages(true);
@@ -247,140 +241,204 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
         canvas.height = 1920;
         const ctx = canvas.getContext('2d')!;
 
-        // Background: Soft vintage receipt paper texture
-        ctx.fillStyle = '#F8F6F0';
+        // Sky Blue Master Background (#70C6FF to #A5DCFF)
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
+        bgGrad.addColorStop(0, '#75C8FF');
+        bgGrad.addColorStop(1, '#A3D8FF');
+        ctx.fillStyle = bgGrad;
         ctx.fillRect(0, 0, 1920, 1920);
 
-        // Outer border & padding
-        ctx.strokeStyle = '#0E5140';
-        ctx.lineWidth = 16;
-        ctx.strokeRect(40, 40, 1840, 1840);
-
+        // Header Title in Official Font Style
+        ctx.fillStyle = '#0054A6';
+        ctx.font = '900 76px "Space Mono", sans-serif';
+        ctx.textAlign = 'center';
+        
         if (part === 1) {
-          // IMAGE 1: Top Half Master
-          // Header Badge
-          ctx.fillStyle = '#0E5140';
-          ctx.fillRect(100, 100, 420, 70);
-          ctx.fillStyle = '#00E08A';
-          ctx.font = 'bold 32px "Space Mono", monospace';
-          ctx.fillText('LƯỚT KHÓI · MINIGAME', 120, 146);
+          ctx.fillText('MỘT NGÀY LÁI XE', 960, 160);
+          ctx.font = '800 64px "Space Mono", sans-serif';
+          ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 240);
+          ctx.font = '900 76px "Space Mono", sans-serif';
+          ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 320);
 
-          // Header Title
-          ctx.fillStyle = '#1A1A1A';
-          ctx.font = 'black 64px "Space Mono", sans-serif';
-          ctx.fillText('MỘT NGÀY LÁI XE,', 100, 260);
-          ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 100, 340);
-          ctx.fillStyle = '#0E5140';
-          ctx.fillText('BAO NHIÊU THỜI GIAN?', 100, 420);
+          // Receipt Paper Frame (#FFF9EB Cream background)
+          ctx.fillStyle = '#FFF9EB';
+          ctx.fillRect(200, 380, 1520, 1480);
 
-          // Receipt Inner Card Frame
-          ctx.fillStyle = '#FFFFFF';
-          ctx.strokeStyle = '#E0DCD3';
+          // Top Header Text
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#1D3B11';
+          ctx.font = '900 52px "Space Mono", monospace';
+          ctx.fillText('X A N H W R A P', 960, 470);
+          ctx.font = '700 36px "Space Mono", monospace';
+          ctx.fillText('PHIẾU HOÀN THỜI GIAN', 960, 520);
+
+          // Dashed Divider
+          ctx.strokeStyle = '#1D3B11';
           ctx.lineWidth = 6;
-          ctx.fillRect(100, 480, 1720, 1340);
-          ctx.strokeRect(100, 480, 1720, 1340);
+          ctx.setLineDash([20, 15]);
+          ctx.beginPath();
+          ctx.moveTo(260, 560);
+          ctx.lineTo(1660, 560);
+          ctx.stroke();
+          ctx.setLineDash([]);
 
-          // Receipt Header
-          ctx.fillStyle = '#0E5140';
-          ctx.font = 'bold 44px "Space Mono", monospace';
-          ctx.fillText('XANHWRAP · PHIẾU HOÀN THỜI GIAN', 140, 560);
-          ctx.fillStyle = '#666666';
-          ctx.font = '32px "Space Mono", monospace';
-          ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()} · ${resultReceipt.recordDate}`, 140, 620);
+          // Metadata row
+          ctx.textAlign = 'left';
+          ctx.font = '700 36px "Space Mono", monospace';
+          ctx.fillText('NGƯỜI LƯỚT CHẶNG', 260, 630);
+          ctx.textAlign = 'right';
+          ctx.fillText(resultReceipt.recordDate || '2026-07-23', 1660, 630);
 
-          // Identity Label Badge Frame
-          const isGreenGroup = resultReceipt.labelGroup === 'green';
-          ctx.fillStyle = isGreenGroup ? '#0E5140' : '#2C2C2A';
-          ctx.fillRect(140, 680, 1640, 220);
+          // Identity Label Badge (Green Pill shape #8CC63F)
+          ctx.fillStyle = '#8CC63F';
+          ctx.beginPath();
+          ctx.roundRect(260, 680, 1400, 140, [70]);
+          ctx.fill();
 
-          ctx.fillStyle = isGreenGroup ? '#00E08A' : '#F5F1E8';
-          ctx.font = 'black 72px "Space Mono", sans-serif';
-          ctx.fillText(`▓▓ ${resultReceipt.assignedLabelName} ▓▓`, 180, 810);
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#133806';
+          ctx.font = '900 60px "Space Mono", sans-serif';
+          ctx.fillText(resultReceipt.assignedLabelName.toUpperCase(), 960, 775);
 
-          // Rarity line
-          ctx.fillStyle = '#888888';
-          ctx.font = 'bold 36px "Space Mono", monospace';
-          const rarityText = resultReceipt.rarityPct ? `ĐỘ HIẾM ${resultReceipt.rarityPct}% · 1 TRONG 16 NHÃN` : '1 TRONG 16 NHÃN DANH TÍNH';
-          ctx.fillText(rarityText, 140, 960);
+          // Dashed Divider
+          ctx.setLineDash([20, 15]);
+          ctx.beginPath();
+          ctx.moveTo(260, 860);
+          ctx.lineTo(1660, 860);
+          ctx.stroke();
+          ctx.setLineDash([]);
 
-          // Main Metric Card
-          ctx.fillStyle = '#0E5140';
-          ctx.fillRect(140, 1020, 1640, 360);
-
-          ctx.fillStyle = '#00E08A';
-          ctx.font = 'black 120px "Space Mono", sans-serif';
-          ctx.fillText(`${resultReceipt.handsFreeMin || resultReceipt.transitMin} PHÚT`, 180, 1150);
-          
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = 'bold 48px "Space Mono", monospace';
-          ctx.fillText(`KHÔNG PHẢI CẦM LÁI = ${resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY`, 180, 1240);
-          ctx.fillText(`TƯƠNG ĐƯƠNG XEM ${resultReceipt.episodesPerYear} TẬP PHIM`, 180, 1310);
-
-          // Summary footer line
-          ctx.fillStyle = '#1A1A1A';
-          ctx.font = 'bold 36px "Space Mono", monospace';
-          ctx.fillText(`CHI TIẾT ${resultReceipt.legsJson?.length || 2} CHẶNG · TỔNG ${resultReceipt.totalKm} KM DI CHUYỂN`, 140, 1480);
-          ctx.fillText(`CO2 GIẢM THIỂU: ${resultReceipt.co2SavedGrams} GRAMS`, 140, 1540);
-
-        } else {
-          // IMAGE 2: Bottom Half Master
-          ctx.fillStyle = '#FFFFFF';
-          ctx.strokeStyle = '#E0DCD3';
-          ctx.lineWidth = 6;
-          ctx.fillRect(100, 100, 1720, 1600);
-          ctx.strokeRect(100, 100, 1720, 1600);
-
-          ctx.fillStyle = '#0E5140';
-          ctx.font = 'bold 44px "Space Mono", monospace';
-          ctx.fillText('CHI TIẾT HÀNH TRÌNH TRONG NGÀY', 140, 180);
-
-          // Render legs list
+          // Render first legs
           const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
-          let currentY = 250;
+          let yPos = 940;
 
-          legsList.slice(0, 8).forEach((leg, idx) => {
-            ctx.fillStyle = '#F4F2EC';
-            ctx.fillRect(140, currentY, 1640, 100);
+          legsList.slice(0, 4).forEach((leg) => {
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#1D3B11';
+            ctx.font = '700 36px "Space Mono", monospace';
+            const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
+            ctx.fillText(legStr, 260, yPos);
 
-            ctx.fillStyle = '#1A1A1A';
-            ctx.font = 'bold 32px "Space Mono", monospace';
-            const modeName = leg.mode === 'metro' ? '🚆 Metro' : leg.mode === 'bus' ? '🚌 Xe buýt' : leg.mode === 'motorbike' ? '🛵 Xe máy' : '🚗 Ô tô';
-            ctx.fillText(`${idx + 1}. [${leg.depart_time}] ${leg.from} → ${leg.to}`, 170, currentY + 45);
+            ctx.textAlign = 'right';
+            ctx.fillText(`${leg.distance_km}KM           ${leg.duration_min}'`, 1660, yPos);
 
-            ctx.fillStyle = '#0E5140';
-            ctx.font = 'bold 28px "Space Mono", monospace';
-            ctx.fillText(`${leg.distance_km}km · ${leg.duration_min} phút (${modeName})`, 170, currentY + 80);
-
-            currentY += 115;
+            yPos += 80;
           });
 
-          // Barcode representation
-          ctx.fillStyle = '#1A1A1A';
-          const barcodeY = Math.min(currentY + 40, 1350);
-          for (let x = 140; x < 1780; x += 18) {
-            const barWidth = Math.random() > 0.4 ? 10 : 4;
-            ctx.fillRect(x, barcodeY, barWidth, 100);
+        } else {
+          // PART 2: Bottom half master
+          // Receipt Paper Frame (#FFF9EB Cream background)
+          ctx.fillStyle = '#FFF9EB';
+          ctx.fillRect(200, 100, 1520, 1680);
+
+          // Render remaining legs if any
+          const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
+          let yPos = 180;
+
+          if (legsList.length > 4) {
+            legsList.slice(4, 8).forEach((leg) => {
+              ctx.textAlign = 'left';
+              ctx.fillStyle = '#1D3B11';
+              ctx.font = '700 36px "Space Mono", monospace';
+              const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
+              ctx.fillText(legStr, 260, yPos);
+
+              ctx.textAlign = 'right';
+              ctx.fillText(`${leg.distance_km}KM           ${leg.duration_min}'`, 1660, yPos);
+
+              yPos += 80;
+            });
           }
 
-          // Lucky number
-          ctx.fillStyle = '#0E5140';
-          ctx.font = 'black 48px "Space Mono", monospace';
-          ctx.fillText(`SỐ DỰ THI MAY MẮN: #${resultReceipt.luckyNumber}`, 140, barcodeY + 160);
+          // Dashed Divider
+          ctx.setLineDash([20, 15]);
+          ctx.strokeStyle = '#1D3B11';
+          ctx.lineWidth = 6;
+          ctx.beginPath();
+          ctx.moveTo(260, yPos);
+          ctx.lineTo(1660, yPos);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          yPos += 70;
 
-          // Perforated edge bottom pattern
-          ctx.fillStyle = '#F8F6F0';
-          for (let px = 40; px < 1880; px += 40) {
+          // Comparison lines
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#1D3B11';
+          ctx.font = '800 38px "Space Mono", monospace';
+          ctx.fillText('TỰ LÁI HÔM NAY', 260, yPos);
+          ctx.textAlign = 'right';
+          const totalHours = Math.floor(resultReceipt.totalMin / 60);
+          const totalMinsRem = resultReceipt.totalMin % 60;
+          ctx.fillText(`${resultReceipt.totalKm}KM         ${totalHours}H ${totalMinsRem < 10 ? '0' : ''}${totalMinsRem}'`, 1660, yPos);
+          yPos += 70;
+
+          ctx.textAlign = 'left';
+          ctx.fillText('NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG', 260, yPos);
+          ctx.textAlign = 'right';
+          const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin;
+          const pubHours = Math.floor(pubMins / 60);
+          const pubMinsRem = pubMins % 60;
+          ctx.fillText(`${pubHours > 0 ? pubHours + 'H ' : ''}${pubMinsRem}'`, 1660, yPos);
+          yPos += 90;
+
+          // Highlight Green Card Box (#8CC63F)
+          ctx.fillStyle = '#8CC63F';
+          ctx.beginPath();
+          ctx.roundRect(260, yPos, 1400, 360, [32]);
+          ctx.fill();
+
+          ctx.textAlign = 'left';
+          ctx.fillStyle = '#133806';
+          ctx.font = '900 48px "Space Mono", sans-serif';
+          ctx.fillText('HOÀN LẠI CHO BẠN', 320, yPos + 80);
+
+          const savedMin = Math.max(0, resultReceipt.totalMin - pubMins);
+          const savedHours = Math.floor(savedMin / 60);
+          const savedMinsRem = savedMin % 60;
+          const savedText = savedHours > 0 ? `${savedHours}H ${savedMinsRem}'` : `${savedMinsRem}'`;
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.font = '900 110px "Space Mono", sans-serif';
+          ctx.fillText(savedText, 320, yPos + 210);
+
+          ctx.fillStyle = '#133806';
+          ctx.font = '900 48px "Space Mono", sans-serif';
+          ctx.fillText('MỖI NGÀY', 1050, yPos + 210);
+
+          ctx.fillStyle = '#0054A6';
+          ctx.font = '900 52px "Space Mono", sans-serif';
+          ctx.fillText(`= ${resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY`, 320, yPos + 300);
+
+          yPos += 440;
+
+          // Barcode graphics
+          ctx.fillStyle = '#1A1A1A';
+          for (let x = 320; x < 1600; x += 18) {
+            const barWidth = Math.random() > 0.4 ? 12 : 5;
+            ctx.fillRect(x, yPos, barWidth, 120);
+          }
+          yPos += 160;
+
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#1D3B11';
+          ctx.font = '800 40px "Space Mono", monospace';
+          ctx.fillText(`MÃ HD ${resultReceipt.id.slice(0, 4).toUpperCase()}  ·  SỐ DỰ THẺ ${resultReceipt.luckyNumber}`, 960, yPos);
+
+          // Bottom zig-zag perforated edge
+          ctx.fillStyle = '#75C8FF';
+          for (let px = 200; px <= 1720; px += 40) {
             ctx.beginPath();
-            ctx.arc(px, 1780, 14, 0, Math.PI * 2);
+            ctx.moveTo(px, 1780);
+            ctx.lineTo(px + 20, 1750);
+            ctx.lineTo(px + 40, 1780);
             ctx.fill();
           }
 
-          // Footer hashtags banner
-          ctx.fillStyle = '#0E5140';
-          ctx.fillRect(40, 1800, 1840, 80);
-          ctx.fillStyle = '#00E08A';
-          ctx.font = 'bold 32px "Space Mono", monospace';
-          ctx.fillText('QUAY SỐ TRÚNG VÉ THÁNG METRO · #XanhWrap #LuotKhoiChamXanh #EcoTransit', 80, 1850);
+          // Bottom Hashtags
+          ctx.textAlign = 'center';
+          ctx.fillStyle = '#0054A6';
+          ctx.font = '900 44px "Space Mono", sans-serif';
+          ctx.fillText('#XanhWrap #LuotKhoiChamXanh', 960, 1850);
         }
 
         return canvas;
@@ -392,13 +450,13 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
       const link1 = document.createElement('a');
       link1.download = `xanhwrap_${resultReceipt.id}_1.jpg`;
-      link1.href = canvas1.toDataURL('image/jpeg', 0.9);
+      link1.href = canvas1.toDataURL('image/jpeg', 0.92);
       link1.click();
 
       setTimeout(() => {
         const link2 = document.createElement('a');
         link2.download = `xanhwrap_${resultReceipt.id}_2.jpg`;
-        link2.href = canvas2.toDataURL('image/jpeg', 0.9);
+        link2.href = canvas2.toDataURL('image/jpeg', 0.92);
         link2.click();
       }, 500);
 
@@ -413,19 +471,19 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     <div className="max-w-5xl mx-auto space-y-8 py-4 px-2 sm:px-4">
 
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-eco-primary via-eco-primaryDeep to-eco-ink text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#0054A6] via-eco-primary to-[#8CC63F] text-white rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
         <div className="absolute -right-10 -bottom-10 opacity-10 pointer-events-none">
           <Printer className="w-96 h-96" />
         </div>
         <div className="relative z-10 space-y-3">
-          <div className="inline-flex items-center space-x-2 bg-eco-mint/20 border border-eco-mint/40 text-eco-mint px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
+          <div className="inline-flex items-center space-x-2 bg-white/20 border border-white/40 text-white px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Chiến dịch Lướt Khói Chạm Xanh · Minigame 2026</span>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black font-mono tracking-tight">
             MÁY IN PHIẾU XANHWRAP
           </h1>
-          <p className="text-xs sm:text-sm text-white/80 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
             Nhập 2 đến 8 chặng di chuyển trong ngày của bạn để máy in tự động cấp **Nhãn Danh Tính** độc bản và xuất bộ phiếu 2 ảnh vuông đăng mạng xã hội tham gia quay số may mắn!
           </p>
         </div>
@@ -707,7 +765,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             <button
               onClick={handleDownloadSquareImages}
               disabled={downloadingImages}
-              className="px-6 py-2.5 bg-eco-primary text-white text-xs font-black uppercase tracking-wider rounded-xl hover:bg-eco-primaryDeep shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
+              className="px-6 py-2.5 bg-[#0054A6] hover:bg-eco-primary text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
             >
               {downloadingImages ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -718,79 +776,108 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             </button>
           </div>
 
-          {/* RECEIPT PAPER PREVIEW CONTAINER */}
-          <div className="bg-[#F8F6F0] border-4 border-[#0E5140] rounded-3xl p-6 sm:p-10 shadow-2xl max-w-2xl mx-auto space-y-6 text-[#1A1A1A] font-mono">
+          {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
+          <div className="bg-[#75C8FF] p-6 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-6">
             
-            {/* Header Badge */}
-            <div className="flex justify-between items-start border-b-2 border-dashed border-[#0E5140] pb-4">
-              <div>
-                <span className="bg-[#0E5140] text-[#00E08A] px-3 py-1 rounded text-xs font-black">
-                  LƯỚT KHÓI · MINIGAME
-                </span>
-                <h2 className="text-xl sm:text-2xl font-black mt-2 text-[#0E5140]">
-                  XANHWRAP PHIẾU HOÀN THỜI GIAN
-                </h2>
-                <p className="text-xs text-[#666666]">
-                  NGƯỜI LƯỚT CHẶNG: <strong>{resultReceipt.nickname.toUpperCase()}</strong> · {resultReceipt.recordDate}
-                </p>
-              </div>
-            </div>
-
-            {/* IDENTITY LABEL BADGE */}
-            <div className={`p-4 rounded-2xl text-center shadow-inner ${
-              resultReceipt.labelGroup === 'green' ? 'bg-[#0E5140] text-[#00E08A]' : 'bg-[#2C2C2A] text-[#F5F1E8]'
-            }`}>
-              <span className="text-xs uppercase tracking-widest block opacity-75">Nhãn Danh Tính Của Bạn</span>
-              <h3 className="text-2xl sm:text-3xl font-black mt-1 tracking-wider">
-                ▓▓ {resultReceipt.assignedLabelName} ▓▓
+            {/* Master Header Title */}
+            <div className="text-center space-y-1 text-[#0054A6]">
+              <h2 className="text-2xl sm:text-3xl font-black font-mono uppercase tracking-tight">
+                MỘT NGÀY LÁI XE
+              </h2>
+              <p className="text-sm sm:text-lg font-bold font-mono">
+                BẠN LẤY LẠI ĐƯỢC
+              </p>
+              <h3 className="text-xl sm:text-2xl font-black font-mono uppercase">
+                BAO NHIÊU THỜI GIAN?
               </h3>
             </div>
 
-            {/* Rarity Tag */}
-            <div className="text-center text-xs text-[#666666] font-bold">
-              {resultReceipt.rarityPct ? `🔥 ĐỘ HIẾM ${resultReceipt.rarityPct}% · 1 TRONG 16 NHÃN` : '✨ 1 TRONG 16 NHÃN DANH TÍNH ĐỘC ĐÁO'}
-            </div>
-
-            {/* MAIN METRIC BOX */}
-            <div className="bg-[#0E5140] text-white p-6 rounded-2xl text-center space-y-2">
-              <span className="text-xs text-[#00E08A] uppercase font-extrabold tracking-widest">Thời gian không phải cầm lái</span>
-              <div className="text-4xl sm:text-5xl font-black text-[#00E08A]">
-                {resultReceipt.handsFreeMin || resultReceipt.transitMin} PHÚT
-              </div>
-              <p className="text-xs font-bold text-white/90">
-                = {resultReceipt.daysPerYear} NGÀY TỰ DO TRONG NĂM NAY
-              </p>
-              <p className="text-[11px] text-white/70">
-                Tương đương thưởng thức {resultReceipt.episodesPerYear} tập phim truyền hình!
-              </p>
-            </div>
-
-            {/* LEGS DETAIL */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-black uppercase tracking-wider text-[#0E5140]">
-                CHI TIẾT {resultReceipt.legsJson?.length || 2} CHẶNG (TỔNG {resultReceipt.totalKm} KM)
-              </h4>
+            {/* Cream Receipt Paper */}
+            <div className="bg-[#FFF9EB] rounded-3xl p-6 sm:p-8 space-y-6 text-[#1D3B11] font-mono shadow-lg border border-[#E8DCC0] relative overflow-hidden">
               
-              <div className="space-y-2">
+              {/* Header Title */}
+              <div className="text-center border-b-2 border-dashed border-[#1D3B11] pb-4 space-y-1">
+                <h3 className="text-xl sm:text-2xl font-black tracking-widest text-[#1D3B11]">
+                  X A N H W R A P
+                </h3>
+                <p className="text-xs font-bold text-[#1D3B11]/80 uppercase">
+                  PHIẾU HOÀN THỜI GIAN
+                </p>
+              </div>
+
+              {/* Metadata Row */}
+              <div className="flex justify-between items-center text-xs font-extrabold">
+                <span>NGƯỜI LƯỚT CHẶNG</span>
+                <span>{resultReceipt.recordDate || '2026-07-23'}</span>
+              </div>
+
+              {/* Green Pill Identity Badge (#8CC63F) */}
+              <div className="bg-[#8CC63F] text-[#133806] py-3.5 px-6 rounded-full text-center shadow-md">
+                <h4 className="text-xl sm:text-2xl font-black tracking-wider uppercase">
+                  {resultReceipt.assignedLabelName}
+                </h4>
+              </div>
+
+              {/* Legs Table Breakdown */}
+              <div className="border-t-2 border-b-2 border-dashed border-[#1D3B11] py-4 space-y-2.5">
                 {(resultReceipt.legsJson || []).map((leg: XanhWrapLeg, i: number) => (
-                  <div key={i} className="bg-white p-3 rounded-xl border border-gray-200 text-xs flex justify-between items-center">
-                    <div>
-                      <span className="font-bold text-[#0E5140]">{i + 1}. [{leg.depart_time}]</span> {leg.from} → {leg.to}
-                    </div>
-                    <span className="font-mono text-gray-600 font-bold shrink-0 ml-2">
-                      {leg.distance_km}km ({leg.duration_min}m)
+                  <div key={i} className="flex justify-between items-center text-xs font-bold font-mono">
+                    <span className="truncate pr-2">
+                      {leg.depart_time} {leg.from.toUpperCase()} → {leg.to.toUpperCase()}
+                    </span>
+                    <span className="shrink-0 font-bold">
+                      {leg.distance_km}KM &nbsp;&nbsp;&nbsp; {leg.duration_min}'
                     </span>
                   </div>
                 ))}
               </div>
+
+              {/* Self-drive comparison summary */}
+              <div className="space-y-2 text-xs font-extrabold">
+                <div className="flex justify-between items-center">
+                  <span>TỰ LÁI HÔM NAY</span>
+                  <span>{resultReceipt.totalKm}KM &nbsp;&nbsp;&nbsp; {Math.floor(resultReceipt.totalMin / 60)}H {resultReceipt.totalMin % 60}'</span>
+                </div>
+                <div className="flex justify-between items-center text-emerald-800">
+                  <span>NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG</span>
+                  <span>
+                    {Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin) / 60) > 0 
+                      ? `${Math.floor((resultReceipt.handsFreeMin || resultReceipt.transitMin) / 60)}H ` 
+                      : ''
+                    }{(resultReceipt.handsFreeMin || resultReceipt.transitMin) % 60}'
+                  </span>
+                </div>
+              </div>
+
+              {/* HIGHLIGHT GREEN CARD BOX (#8CC63F) */}
+              <div className="bg-[#8CC63F] text-[#133806] p-5 sm:p-6 rounded-2xl space-y-2 shadow-md">
+                <span className="text-xs font-black uppercase tracking-wider block">HOÀN LẠI CHO BẠN</span>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-3xl sm:text-5xl font-black text-white drop-shadow-sm">
+                    {Math.floor(Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) / 60) > 0 
+                      ? `${Math.floor(Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) / 60)}H ` 
+                      : ''
+                    }{Math.max(0, resultReceipt.totalMin - (resultReceipt.handsFreeMin || resultReceipt.transitMin)) % 60}'
+                  </span>
+                  <span className="text-sm font-black uppercase tracking-wider">MỖI NGÀY</span>
+                </div>
+                <div className="text-sm sm:text-base font-black text-[#0054A6] pt-1">
+                  = {resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY
+                </div>
+              </div>
+
+              {/* Barcode & Lucky number */}
+              <div className="pt-2 text-center space-y-3">
+                <div className="h-12 bg-[repeating-linear-gradient(90deg,#1A1A1A,#1A1A1A_4px,transparent_4px,transparent_8px)] rounded max-w-sm mx-auto opacity-90" />
+                <div className="text-xs font-black text-[#1D3B11] tracking-wider uppercase">
+                  MÃ HD {resultReceipt.id.slice(0, 4).toUpperCase()} &nbsp;·&nbsp; SỐ DỰ THẺ {resultReceipt.luckyNumber}
+                </div>
+              </div>
             </div>
 
-            {/* Barcode & Lucky number */}
-            <div className="border-t-2 border-dashed border-[#0E5140] pt-4 text-center space-y-2">
-              <div className="h-10 bg-[repeating-linear-gradient(90deg,#1A1A1A,#1A1A1A_4px,transparent_4px,transparent_8px)] rounded max-w-sm mx-auto opacity-80" />
-              <div className="text-sm font-black text-[#0E5140]">
-                SỐ DỰ THI MAY MẮN: #{resultReceipt.luckyNumber}
-              </div>
+            {/* Bottom Hashtags Banner */}
+            <div className="text-center text-[#0054A6] font-black text-sm tracking-wider font-mono">
+              #XanhWrap #LuotKhoiChamXanh
             </div>
           </div>
 
