@@ -228,25 +228,37 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     }
   };
 
-  // Helper drawing leaf graphics on canvas
+  // Helper drawing realistic leaf graphics on canvas (Chiếc lá xanh mềm mại có cuống chuẩn 100%)
   const drawLeaf = (ctx: CanvasRenderingContext2D, x: number, y: number, size: number, angleDeg: number) => {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate((angleDeg * Math.PI) / 180);
-    ctx.fillStyle = '#2E963D';
+    
+    // Thân lá / Cuống lá dài uốn cong mềm mại
+    ctx.strokeStyle = '#2E963D';
+    ctx.lineWidth = Math.max(3, size * 0.08);
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(0, size * 0.4);
+    ctx.quadraticCurveTo(size * 0.1, 0, size * 0.9, -size * 0.7);
+    ctx.stroke();
+
+    // Phiến lá dạng hình giọt nước / hình tim bầu ngược bám góc cuống
+    ctx.fillStyle = '#39B54A';
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.bezierCurveTo(size * 0.5, -size * 0.8, size * 1.2, -size * 0.4, size, 0);
-    ctx.bezierCurveTo(size * 1.2, size * 0.4, size * 0.5, size * 0.8, 0, 0);
+    ctx.bezierCurveTo(-size * 0.6, -size * 0.3, -size * 0.5, -size * 0.9, size * 0.2, -size * 1.1);
+    ctx.bezierCurveTo(size * 0.8, -size * 0.9, size * 0.7, -size * 0.3, 0, 0);
     ctx.fill();
 
-    // Leaf vein line
+    // Gân lá chính giữa
     ctx.strokeStyle = '#1D6829';
-    ctx.lineWidth = Math.max(2, size * 0.05);
+    ctx.lineWidth = Math.max(2, size * 0.04);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.lineTo(size * 0.9, 0);
+    ctx.lineTo(size * 0.2, -size * 1.05);
     ctx.stroke();
+
     ctx.restore();
   };
 
@@ -335,14 +347,8 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.font = '900 86px "Space Mono", sans-serif';
           ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 540);
 
-          // 7. Leaf Stick Top-Right of Receipt Paper
-          ctx.strokeStyle = '#2E963D';
-          ctx.lineWidth = 14;
-          ctx.beginPath();
-          ctx.moveTo(1640, 720);
-          ctx.lineTo(1640, 600);
-          ctx.stroke();
-          drawLeaf(ctx, 1640, 600, 160, -40);
+          // 7. Realistic Leaf Top-Right of Receipt Paper Corner
+          drawLeaf(ctx, 1640, 660, 140, 15);
 
           // 8. Solid Blue Backing Frame (#0054A6)
           ctx.fillStyle = '#0054A6';
@@ -498,7 +504,6 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           ctx.font = '900 50px "Space Mono", sans-serif';
           ctx.fillText('HOÀN LẠI CHO BẠN', 390, yPos + 85);
 
-          // Sửa lỗi: Thời gian hoàn lại chính là pubMins (số phút rảnh tay/đi công cộng, VD: 75')
           const savedText = `${pubMins}'`;
 
           ctx.fillStyle = '#FFFFFF';
@@ -684,7 +689,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
           {/* Section 2: Preset Chọn Tuyến Nhanh */}
           <div className="bg-eco-soft/30 border border-eco-mint rounded-2xl p-4 space-y-2">
             <label className="block text-xs font-black uppercase text-eco-ink flex items-center space-x-1.5">
-              <Sparkles className="w-4 h-4 text-eco-accentGreen" />
+              <Sparkles className="w-4 h-4 text-eco-[#8CC63F]" />
               <span>Gợi ý chặng phổ biến TP.HCM (Thêm nhanh)</span>
             </label>
             <select
@@ -914,10 +919,12 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             {/* Cream Receipt Paper with Solid Blue Frame Backing */}
             <div className="bg-[#0054A6] p-2.5 rounded-3xl shadow-2xl relative">
               
-              {/* Top-Right Leaf Stick Graphics */}
-              <div className="absolute -top-10 -right-2 z-20 pointer-events-none">
-                <div className="w-4 h-12 bg-[#2E963D] transform rotate-12 rounded-full mx-auto" />
-                <div className="w-10 h-10 bg-[#2E963D] rounded-tl-full rounded-br-full transform -rotate-45 shadow-sm" />
+              {/* Top-Right Realistic Leaf Stick Graphics */}
+              <div className="absolute -top-7 -right-1 z-20 pointer-events-none transform rotate-12">
+                {/* Cuống lá mảnh uốn cong */}
+                <div className="w-1.5 h-8 bg-[#2E963D] rounded-full mx-auto shadow-sm" />
+                {/* Phiến lá xanh tươi hình giọt nước bầu bám cuống */}
+                <div className="w-7 h-10 bg-[#39B54A] border border-[#2E963D] rounded-tl-full rounded-br-full transform -rotate-45 shadow-md -mt-3" />
               </div>
 
               {/* Inner Cream Paper (#FFF7E3) */}
