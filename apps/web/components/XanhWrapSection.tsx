@@ -35,8 +35,8 @@ export default function XanhWrapSection() {
 
   // Legs array (Min 2, Max 8)
   const [legs, setLegs] = useState<XanhWrapLeg[]>([
-    { from: 'P. Linh Trung', to: 'P. Bến Thành', depart_time: '07:00', mode: 'metro', distance_km: 14, duration_min: 52, transit_line: 'Metro số 1' },
-    { from: 'P. Bến Thành', to: 'P. Thảo Điền', depart_time: '12:15', mode: 'metro', distance_km: 8, duration_min: 25, transit_line: 'Metro số 1' },
+    { from: '', to: '', depart_time: '07:15', mode: 'metro', distance_km: 10, duration_min: 25, transit_line: 'Metro số 1' },
+    { from: '', to: '', depart_time: '17:30', mode: 'bus', distance_km: 10, duration_min: 30, transit_line: 'Buýt công cộng' },
   ]);
 
   // Loading & Step states
@@ -574,11 +574,11 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đi (Phường/Quận/Khu vực)</label>
+                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đi (Phường/Khu vực)</label>
                       <input
                         type="text"
                         list="suggested-locations"
-                        placeholder="Thủ Đức, Q1, Thảo Điền, Nhà..."
+                        placeholder="VD: P. Linh Trung, P. Bến Thành, Nhà..."
                         value={leg.from}
                         onChange={(e) => handleLegChange(idx, 'from', e.target.value)}
                         className="w-full bg-eco-soft/40 border border-eco-primary/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-eco-primary"
@@ -587,11 +587,11 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đến (Phường/Quận/Khu vực)</label>
+                      <label className="block text-[11px] font-bold text-eco-muted mb-1">Điểm đến (Phường/Khu vực)</label>
                       <input
                         type="text"
                         list="suggested-locations"
-                        placeholder="Q1, B.Thạnh, Nhà..."
+                        placeholder="VD: P. Bến Thành, P. Thảo Điền, Trường ĐH FPT..."
                         value={leg.to}
                         onChange={(e) => handleLegChange(idx, 'to', e.target.value)}
                         className="w-full bg-eco-soft/40 border border-eco-primary/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-eco-primary"
