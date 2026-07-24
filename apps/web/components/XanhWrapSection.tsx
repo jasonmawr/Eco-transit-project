@@ -544,9 +544,14 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
       ctx.font = '900 48px "Inter", "Arial", sans-serif';
       ctx.fillText('#XanhWrap #LuotKhoiChamXanh', 960, canvasH - 50);
 
-      // Download single seamless image
+      // Download single seamless image with clean human-readable filename
+      const rawNickname = (resultReceipt.nickname || 'NguoiLuotChang').trim().replace(/\s+/g, '_');
+      const lucky = resultReceipt.luckyNumber || '555';
+      const date = resultReceipt.recordDate || '2026-07-23';
+      const fileName = `xanhwrap_${rawNickname}_${lucky}_${date}.jpg`;
+
       const link = document.createElement('a');
-      link.download = `xanhwrap_${resultReceipt.id}.jpg`;
+      link.download = fileName;
       link.href = canvas.toDataURL('image/jpeg', 0.95);
       link.click();
 
@@ -862,7 +867,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
               ) : (
                 <Download className="w-4 h-4" />
               )}
-              <span>TẢI PHIẾU XANHWRAP (1 ẢNH LIỀN MẠCH JPG)</span>
+              <span>TẢI PHIẾU XANHWRAP</span>
             </button>
           </div>
 
