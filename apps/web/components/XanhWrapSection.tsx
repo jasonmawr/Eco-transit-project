@@ -272,8 +272,8 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     ctx.restore();
   };
 
-  // Generate and Download 2 Square JPG receipt images via HTML5 Canvas (Matching Official Campaign Visual 100%)
-  const handleDownloadSquareImages = async () => {
+  // Generate and Download 1 Single Seamless Poster JPG image via HTML5 Canvas (1 Ảnh Liền Mạch 100%)
+  const handleDownloadSeamlessImage = async () => {
     if (!resultReceipt) return;
     setDownloadingImages(true);
 
@@ -290,299 +290,265 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
         }
       });
 
-      const createSquareCanvas = (part: 1 | 2): HTMLCanvasElement => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 1920;
-        canvas.height = 1920;
-        const ctx = canvas.getContext('2d')!;
+      const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
+      const extraLegsHeight = Math.max(0, legsList.length - 2) * 85;
+      const canvasW = 1920;
+      const canvasH = 2650 + extraLegsHeight;
 
-        // 1. Sky Blue Background Gradient (#84D0FF to #B6E5FF)
-        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1920);
-        bgGrad.addColorStop(0, '#84D0FF');
-        bgGrad.addColorStop(1, '#B6E5FF');
-        ctx.fillStyle = bgGrad;
-        ctx.fillRect(0, 0, 1920, 1920);
+      const canvas = document.createElement('canvas');
+      canvas.width = canvasW;
+      canvas.height = canvasH;
+      const ctx = canvas.getContext('2d')!;
 
-        // 2. Wind Streaks Graphics (Hiệu ứng gió)
-        drawWindStreak(ctx, 100, 1400, 400, 1800, 0.7);
-        drawWindStreak(ctx, 60, 1200, 300, 1600, 0.5);
-        drawWindStreak(ctx, 1600, 800, 1900, 1300, 0.6);
-        drawWindStreak(ctx, 1500, 1000, 1850, 1500, 0.4);
+      // 1. Sky Blue Background Gradient (#84D0FF to #B6E5FF)
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvasH);
+      bgGrad.addColorStop(0, '#84D0FF');
+      bgGrad.addColorStop(1, '#B6E5FF');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvasW, canvasH);
 
-        // 3. Floating Green Leaves (Hiệu ứng lá cây lướt gió)
-        drawLeaf(ctx, 120, 1500, 110, -30);
-        drawLeaf(ctx, 80, 1750, 130, 20);
-        drawLeaf(ctx, 220, 1850, 100, -10);
-        drawLeaf(ctx, 1820, 1200, 140, 45);
-        drawLeaf(ctx, 1780, 1500, 120, -25);
-        drawLeaf(ctx, 1860, 1780, 110, 15);
+      // 2. Decorative Wind Streaks Graphics across full height
+      drawWindStreak(ctx, 100, 1400, 400, 1800, 0.7);
+      drawWindStreak(ctx, 60, 1200, 300, 1600, 0.5);
+      drawWindStreak(ctx, 1600, 800, 1900, 1300, 0.6);
+      drawWindStreak(ctx, 1500, 1000, 1850, 1500, 0.4);
+      drawWindStreak(ctx, 80, 2100, 420, 2500, 0.6);
+      drawWindStreak(ctx, 1550, 1900, 1880, 2350, 0.5);
 
-        if (part === 1) {
-          // PART 1: TOP HALF MASTER
-          // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
-          if (logoImg.complete && logoImg.naturalWidth > 0) {
-            ctx.save();
-            const targetW = 950;
-            const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
-            ctx.drawImage(logoImg, (1920 - targetW) / 2, 35, targetW, targetH);
-            ctx.restore();
-          }
+      // 3. Floating Green Leaves along margins
+      drawLeaf(ctx, 120, 1500, 110, -30);
+      drawLeaf(ctx, 80, 1750, 130, 20);
+      drawLeaf(ctx, 220, 1850, 100, -10);
+      drawLeaf(ctx, 1820, 1200, 140, 45);
+      drawLeaf(ctx, 1780, 1500, 120, -25);
+      drawLeaf(ctx, 1860, 1780, 110, 15);
+      drawLeaf(ctx, 110, 2200, 125, -20);
+      drawLeaf(ctx, 1840, 2350, 135, 30);
 
-          // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Có dấu tiếng Việt 100%, font sans-serif sắc nét, position y=310)
-          ctx.save();
-          ctx.translate(140, 310);
-          ctx.rotate((-12 * Math.PI) / 180);
-          
-          ctx.fillStyle = '#0054A6';
-          ctx.font = '900 58px "Inter", "Arial", sans-serif';
-          ctx.fillText('LƯỚT', 0, 0);
+      // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
+      if (logoImg.complete && logoImg.naturalWidth > 0) {
+        ctx.save();
+        const targetW = 950;
+        const targetH = (logoImg.naturalHeight / logoImg.naturalWidth) * targetW;
+        ctx.drawImage(logoImg, (canvasW - targetW) / 2, 35, targetW, targetH);
+        ctx.restore();
+      }
 
-          ctx.fillStyle = '#8CC63F';
-          ctx.beginPath();
-          ctx.roundRect(175, -52, 230, 72, [16]);
-          ctx.fill();
+      // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Positioned y=310, 0 overlap)
+      ctx.save();
+      ctx.translate(140, 310);
+      ctx.rotate((-12 * Math.PI) / 180);
+      
+      ctx.fillStyle = '#0054A6';
+      ctx.font = '900 58px "Inter", "Arial", sans-serif';
+      ctx.fillText('LƯỚT', 0, 0);
 
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = '900 58px "Inter", "Arial", sans-serif';
-          ctx.fillText('KHÓI', 195, 0);
+      ctx.fillStyle = '#8CC63F';
+      ctx.beginPath();
+      ctx.roundRect(175, -52, 230, 72, [16]);
+      ctx.fill();
 
-          ctx.fillStyle = '#0054A6';
-          ctx.font = '900 48px "Inter", "Arial", sans-serif';
-          ctx.fillText('CHẠM XANH', 0, 60);
-          ctx.restore();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 58px "Inter", "Arial", sans-serif';
+      ctx.fillText('KHÓI', 195, 0);
 
-          // 6. Title Text: "MỘT NGÀY LÁI XE BẠN LẤY LẠI ĐƯỢC BAO NHIÊU THỜI GIAN?"
-          ctx.fillStyle = '#0054A6';
-          ctx.textAlign = 'center';
-          ctx.font = '900 82px "Inter", "Arial", sans-serif';
-          ctx.fillText('MỘT NGÀY LÁI XE', 960, 360);
-          ctx.font = '800 64px "Inter", "Arial", sans-serif';
-          ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 445);
-          ctx.font = '900 82px "Inter", "Arial", sans-serif';
-          ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 530);
+      ctx.fillStyle = '#0054A6';
+      ctx.font = '900 48px "Inter", "Arial", sans-serif';
+      ctx.fillText('CHẠM XANH', 0, 60);
+      ctx.restore();
 
-          // 7. Realistic Leaf Top-Right of Receipt Paper Corner
-          drawLeaf(ctx, 1640, 660, 140, 15);
+      // 6. Title Text: "MỘT NGÀY LÁI XE BẠN LẤY LẠI ĐƯỢC BAO NHIÊU THỜI GIAN?"
+      ctx.fillStyle = '#0054A6';
+      ctx.textAlign = 'center';
+      ctx.font = '900 82px "Inter", "Arial", sans-serif';
+      ctx.fillText('MỘT NGÀY LÁI XE', 960, 360);
+      ctx.font = '800 64px "Inter", "Arial", sans-serif';
+      ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 445);
+      ctx.font = '900 82px "Inter", "Arial", sans-serif';
+      ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 530);
 
-          // 8. Solid Blue Backing Frame (#0054A6)
-          ctx.fillStyle = '#0054A6';
-          ctx.fillRect(250, 620, 1420, 1300);
+      // 7. Realistic Leaf Top-Right of Receipt Paper Corner
+      drawLeaf(ctx, 1640, 660, 140, 15);
 
-          // 9. Cream Receipt Paper (#FFF7E3)
-          ctx.fillStyle = '#FFF7E3';
-          ctx.fillRect(275, 645, 1370, 1275);
+      // Calculate Receipt Paper Dynamic Height
+      const receiptBodyH = 1820 + extraLegsHeight;
 
-          // Receipt Header Inside Paper
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '900 56px "Space Mono", monospace';
-          ctx.fillText('X A N H W R A P', 960, 740);
-          ctx.font = '700 36px "Space Mono", monospace';
-          ctx.fillText('PHIẾU HOÀN THỜI GIAN', 960, 790);
+      // 8. Solid Blue Backing Frame (#0054A6) with folded corner
+      ctx.fillStyle = '#0054A6';
+      ctx.beginPath();
+      ctx.moveTo(250, 620);
+      ctx.lineTo(1670, 620);
+      ctx.lineTo(1670, 620 + receiptBodyH - 100);
+      ctx.lineTo(1570, 620 + receiptBodyH); // 45-deg folded corner
+      ctx.lineTo(250, 620 + receiptBodyH);
+      ctx.closePath();
+      ctx.fill();
 
-          // Dashed Divider Line
-          ctx.strokeStyle = '#1C480C';
-          ctx.lineWidth = 6;
-          ctx.setLineDash([20, 15]);
-          ctx.beginPath();
-          ctx.moveTo(330, 830);
-          ctx.lineTo(1590, 830);
-          ctx.stroke();
-          ctx.setLineDash([]);
+      // 9. Cream Receipt Paper (#FFF7E3)
+      ctx.fillStyle = '#FFF7E3';
+      ctx.beginPath();
+      ctx.moveTo(275, 645);
+      ctx.lineTo(1645, 645);
+      ctx.lineTo(1645, 620 + receiptBodyH - 125);
+      ctx.lineTo(1545, 620 + receiptBodyH - 25);
+      ctx.lineTo(275, 620 + receiptBodyH - 25);
+      ctx.closePath();
+      ctx.fill();
 
-          // Metadata row: Hiển thị tên biệt danh người dùng điền lúc đầu
-          ctx.textAlign = 'left';
-          ctx.font = '800 38px "Space Mono", monospace';
-          ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 900);
-          ctx.textAlign = 'right';
-          ctx.fillText(resultReceipt.recordDate || '2026-07-23', 1590, 900);
+      // 10. Inner Receipt Content (Seamless Flow)
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '900 56px "Inter", "Arial", sans-serif';
+      ctx.fillText('X A N H W R A P', 960, 740);
+      ctx.font = '700 36px "Inter", "Arial", sans-serif';
+      ctx.fillText('PHIẾU HOÀN THỜI GIAN', 960, 790);
 
-          // Identity Label Badge (#8CC63F Pill shape)
-          ctx.fillStyle = '#8CC63F';
-          ctx.beginPath();
-          ctx.roundRect(330, 950, 1260, 140, [70]);
-          ctx.fill();
+      // Dashed Divider Line
+      ctx.strokeStyle = '#1C480C';
+      ctx.lineWidth = 6;
+      ctx.setLineDash([20, 15]);
+      ctx.beginPath();
+      ctx.moveTo(330, 830);
+      ctx.lineTo(1590, 830);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '900 60px "Space Mono", sans-serif';
-          ctx.fillText(resultReceipt.assignedLabelName.toUpperCase(), 960, 1045);
+      // Metadata row: Biệt danh & Ngày
+      ctx.textAlign = 'left';
+      ctx.font = '800 38px "Space Mono", monospace';
+      ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 900);
+      ctx.textAlign = 'right';
+      ctx.fillText(resultReceipt.recordDate || '2026-07-23', 1590, 900);
 
-          // Dashed Divider
-          ctx.setLineDash([20, 15]);
-          ctx.beginPath();
-          ctx.moveTo(330, 1130);
-          ctx.lineTo(1590, 1130);
-          ctx.stroke();
-          ctx.setLineDash([]);
+      // Identity Label Badge (#8CC63F Pill shape)
+      ctx.fillStyle = '#8CC63F';
+      ctx.beginPath();
+      ctx.roundRect(330, 950, 1260, 140, [70]);
+      ctx.fill();
 
-          // Render first legs
-          const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
-          let yPos = 1210;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '900 60px "Inter", "Arial", sans-serif';
+      ctx.fillText(resultReceipt.assignedLabelName.toUpperCase(), 960, 1045);
 
-          legsList.slice(0, 4).forEach((leg) => {
-            ctx.textAlign = 'left';
-            ctx.fillStyle = '#1C480C';
-            ctx.font = '700 38px "Space Mono", monospace';
-            const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
-            ctx.fillText(legStr, 330, yPos);
+      // Dashed Divider
+      ctx.setLineDash([20, 15]);
+      ctx.beginPath();
+      ctx.moveTo(330, 1130);
+      ctx.lineTo(1590, 1130);
+      ctx.stroke();
+      ctx.setLineDash([]);
 
-            ctx.textAlign = 'right';
-            ctx.fillText(`${leg.distance_km}KM           ${leg.duration_min}'`, 1590, yPos);
+      // Render ALL Legs (2 to 8 legs in single continuous list)
+      let yPos = 1210;
+      legsList.forEach((leg) => {
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#1C480C';
+        ctx.font = '700 38px "Space Mono", monospace';
+        const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
+        ctx.fillText(legStr, 330, yPos);
 
-            yPos += 85;
-          });
+        ctx.textAlign = 'right';
+        ctx.fillText(`${leg.distance_km}KM           ${leg.duration_min}'`, 1590, yPos);
 
-        } else {
-          // PART 2: BOTTOM HALF MASTER
-          // 4. Solid Blue Backing Frame (#0054A6) with bottom-right folded corner shape
-          ctx.fillStyle = '#0054A6';
-          ctx.beginPath();
-          ctx.moveTo(250, 0);
-          ctx.lineTo(1670, 0);
-          ctx.lineTo(1670, 1640);
-          ctx.lineTo(1570, 1740); // 45-deg folded corner
-          ctx.lineTo(250, 1740);
-          ctx.closePath();
-          ctx.fill();
+        yPos += 85;
+      });
 
-          // 5. Cream Receipt Paper (#FFF7E3)
-          ctx.fillStyle = '#FFF7E3';
-          ctx.beginPath();
-          ctx.moveTo(275, 0);
-          ctx.lineTo(1645, 0);
-          ctx.lineTo(1645, 1615);
-          ctx.lineTo(1545, 1715);
-          ctx.lineTo(275, 1715);
-          ctx.closePath();
-          ctx.fill();
+      // Dashed Divider Line after legs
+      ctx.setLineDash([20, 15]);
+      ctx.beginPath();
+      ctx.moveTo(330, yPos);
+      ctx.lineTo(1590, yPos);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      yPos += 75;
 
-          // Render remaining legs if any
-          const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
-          let yPos = 80;
+      // Comparison lines
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '800 40px "Inter", "Arial", sans-serif';
+      ctx.fillText('TỰ LÁI HÔM NAY', 330, yPos);
+      ctx.textAlign = 'right';
+      ctx.font = '800 40px "Space Mono", monospace';
+      const totalHours = Math.floor(resultReceipt.totalMin / 60);
+      const totalMinsRem = resultReceipt.totalMin % 60;
+      ctx.fillText(`${resultReceipt.totalKm}KM         ${totalHours}H ${totalMinsRem < 10 ? '0' : ''}${totalMinsRem}'`, 1590, yPos);
+      yPos += 75;
 
-          if (legsList.length > 4) {
-            legsList.slice(4, 8).forEach((leg) => {
-              ctx.textAlign = 'left';
-              ctx.fillStyle = '#1C480C';
-              ctx.font = '700 38px "Space Mono", monospace';
-              const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
-              ctx.fillText(legStr, 330, yPos);
+      ctx.textAlign = 'left';
+      ctx.font = '800 40px "Inter", "Arial", sans-serif';
+      ctx.fillText('NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG', 330, yPos);
+      ctx.textAlign = 'right';
+      ctx.font = '800 40px "Space Mono", monospace';
+      const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin;
+      const pubHours = Math.floor(pubMins / 60);
+      const pubMinsRem = pubMins % 60;
+      ctx.fillText(`${pubHours > 0 ? pubHours + 'H ' : ''}${pubMinsRem}'`, 1590, yPos);
+      yPos += 95;
 
-              ctx.textAlign = 'right';
-              ctx.fillText(`${leg.distance_km}KM           ${leg.duration_min}'`, 1590, yPos);
+      // Highlight Green Card Box (#8CC63F)
+      ctx.fillStyle = '#8CC63F';
+      ctx.beginPath();
+      ctx.roundRect(330, yPos, 1260, 360, [32]);
+      ctx.fill();
 
-              yPos += 85;
-            });
-          }
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '900 50px "Inter", "Arial", sans-serif';
+      ctx.fillText('HOÀN LẠI CHO BẠN', 390, yPos + 85);
 
-          // Dashed Divider Line
-          ctx.strokeStyle = '#1C480C';
-          ctx.lineWidth = 6;
-          ctx.setLineDash([20, 15]);
-          ctx.beginPath();
-          ctx.moveTo(330, yPos);
-          ctx.lineTo(1590, yPos);
-          ctx.stroke();
-          ctx.setLineDash([]);
-          yPos += 75;
+      const savedText = `${pubMins}'`;
 
-          // Comparison lines
-          ctx.textAlign = 'left';
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '800 40px "Space Mono", monospace';
-          ctx.fillText('TỰ LÁI HÔM NAY', 330, yPos);
-          ctx.textAlign = 'right';
-          const totalHours = Math.floor(resultReceipt.totalMin / 60);
-          const totalMinsRem = resultReceipt.totalMin % 60;
-          ctx.fillText(`${resultReceipt.totalKm}KM         ${totalHours}H ${totalMinsRem < 10 ? '0' : ''}${totalMinsRem}'`, 1590, yPos);
-          yPos += 75;
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 115px "Inter", "Arial", sans-serif';
+      ctx.fillText(savedText, 390, yPos + 220);
 
-          ctx.textAlign = 'left';
-          ctx.fillText('NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG', 330, yPos);
-          ctx.textAlign = 'right';
-          const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin;
-          const pubHours = Math.floor(pubMins / 60);
-          const pubMinsRem = pubMins % 60;
-          ctx.fillText(`${pubHours > 0 ? pubHours + 'H ' : ''}${pubMinsRem}'`, 1590, yPos);
-          yPos += 95;
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '900 50px "Inter", "Arial", sans-serif';
+      ctx.fillText('MỖI NGÀY', 1050, yPos + 220);
 
-          // Highlight Green Card Box (#8CC63F)
-          ctx.fillStyle = '#8CC63F';
-          ctx.beginPath();
-          ctx.roundRect(330, yPos, 1260, 360, [32]);
-          ctx.fill();
+      ctx.fillStyle = '#0054A6';
+      ctx.font = '900 52px "Inter", "Arial", sans-serif';
+      ctx.fillText(`= ${resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY`, 390, yPos + 310);
 
-          ctx.textAlign = 'left';
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '900 50px "Space Mono", sans-serif';
-          ctx.fillText('HOÀN LẠI CHO BẠN', 390, yPos + 85);
+      yPos += 440;
 
-          const savedText = `${pubMins}'`;
+      // Barcode graphics
+      ctx.fillStyle = '#1A1A1A';
+      for (let x = 390; x < 1530; x += 18) {
+        const barWidth = Math.random() > 0.4 ? 12 : 5;
+        ctx.fillRect(x, yPos, barWidth, 130);
+      }
+      yPos += 175;
 
-          ctx.fillStyle = '#FFFFFF';
-          ctx.font = '900 115px "Space Mono", sans-serif';
-          ctx.fillText(savedText, 390, yPos + 220);
+      // Barcode text label
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '800 42px "Space Mono", monospace';
+      ctx.fillText(`MÃ HD ${resultReceipt.id.slice(0, 4).toUpperCase()}   •   SỐ DỰ THẺ ${resultReceipt.luckyNumber}`, 960, yPos);
+      yPos += 75;
 
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '900 50px "Space Mono", sans-serif';
-          ctx.fillText('MỖI NGÀY', 1050, yPos + 220);
+      // Bottom Solid Blue Diagonal Zig-Zag Perforated Teeth (#0054A6)
+      ctx.fillStyle = '#0054A6';
+      for (let px = 275; px <= 1500; px += 60) {
+        ctx.beginPath();
+        ctx.moveTo(px, yPos);
+        ctx.lineTo(px + 30, yPos + 40);
+        ctx.lineTo(px + 60, yPos);
+        ctx.fill();
+      }
 
-          ctx.fillStyle = '#0054A6';
-          ctx.font = '900 52px "Space Mono", sans-serif';
-          ctx.fillText(`= ${resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY`, 390, yPos + 310);
+      // Bottom Hashtags
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#0054A6';
+      ctx.font = '900 48px "Inter", "Arial", sans-serif';
+      ctx.fillText('#XanhWrap #LuotKhoiChamXanh', 960, canvasH - 50);
 
-          yPos += 440;
-
-          // Barcode graphics
-          ctx.fillStyle = '#1A1A1A';
-          for (let x = 390; x < 1530; x += 18) {
-            const barWidth = Math.random() > 0.4 ? 12 : 5;
-            ctx.fillRect(x, yPos, barWidth, 130);
-          }
-          yPos += 175;
-
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#1C480C';
-          ctx.font = '800 42px "Space Mono", monospace';
-          ctx.fillText(`MÃ HD ${resultReceipt.id.slice(0, 4).toUpperCase()}   •   SỐ DỰ THẺ ${resultReceipt.luckyNumber}`, 960, yPos);
-          yPos += 75;
-
-          // Bottom Solid Blue Diagonal Zig-Zag Perforated Teeth (#0054A6)
-          ctx.fillStyle = '#0054A6';
-          for (let px = 275; px <= 1500; px += 60) {
-            ctx.beginPath();
-            ctx.moveTo(px, yPos);
-            ctx.lineTo(px + 30, yPos + 40);
-            ctx.lineTo(px + 60, yPos);
-            ctx.fill();
-          }
-
-          // Bottom Hashtags
-          ctx.textAlign = 'center';
-          ctx.fillStyle = '#0054A6';
-          ctx.font = '900 48px "Space Mono", sans-serif';
-          ctx.fillText('#XanhWrap #LuotKhoiChamXanh', 960, 1860);
-        }
-
-        return canvas;
-      };
-
-      // Generate Image 1 & Image 2
-      const canvas1 = createSquareCanvas(1);
-      const canvas2 = createSquareCanvas(2);
-
-      const link1 = document.createElement('a');
-      link1.download = `xanhwrap_${resultReceipt.id}_1.jpg`;
-      link1.href = canvas1.toDataURL('image/jpeg', 0.95);
-      link1.click();
-
-      setTimeout(() => {
-        const link2 = document.createElement('a');
-        link2.download = `xanhwrap_${resultReceipt.id}_2.jpg`;
-        link2.href = canvas2.toDataURL('image/jpeg', 0.95);
-        link2.click();
-      }, 500);
+      // Download single seamless image
+      const link = document.createElement('a');
+      link.download = `xanhwrap_${resultReceipt.id}.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.95);
+      link.click();
 
     } catch (err) {
       console.error('Error rendering receipt canvas:', err);
@@ -608,7 +574,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             MÁY IN PHIẾU XANHWRAP
           </h1>
           <p className="text-xs sm:text-sm text-white/90 max-w-2xl leading-relaxed">
-            Nhập 2 đến 8 chặng di chuyển trong ngày của bạn để máy in tự động cấp **Nhãn Danh Tính** độc bản và xuất bộ phiếu 2 ảnh vuông đăng mạng xã hội tham gia quay số may mắn!
+            Nhập 2 đến 8 chặng di chuyển trong ngày của bạn để máy in tự động cấp **Nhãn Danh Tính** độc bản và xuất phiếu 1 ảnh liền mạch đăng mạng xã hội tham gia quay số may mắn!
           </p>
         </div>
       </div>
@@ -887,16 +853,16 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             </button>
 
             <button
-              onClick={handleDownloadSquareImages}
+              onClick={handleDownloadSeamlessImage}
               disabled={downloadingImages}
-              className="px-6 py-2.5 bg-[#0054A6] hover:bg-eco-primary text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
+              className="px-6 py-3 bg-[#0054A6] hover:bg-eco-primary text-white text-xs font-black uppercase tracking-wider rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
             >
               {downloadingImages ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
               ) : (
                 <Download className="w-4 h-4" />
               )}
-              <span>TẢI CẢ 2 ẢNH (JPG 1920x1920)</span>
+              <span>TẢI PHIẾU XANHWRAP (1 ẢNH LIỀN MẠCH JPG)</span>
             </button>
           </div>
 
@@ -1084,7 +1050,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                     className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl px-4 py-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-eco-primary"
                     required
                   />
-                  <span className="text-[10px] text-eco-muted">Bài đăng kèm 2 ảnh phiếu vừa tải về và mở chế độ Công khai</span>
+                  <span className="text-[10px] text-eco-muted">Bài đăng kèm ảnh phiếu vừa tải về và mở chế độ Công khai</span>
                 </div>
 
                 <button
