@@ -269,8 +269,8 @@ export function assignXanhWrapLabel(legs: XanhWrapLeg[]): XanhWrapLabelDef {
     return ALL_LABELS.find(l => l.code === 'model_employee')!;
   }
 
-  const totalKm = legs.reduce((acc, l) => acc + (l.distance_km || 0), 0);
-  const totalMin = legs.reduce((acc, l) => acc + (l.duration_min || 0), 0);
+  const totalKm = legs.reduce((acc, l) => acc + (Number(l.distance_km) || 0), 0);
+  const totalMin = legs.reduce((acc, l) => acc + (Number(l.duration_min) || 0), 0);
   
   const publicLegs = legs.filter(l => ['bus', 'metro'].includes(l.mode));
   const publicRatio = publicLegs.length / legs.length;

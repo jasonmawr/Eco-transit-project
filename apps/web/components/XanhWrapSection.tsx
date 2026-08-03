@@ -559,16 +559,20 @@ export default function XanhWrapSection() {
       ctx.font = '900 34px "Inter", "Arial", sans-serif';
       ctx.fillText('🍃 CO₂e GIẢM ƯỚC TÍNH', 1010, yPos + 65);
 
-      const co2Trip = resultReceipt.co2e_saved_trip_kg ?? (resultReceipt.co2SavedGrams ? (resultReceipt.co2SavedGrams / 1000).toFixed(2) : '1.1');
-      const co2Year = resultReceipt.co2e_saved_year_kg ?? Math.round((resultReceipt.co2SavedGrams || 1110) * 250 / 1000);
+      const co2Trip = (resultReceipt.co2e_saved_trip_kg !== undefined ? resultReceipt.co2e_saved_trip_kg : (resultReceipt.co2SavedGrams ? (resultReceipt.co2SavedGrams / 1000).toFixed(2) : 0));
+      const co2Year = resultReceipt.co2e_saved_year_kg ?? Math.round((resultReceipt.co2SavedGrams || 0) * (resultReceipt.annual_travel_days || 250) / 1000);
 
       ctx.fillStyle = '#FFFFFF';
       ctx.font = '900 75px "Inter", "Arial", sans-serif';
       ctx.fillText(`${co2Trip} KG`, 1010, yPos + 180);
 
       ctx.fillStyle = '#072007';
-      ctx.font = '900 34px "Inter", "Arial", sans-serif';
-      ctx.fillText(`≈ ${co2Year} KG/NĂM*`, 1010, yPos + 270);
+      ctx.font = '900 30px "Inter", "Arial", sans-serif';
+      if (Number(co2Trip) > 0) {
+        ctx.fillText(`≈ ${co2Year} KG/NĂM*`, 1010, yPos + 270);
+      } else {
+        ctx.fillText(`Chưa ghi nhận mức giảm*`, 1010, yPos + 270);
+      }
 
       yPos += cardH + 45;
 
