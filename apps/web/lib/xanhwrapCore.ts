@@ -361,14 +361,21 @@ export function calculateXanhWrapStats(legs: XanhWrapLeg[], options?: CalculateC
   const annualTravelDays = options?.annualTravelDays ?? 250;
   const baselineFactor = EMISSION_FACTORS[baselineMode] ?? 0.11367;
 
-  const totalKm = parseFloat(legs.reduce((acc, l) => acc + (l.distance_km || 0), 0).toFixed(1));
-  const totalMin = legs.reduce((acc, l) => acc + (l.duration_min || 0), 0);
+  // Strict Number coercion to prevent string concatenation bugs
+  const cleanLegs = (legs || []).map(l => ({
+    ...l,
+    distance_km: Number(l.distance_km) || 0,
+    duration_min: Number(l.duration_min) || 0,
+  }));
 
-  const handsFreeMin = legs
+  const totalKm = parseFloat(cleanLegs.reduce((acc, l) => acc + l.distance_km, 0).toFixed(1));
+  const totalMin = cleanLegs.reduce((acc, l) => acc + l.duration_min, 0);
+
+  const handsFreeMin = cleanLegs
     .filter(l => ['bus', 'metro', 'ride_hailing'].includes(l.mode))
-    .reduce((sum, l) => sum + (l.duration_min || 0), 0);
+    .reduce((sum, l) => sum + l.duration_min, 0);
 
-  const transitMin = legs.reduce((sum, l) => {
+  const transitMin = cleanLegs.reduce((sum, l) => {
     if (['bus', 'metro'].includes(l.mode)) {
       return sum + l.duration_min;
     }
@@ -379,10 +386,9 @@ export function calculateXanhWrapStats(legs: XanhWrapLeg[], options?: CalculateC
   }, 0);
 
   let greenEmissionKg = 0;
-  for (const leg of legs) {
-    const dist = Number(leg.distance_km);
+  for (const leg of cleanLegs) {
     const factor = EMISSION_FACTORS[leg.mode] ?? 0.0505387;
-    greenEmissionKg += dist * factor;
+    greenEmissionKg += leg.distance_km * factor;
   }
 
   const baselineEmissionKg = totalKm * baselineFactor;

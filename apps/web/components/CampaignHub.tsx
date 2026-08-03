@@ -29,14 +29,26 @@ export default function CampaignHub({ activeSection, onSectionSelect, user, onLo
   const [showAvatarSelector, setShowAvatarSelector] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(user);
 
-  // Layout collapsed state & defer collapse state
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Layout collapsed state & defer collapse state (Default to collapsed on mobile to avoid screen obstruction)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
   const [pendingCollapse, setPendingCollapse] = useState(false);
   const [trainIsMoving, setTrainIsMoving] = useState(false);
 
   useEffect(() => {
     setCurrentUser(user);
   }, [user]);
+
+  // Auto collapse on mobile when section changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      setIsCollapsed(true);
+    }
+  }, [activeSection]);
 
   // SSR hydration guard
   useEffect(() => {
