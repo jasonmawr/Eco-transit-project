@@ -211,7 +211,7 @@ export const XANHWRAP_PRESETS: XanhWrapPreset[] = [
 ];
 
 export const ALL_LABELS: XanhWrapLabelDef[] = [
-  { code: 'no_smoke_absolute', name: 'KHÔNG KHÓI TUYỆT ĐỐI', group: 'green', description: '100% chặng đi bus/metro và tổng quãng đường ≥ 20km' },
+  { code: 'no_smoke_absolute', name: 'LƯỚT XANH CHỦ ĐỘNG', group: 'green', description: '100% chặng đi bus/metro và tổng quãng đường ≥ 20km' },
   { code: 'retired_driver', name: 'TAY LÁI VỀ HƯU', group: 'green', description: '100% chặng di chuyển bằng xe buýt hoặc metro' },
   { code: 'station_regular', name: 'RA GA NHƯ VỀ NHÀ', group: 'green', description: 'Từ 60% số chặng trở lên đi bằng phương tiện công cộng' },
   { code: 'quitting_rookie', name: 'TẬP TÀNH BỎ XE', group: 'green', description: 'Có ít nhất 1 chặng di chuyển bằng buýt hoặc metro' },
@@ -228,6 +228,19 @@ export const ALL_LABELS: XanhWrapLabelDef[] = [
   { code: 'golden_hour', name: 'NGƯỜI CỦA GIỜ VÀNG', group: 'standard', description: 'Không có chặng nào dính giờ cao điểm sáng hay chiều' },
   { code: 'model_employee', name: 'NHÂN VIÊN KIỂU MẪU', group: 'standard', description: 'Hành trình di chuyển tiêu chuẩn năng động trong ngày' },
 ];
+
+export const EMISSION_FACTORS: Record<string, number> = {
+  motorbike_average: 0.11367,  // kg CO2e / vehicle-km
+  petrol_car_average: 0.16272, // kg CO2e / vehicle-km
+  motorbike: 0.11367,          // alias
+  car: 0.16272,                // alias
+  ride_hailing: 0.16272,       // alias
+  metro: 0.0817408,            // kg CO2e / passenger-km
+  electric_bus: 0.0505387,     // kg CO2e / passenger-km
+  bus: 0.0505387,              // alias
+  walk: 0,
+  bicycle: 0,
+};
 
 export const MODE_COEF_CO2: Record<string, number> = {
   motorbike: 56,
@@ -338,7 +351,16 @@ export function assignXanhWrapLabel(legs: XanhWrapLeg[]): XanhWrapLabelDef {
   return ALL_LABELS.find(l => l.code === 'model_employee')!;
 }
 
-export function calculateXanhWrapStats(legs: XanhWrapLeg[]) {
+export interface CalculateCO2eOptions {
+  baselineMode?: 'motorbike_average' | 'petrol_car_average';
+  annualTravelDays?: number;
+}
+
+export function calculateXanhWrapStats(legs: XanhWrapLeg[], options?: CalculateCO2eOptions) {
+  const baselineMode = options?.baselineMode || 'motorbike_average';
+  const annualTravelDays = options?.annualTravelDays ?? 250;
+  const baselineFactor = EMISSION_FACTORS[baselineMode] ?? 0.11367;
+
   const totalKm = parseFloat(legs.reduce((acc, l) => acc + (l.distance_km || 0), 0).toFixed(1));
   const totalMin = legs.reduce((acc, l) => acc + (l.duration_min || 0), 0);
 
@@ -356,27 +378,37 @@ export function calculateXanhWrapStats(legs: XanhWrapLeg[]) {
     return sum + Math.round((l.distance_km / 16) * 60 + 12);
   }, 0);
 
-  const baselinePrivateCoef = 124;
-  let co2SavedGrams = 0;
-  legs.forEach(l => {
-    const currentCoef = MODE_COEF_CO2[l.mode] ?? 56;
-    if (['bus', 'metro', 'bicycle', 'walk'].includes(l.mode)) {
-      co2SavedGrams += Math.round(l.distance_km * (baselinePrivateCoef - currentCoef));
-    }
-  });
+  let greenEmissionKg = 0;
+  for (const leg of legs) {
+    const dist = Number(leg.distance_km);
+    const factor = EMISSION_FACTORS[leg.mode] ?? 0.0505387;
+    greenEmissionKg += dist * factor;
+  }
+
+  const baselineEmissionKg = totalKm * baselineFactor;
+  const co2eSavedTripKg = Math.max(0, baselineEmissionKg - greenEmissionKg);
+  const co2eSavedYearKg = Math.round(co2eSavedTripKg * annualTravelDays);
 
   const value = handsFreeMin > 0 ? handsFreeMin : transitMin;
-  const daysPerYear = Math.round((value * 250) / (60 * 24));
-  const episodesPerYear = Math.round((value * 250) / 45);
+  const daysPerYear = Math.round((value * annualTravelDays) / (60 * 24));
+  const episodesPerYear = Math.round((value * annualTravelDays) / 45);
 
   return {
     totalKm,
     totalMin,
     handsFreeMin,
     transitMin,
-    co2SavedGrams: Math.max(0, co2SavedGrams),
+    co2SavedGrams: Math.round(co2eSavedTripKg * 1000),
+    baseline_emission_kg: +baselineEmissionKg.toFixed(2),
+    green_emission_kg: +greenEmissionKg.toFixed(2),
+    co2e_saved_trip_kg: +co2eSavedTripKg.toFixed(2),
+    co2e_saved_year_kg: co2eSavedYearKg,
+    annual_travel_days: annualTravelDays,
+    factor_version: 'xanhwrap-2026.08-v1',
+    is_estimate: true,
     metricValue: value,
     daysPerYear: Math.max(1, daysPerYear),
     episodesPerYear: Math.max(1, episodesPerYear),
   };
 }
+

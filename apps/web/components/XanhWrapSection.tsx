@@ -23,9 +23,11 @@ import {
 export default function XanhWrapSection() {
   // Step 1: Input Form State
   const [nickname, setNickname] = useState('');
-  const [recordDate, setRecordDate] = useState('2026-07-23');
+  const [recordDate, setRecordDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [reflection, setReflection] = useState('');
   const [luckyNumber, setLuckyNumber] = useState('555');
+  const [baselineMode, setBaselineMode] = useState<'motorbike_average' | 'petrol_car_average'>('motorbike_average');
+  const [annualTravelDays, setAnnualTravelDays] = useState<number>(250);
 
   // Legs array (Min 2, Max 8)
   const [legs, setLegs] = useState<XanhWrapLeg[]>([
@@ -134,6 +136,13 @@ export default function XanhWrapSection() {
       return;
     }
 
+    // Validate leg distances > 0
+    const hasInvalidDist = legs.some(l => !l.distance_km || Number(l.distance_km) <= 0);
+    if (hasInvalidDist) {
+      setError('Vui lòng kiểm tra quãng đường của từng chặng (phải lớn hơn 0 km).');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -148,6 +157,8 @@ export default function XanhWrapSection() {
           recordDate,
           reflection: reflection.trim(),
           luckyNumber: luckyVal,
+          baselineMode,
+          annualTravelDays,
           legs,
         }),
         credentials: 'include',
@@ -213,8 +224,13 @@ export default function XanhWrapSection() {
   // Copy sample caption
   const handleCopyCaption = async () => {
     if (!resultReceipt) return;
-    const caption = `Nhãn của mình: [ ${resultReceipt.assignedLabelName} ] — độ hiếm ${resultReceipt.rarityPct ? resultReceipt.rarityPct + '%' : 'mới'}
-Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} phút không phải cầm lái. Đổi sang buýt/metro thì lấy lại được ${resultReceipt.daysPerYear} ngày tự do mỗi năm!
+    const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.totalMin;
+    const co2Trip = resultReceipt.co2e_saved_trip_kg ?? (resultReceipt.co2SavedGrams ? (resultReceipt.co2SavedGrams / 1000).toFixed(2) : '1.1');
+    const co2Year = resultReceipt.co2e_saved_year_kg ?? Math.round((resultReceipt.co2SavedGrams || 1110) * (resultReceipt.annual_travel_days || 250) / 1000);
+
+    const caption = `Nhãn danh tính của mình: [ ${resultReceipt.assignedLabelName} ] — độ hiếm ${resultReceipt.rarityPct ? resultReceipt.rarityPct + '%' : 'mới'}
+⏱️ Thời gian có thể tận dụng: ${pubMins} phút/ngày (≈ ${resultReceipt.daysPerYear} ngày tự do/năm!)
+🌱 CO₂e giảm ước tính: ${co2Trip} kg/hành trình (≈ ${co2Year} kg CO₂e/năm)
 💬 Dòng suy nghĩ: "${resultReceipt.reflection}"
 🎲 Số dự thi may mắn: #${resultReceipt.luckyNumber}
 #XanhWrap #LuotKhoiChamXanh #EcoTransit`;
@@ -272,13 +288,12 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
     ctx.restore();
   };
 
-  // Generate and Download 1 Single Seamless Poster JPG image via HTML5 Canvas (1 Ảnh Liền Mạch 100%)
+  // Generate and Download 1 Single Seamless Poster JPG image via HTML5 Canvas
   const handleDownloadSeamlessImage = async () => {
     if (!resultReceipt) return;
     setDownloadingImages(true);
 
     try {
-      // Preload official BTC transparent PNG logo strip image
       const logoImg = new Image();
       logoImg.crossOrigin = 'anonymous';
       logoImg.src = '/images/xanhwrap-brand-logos.png';
@@ -293,39 +308,32 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
       const legsList: XanhWrapLeg[] = resultReceipt.legsJson || [];
       const extraLegsHeight = Math.max(0, legsList.length - 2) * 85;
       const canvasW = 1920;
-      const canvasH = 2650 + extraLegsHeight;
+      const canvasH = 2700 + extraLegsHeight;
 
       const canvas = document.createElement('canvas');
       canvas.width = canvasW;
       canvas.height = canvasH;
       const ctx = canvas.getContext('2d')!;
 
-      // 1. Sky Blue Background Gradient (#84D0FF to #B6E5FF)
+      // 1. Sky Blue Background Gradient
       const bgGrad = ctx.createLinearGradient(0, 0, 0, canvasH);
       bgGrad.addColorStop(0, '#84D0FF');
       bgGrad.addColorStop(1, '#B6E5FF');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, canvasW, canvasH);
 
-      // 2. Decorative Wind Streaks Graphics across full height
+      // 2. Decorative Wind Streaks Graphics
       drawWindStreak(ctx, 100, 1400, 400, 1800, 0.7);
       drawWindStreak(ctx, 60, 1200, 300, 1600, 0.5);
       drawWindStreak(ctx, 1600, 800, 1900, 1300, 0.6);
       drawWindStreak(ctx, 1500, 1000, 1850, 1500, 0.4);
-      drawWindStreak(ctx, 80, 2100, 420, 2500, 0.6);
-      drawWindStreak(ctx, 1550, 1900, 1880, 2350, 0.5);
 
       // 3. Floating Green Leaves along margins
       drawLeaf(ctx, 120, 1500, 110, -30);
       drawLeaf(ctx, 80, 1750, 130, 20);
-      drawLeaf(ctx, 220, 1850, 100, -10);
       drawLeaf(ctx, 1820, 1200, 140, 45);
-      drawLeaf(ctx, 1780, 1500, 120, -25);
-      drawLeaf(ctx, 1860, 1780, 110, 15);
-      drawLeaf(ctx, 110, 2200, 125, -20);
-      drawLeaf(ctx, 1840, 2350, 135, 30);
 
-      // 4. Top Brand Header Bar - Official Transparent PNG 4-Logo Strip Image
+      // 4. Header Bar Logo Strip
       if (logoImg.complete && logoImg.naturalWidth > 0) {
         ctx.save();
         const targetW = 950;
@@ -334,11 +342,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
         ctx.restore();
       }
 
-      // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH" (Positioned y=310, 0 overlap)
+      // 5. Left Slanted Slogan Logo Badge "LƯỚT KHÓI CHẠM XANH"
       ctx.save();
       ctx.translate(140, 310);
       ctx.rotate((-12 * Math.PI) / 180);
-      
       ctx.fillStyle = '#0054A6';
       ctx.font = '900 58px "Inter", "Arial", sans-serif';
       ctx.fillText('LƯỚT', 0, 0);
@@ -357,94 +364,87 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
       ctx.fillText('CHẠM XANH', 0, 60);
       ctx.restore();
 
-      // 6. Title Text: "MỘT NGÀY LÁI XE BẠN LẤY LẠI ĐƯỢC BAO NHIÊU THỜI GIAN?"
+      // 6. Spec 7.1 Title Text: "MỘT NGÀY DI CHUYỂN, BẠN NHẬN LẠI ĐƯỢC GÌ?"
       ctx.fillStyle = '#0054A6';
       ctx.textAlign = 'center';
       ctx.font = '900 82px "Inter", "Arial", sans-serif';
-      ctx.fillText('MỘT NGÀY LÁI XE', 960, 360);
-      ctx.font = '800 64px "Inter", "Arial", sans-serif';
-      ctx.fillText('BẠN LẤY LẠI ĐƯỢC', 960, 445);
-      ctx.font = '900 82px "Inter", "Arial", sans-serif';
-      ctx.fillText('BAO NHIÊU THỜI GIAN?', 960, 530);
+      ctx.fillText('MỘT NGÀY DI CHUYỂN', 960, 360);
+      ctx.font = '800 68px "Inter", "Arial", sans-serif';
+      ctx.fillText('BẠN NHẬN LẠI ĐƯỢC GÌ?', 960, 445);
+      ctx.font = '700 38px "Inter", "Arial", sans-serif';
+      ctx.fillText('Thời gian có thể tận dụng • CO₂e giảm ước tính', 960, 520);
 
-      // 7. Realistic Leaf Top-Right of Receipt Paper Corner
-      drawLeaf(ctx, 1640, 660, 140, 15);
+      // Dynamic Receipt Height
+      const receiptBodyH = 1880 + extraLegsHeight;
 
-      // Calculate Receipt Paper Dynamic Height
-      const receiptBodyH = 1820 + extraLegsHeight;
-
-      // 8. Solid Blue Backing Frame (#0054A6) with folded corner
+      // Solid Blue Frame Backing
       ctx.fillStyle = '#0054A6';
       ctx.beginPath();
-      ctx.moveTo(250, 620);
-      ctx.lineTo(1670, 620);
-      ctx.lineTo(1670, 620 + receiptBodyH - 100);
-      ctx.lineTo(1570, 620 + receiptBodyH); // 45-deg folded corner
-      ctx.lineTo(250, 620 + receiptBodyH);
+      ctx.moveTo(250, 600);
+      ctx.lineTo(1670, 600);
+      ctx.lineTo(1670, 600 + receiptBodyH - 100);
+      ctx.lineTo(1570, 600 + receiptBodyH);
+      ctx.lineTo(250, 600 + receiptBodyH);
       ctx.closePath();
       ctx.fill();
 
-      // 9. Cream Receipt Paper (#FFF7E3)
+      // Cream Receipt Paper
       ctx.fillStyle = '#FFF7E3';
       ctx.beginPath();
-      ctx.moveTo(275, 645);
-      ctx.lineTo(1645, 645);
-      ctx.lineTo(1645, 620 + receiptBodyH - 125);
-      ctx.lineTo(1545, 620 + receiptBodyH - 25);
-      ctx.lineTo(275, 620 + receiptBodyH - 25);
+      ctx.moveTo(275, 625);
+      ctx.lineTo(1645, 625);
+      ctx.lineTo(1645, 600 + receiptBodyH - 125);
+      ctx.lineTo(1545, 600 + receiptBodyH - 25);
+      ctx.lineTo(275, 600 + receiptBodyH - 25);
       ctx.closePath();
       ctx.fill();
 
-      // 10. Inner Receipt Content (Seamless Flow)
+      // Inner Receipt Content
       ctx.textAlign = 'center';
       ctx.fillStyle = '#1C480C';
       ctx.font = '900 56px "Inter", "Arial", sans-serif';
-      ctx.fillText('X A N H W R A P', 960, 740);
-      ctx.font = '700 36px "Inter", "Arial", sans-serif';
-      ctx.fillText('PHIẾU HOÀN THỜI GIAN', 960, 790);
+      ctx.fillText('X A N H W R A P', 960, 720);
+      ctx.font = '700 34px "Inter", "Arial", sans-serif';
+      ctx.fillText('XANHWRAP – PHIẾU HOÀN HÀNH TRÌNH XANH', 960, 770);
 
-      // Dashed Divider Line
       ctx.strokeStyle = '#1C480C';
       ctx.lineWidth = 6;
       ctx.setLineDash([20, 15]);
       ctx.beginPath();
-      ctx.moveTo(330, 830);
-      ctx.lineTo(1590, 830);
+      ctx.moveTo(330, 810);
+      ctx.lineTo(1590, 810);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Metadata row: Biệt danh & Ngày
       ctx.textAlign = 'left';
       ctx.font = '800 38px "Space Mono", monospace';
-      ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 900);
+      ctx.fillText(`NGƯỜI LƯỚT CHẶNG: ${resultReceipt.nickname.toUpperCase()}`, 330, 880);
       ctx.textAlign = 'right';
-      ctx.fillText(resultReceipt.recordDate || '2026-07-23', 1590, 900);
+      ctx.fillText(resultReceipt.recordDate || '2026-08-02', 1590, 880);
 
-      // Identity Label Badge (#8CC63F Pill shape)
+      // Identity Label Badge
       ctx.fillStyle = '#8CC63F';
       ctx.beginPath();
-      ctx.roundRect(330, 950, 1260, 140, [70]);
+      ctx.roundRect(330, 930, 1260, 140, [70]);
       ctx.fill();
 
       ctx.textAlign = 'center';
       ctx.fillStyle = '#1C480C';
       ctx.font = '900 60px "Inter", "Arial", sans-serif';
-      ctx.fillText(resultReceipt.assignedLabelName.toUpperCase(), 960, 1045);
+      ctx.fillText(resultReceipt.assignedLabelName.toUpperCase(), 960, 1025);
 
-      // Dashed Divider
       ctx.setLineDash([20, 15]);
       ctx.beginPath();
-      ctx.moveTo(330, 1130);
-      ctx.lineTo(1590, 1130);
+      ctx.moveTo(330, 1110);
+      ctx.lineTo(1590, 1110);
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Render ALL Legs (2 to 8 legs in single continuous list)
-      let yPos = 1210;
+      let yPos = 1190;
       legsList.forEach((leg) => {
         ctx.textAlign = 'left';
         ctx.fillStyle = '#1C480C';
-        ctx.font = '700 38px "Space Mono", monospace';
+        ctx.font = '700 36px "Space Mono", monospace';
         const legStr = `${leg.depart_time} ${leg.from.toUpperCase()} → ${leg.to.toUpperCase()}`;
         ctx.fillText(legStr, 330, yPos);
 
@@ -454,7 +454,6 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
         yPos += 85;
       });
 
-      // Dashed Divider Line after legs
       ctx.setLineDash([20, 15]);
       ctx.beginPath();
       ctx.moveTo(330, yPos);
@@ -463,72 +462,101 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
       ctx.setLineDash([]);
       yPos += 75;
 
-      // Comparison lines
       ctx.textAlign = 'left';
       ctx.fillStyle = '#1C480C';
-      ctx.font = '800 40px "Inter", "Arial", sans-serif';
+      ctx.font = '800 38px "Inter", "Arial", sans-serif';
       ctx.fillText('TỰ LÁI HÔM NAY', 330, yPos);
       ctx.textAlign = 'right';
-      ctx.font = '800 40px "Space Mono", monospace';
+      ctx.font = '800 38px "Space Mono", monospace';
       const totalHours = Math.floor(resultReceipt.totalMin / 60);
       const totalMinsRem = resultReceipt.totalMin % 60;
       ctx.fillText(`${resultReceipt.totalKm}KM         ${totalHours}H ${totalMinsRem < 10 ? '0' : ''}${totalMinsRem}'`, 1590, yPos);
       yPos += 75;
 
       ctx.textAlign = 'left';
-      ctx.font = '800 40px "Inter", "Arial", sans-serif';
+      ctx.font = '800 38px "Inter", "Arial", sans-serif';
       ctx.fillText('NẾU ĐI PHƯƠNG TIỆN CÔNG CỘNG', 330, yPos);
       ctx.textAlign = 'right';
-      ctx.font = '800 40px "Space Mono", monospace';
+      ctx.font = '800 38px "Space Mono", monospace';
       const pubMins = resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin;
       const pubHours = Math.floor(pubMins / 60);
       const pubMinsRem = pubMins % 60;
       ctx.fillText(`${pubHours > 0 ? pubHours + 'H ' : ''}${pubMinsRem}'`, 1590, yPos);
       yPos += 95;
 
-      // Highlight Green Card Box (#8CC63F)
+      // DUAL KPI CARDS (Side-by-side on Canvas)
+      const cardW = 610;
+      const cardH = 340;
+
+      // Card 1: Time (Left Box)
       ctx.fillStyle = '#8CC63F';
       ctx.beginPath();
-      ctx.roundRect(330, yPos, 1260, 360, [32]);
+      ctx.roundRect(330, yPos, cardW, cardH, [28]);
       ctx.fill();
 
       ctx.textAlign = 'left';
       ctx.fillStyle = '#1C480C';
-      ctx.font = '900 50px "Inter", "Arial", sans-serif';
-      ctx.fillText('HOÀN LẠI CHO BẠN', 390, yPos + 85);
-
-      const savedText = `${pubMins}'`;
+      ctx.font = '900 34px "Inter", "Arial", sans-serif';
+      ctx.fillText('⏱️ THỜI GIAN CÓ THỂ TẬN DỤNG', 360, yPos + 65);
 
       ctx.fillStyle = '#FFFFFF';
-      ctx.font = '900 115px "Inter", "Arial", sans-serif';
-      ctx.fillText(savedText, 390, yPos + 220);
+      ctx.font = '900 80px "Inter", "Arial", sans-serif';
+      ctx.fillText(`${pubMins}'`, 360, yPos + 180);
 
       ctx.fillStyle = '#1C480C';
-      ctx.font = '900 50px "Inter", "Arial", sans-serif';
-      ctx.fillText('MỖI NGÀY', 1050, yPos + 220);
+      ctx.font = '900 36px "Inter", "Arial", sans-serif';
+      ctx.fillText('/ NGÀY', 360 + ctx.measureText(`${pubMins}' `).width, yPos + 180);
 
       ctx.fillStyle = '#0054A6';
-      ctx.font = '900 52px "Inter", "Arial", sans-serif';
-      ctx.fillText(`= ${resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY`, 390, yPos + 310);
+      ctx.font = '900 34px "Inter", "Arial", sans-serif';
+      ctx.fillText(`= ${resultReceipt.daysPerYear} NGÀY/NĂM*`, 360, yPos + 270);
 
-      yPos += 440;
+      // Card 2: CO2e (Right Box)
+      ctx.fillStyle = '#39B54A';
+      ctx.beginPath();
+      ctx.roundRect(980, yPos, cardW, cardH, [28]);
+      ctx.fill();
+
+      ctx.fillStyle = '#072007';
+      ctx.font = '900 34px "Inter", "Arial", sans-serif';
+      ctx.fillText('🍃 CO₂e GIẢM ƯỚC TÍNH', 1010, yPos + 65);
+
+      const co2Trip = resultReceipt.co2e_saved_trip_kg ?? (resultReceipt.co2SavedGrams ? (resultReceipt.co2SavedGrams / 1000).toFixed(2) : '1.1');
+      const co2Year = resultReceipt.co2e_saved_year_kg ?? Math.round((resultReceipt.co2SavedGrams || 1110) * 250 / 1000);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '900 75px "Inter", "Arial", sans-serif';
+      ctx.fillText(`${co2Trip} KG`, 1010, yPos + 180);
+
+      ctx.fillStyle = '#072007';
+      ctx.font = '900 34px "Inter", "Arial", sans-serif';
+      ctx.fillText(`≈ ${co2Year} KG/NĂM*`, 1010, yPos + 270);
+
+      yPos += cardH + 45;
+
+      // Footnote Text
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1C480C';
+      ctx.font = '600 28px "Inter", "Arial", sans-serif';
+      ctx.fillText('*Ước tính theo 250 ngày di chuyển/năm; hệ số được cấu hình trong hệ thống.', 960, yPos);
+      yPos += 75;
 
       // Barcode graphics
       ctx.fillStyle = '#1A1A1A';
       for (let x = 390; x < 1530; x += 18) {
         const barWidth = Math.random() > 0.4 ? 12 : 5;
-        ctx.fillRect(x, yPos, barWidth, 130);
+        ctx.fillRect(x, yPos, barWidth, 120);
       }
-      yPos += 175;
+      yPos += 160;
 
       // Barcode text label
       ctx.textAlign = 'center';
       ctx.fillStyle = '#1C480C';
-      ctx.font = '800 42px "Space Mono", monospace';
+      ctx.font = '800 40px "Space Mono", monospace';
       ctx.fillText(`MÃ HD ${resultReceipt.id.slice(0, 4).toUpperCase()}   •   SỐ DỰ THẺ ${resultReceipt.luckyNumber}`, 960, yPos);
       yPos += 75;
 
-      // Bottom Solid Blue Diagonal Zig-Zag Perforated Teeth (#0054A6)
+      // Bottom Perforated Teeth
       ctx.fillStyle = '#0054A6';
       for (let px = 275; px <= 1500; px += 60) {
         ctx.beginPath();
@@ -538,16 +566,14 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
         ctx.fill();
       }
 
-      // Bottom Hashtags
       ctx.textAlign = 'center';
       ctx.fillStyle = '#0054A6';
       ctx.font = '900 48px "Inter", "Arial", sans-serif';
       ctx.fillText('#XanhWrap #LuotKhoiChamXanh', 960, canvasH - 50);
 
-      // Download single seamless image with clean human-readable filename
       const rawNickname = (resultReceipt.nickname || 'NguoiLuotChang').trim().replace(/\s+/g, '_');
       const lucky = resultReceipt.luckyNumber || '555';
-      const date = resultReceipt.recordDate || '2026-07-23';
+      const date = resultReceipt.recordDate || '2026-08-02';
       const fileName = `xanhwrap_${rawNickname}_${lucky}_${date}.jpg`;
 
       const link = document.createElement('a');
@@ -626,17 +652,15 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                 <input
                   type="date"
                   value={recordDate}
-                  min="2026-07-23"
-                  max="2026-07-31"
                   onChange={(e) => setRecordDate(e.target.value)}
                   className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl px-4 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-eco-primary font-mono"
                   required
                 />
-                <span className="text-[10px] text-eco-muted">Trong thời gian chiến dịch (23/07 - 31/07/2026)</span>
+                <span className="text-[10px] text-eco-muted">Chọn ngày ghi nhận hành trình di chuyển</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-xs font-extrabold text-eco-ink mb-1">
                   Dòng suy nghĩ / Khoảnh khắc di chuyển <span className="text-red-500">*</span>
@@ -651,6 +675,21 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                   required
                 />
                 <span className="text-[10px] text-eco-muted">Từ 10 đến 200 ký tự (Dùng xét Giải Suy Nghĩ Ấn Tượng)</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-extrabold text-eco-ink mb-1">
+                  Phương tiện so sánh (Baseline)
+                </label>
+                <select
+                  value={baselineMode}
+                  onChange={(e) => setBaselineMode(e.target.value as any)}
+                  className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl px-3 py-2.5 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-eco-primary"
+                >
+                  <option value="motorbike_average">🛵 Xe máy xăng (0.114 kg CO₂e/km)</option>
+                  <option value="petrol_car_average">🚗 Ô tô xăng (0.163 kg CO₂e/km)</option>
+                </select>
+                <span className="text-[10px] text-eco-muted">Dùng làm mốc tính CO₂e giảm</span>
               </div>
 
               <div>
@@ -771,7 +810,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                         className="w-full bg-eco-soft/40 border border-eco-primary/10 rounded-xl px-3 py-2 text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-eco-primary"
                       >
                         <option value="metro">🚆 Metro số 1</option>
-                        <option value="bus">🚌 Xe buýt công cộng</option>
+                        <option value="bus">🚌 Xe buýt công cộng / buýt điện</option>
                         <option value="ride_hailing">🚗 Xe công nghệ (Grab/Be/XanhSM)</option>
                         <option value="motorbike">🛵 Xe máy cá nhân</option>
                         <option value="car">🚗 Ô tô cá nhân</option>
@@ -871,10 +910,10 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
             </button>
           </div>
 
-          {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Official Campaign Visual 100%) */}
+          {/* RECEIPT PAPER PREVIEW CONTAINER (Matching Spec 7.1 & 7.2 100%) */}
           <div className="bg-[#84D0FF] p-3 sm:p-10 rounded-3xl shadow-2xl max-w-2xl mx-auto space-y-4 sm:space-y-6 relative overflow-hidden">
             
-            {/* Header Brand Logos Row (Hiển thị dải logo chuẩn đồ họa PNG trong suốt từ BTC) */}
+            {/* Header Brand Logos Row */}
             <div className="flex justify-center items-center border-b border-white/30 pb-2.5 pt-1">
               <img 
                 src="/images/xanhwrap-brand-logos.png" 
@@ -883,7 +922,7 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
               />
             </div>
 
-            {/* Master Header Title & Slanted Slogan Logo */}
+            {/* Master Header Title & Slanted Slogan Logo (Spec 7.1) */}
             <div className="relative text-center space-y-1 text-[#0054A6]">
               {/* Slanted Logo Badge */}
               <div className="absolute -left-1 -top-3 transform -rotate-12 scale-75 sm:scale-100 origin-top-left bg-white/90 border-2 border-[#0054A6] px-2 py-1 rounded-xl shadow-md text-left text-[10px] leading-tight">
@@ -893,24 +932,22 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
               </div>
 
               <h2 className="text-xl sm:text-4xl font-black font-mono uppercase tracking-tight text-[#0054A6] pt-1">
-                MỘT NGÀY LÁI XE
+                MỘT NGÀY DI CHUYỂN
               </h2>
-              <p className="text-xs sm:text-xl font-extrabold font-mono text-[#0054A6]">
-                BẠN LẤY LẠI ĐƯỢC
-              </p>
               <h3 className="text-lg sm:text-3xl font-black font-mono uppercase text-[#0054A6]">
-                BAO NHIÊU THỜI GIAN?
+                BẠN NHẬN LẠI ĐƯỢC GÌ?
               </h3>
+              <p className="text-xs sm:text-sm font-bold text-[#0054A6]/90 pt-0.5">
+                Thời gian có thể tận dụng • CO₂e giảm ước tính
+              </p>
             </div>
 
             {/* Cream Receipt Paper with Solid Blue Frame Backing */}
             <div className="bg-[#0054A6] p-1.5 sm:p-2.5 rounded-3xl shadow-2xl relative">
               
-              {/* Top-Right Realistic Leaf Stick Graphics */}
+              {/* Top-Right Leaf Stick Graphics */}
               <div className="absolute -top-7 -right-1 z-20 pointer-events-none transform rotate-12">
-                {/* Cuống lá mảnh uốn cong */}
                 <div className="w-1.5 h-8 bg-[#2E963D] rounded-full mx-auto shadow-sm" />
-                {/* Phiến lá xanh tươi hình giọt nước bầu bám cuống */}
                 <div className="w-7 h-10 bg-[#39B54A] border border-[#2E963D] rounded-tl-full rounded-br-full transform -rotate-45 shadow-md -mt-3" />
               </div>
 
@@ -923,14 +960,14 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                     X A N H W R A P
                   </h3>
                   <p className="text-[10px] sm:text-xs font-bold text-[#1C480C]/80 uppercase">
-                    PHIẾU HOÀN THỜI GIAN
+                    XANHWRAP – PHIẾU HOÀN HÀNH TRÌNH XANH
                   </p>
                 </div>
 
-                {/* Metadata Row: Hiển thị tên biệt danh người dùng điền lúc đầu */}
+                {/* Metadata Row */}
                 <div className="flex justify-between items-center text-[10px] sm:text-xs font-extrabold">
                   <span className="truncate pr-2">NGƯỜI LƯỚT CHẶNG: <strong>{resultReceipt.nickname.toUpperCase()}</strong></span>
-                  <span className="shrink-0">{resultReceipt.recordDate || '2026-07-23'}</span>
+                  <span className="shrink-0">{resultReceipt.recordDate || '2026-08-02'}</span>
                 </div>
 
                 {/* Green Pill Identity Badge (#8CC63F) */}
@@ -971,19 +1008,40 @@ Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} 
                   </div>
                 </div>
 
-                {/* HIGHLIGHT GREEN CARD BOX (#8CC63F) */}
-                <div className="bg-[#8CC63F] text-[#1C480C] p-5 sm:p-6 rounded-2xl space-y-2 shadow-md">
-                  <span className="text-xs font-black uppercase tracking-wider block">HOÀN LẠI CHO BẠN</span>
-                  <div className="flex items-baseline justify-between">
-                    <span className="text-3xl sm:text-5xl font-black text-white drop-shadow-sm">
-                      {(resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin)}'
-                    </span>
-                    <span className="text-sm font-black uppercase tracking-wider">MỖI NGÀY</span>
+                {/* DUAL KPI CARDS (Spec 7.1 & 7.2) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* KPI 1: Time */}
+                  <div className="bg-[#8CC63F] text-[#1C480C] p-4 rounded-2xl flex flex-col justify-between shadow-md space-y-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider block">⏱️ THỜI GIAN CÓ THỂ TẬN DỤNG</span>
+                    <div>
+                      <span className="text-2xl sm:text-3xl font-black text-white drop-shadow-sm">
+                        {(resultReceipt.handsFreeMin || resultReceipt.transitMin || resultReceipt.metricValue || resultReceipt.totalMin)}'
+                      </span>
+                      <span className="text-xs font-black uppercase ml-1">/ NGÀY</span>
+                    </div>
+                    <div className="text-[11px] font-black text-[#0054A6]">
+                      = {resultReceipt.daysPerYear} NGÀY TRONG NĂM*
+                    </div>
                   </div>
-                  <div className="text-sm sm:text-base font-black text-[#0054A6] pt-1">
-                    = {resultReceipt.daysPerYear} NGÀY TRONG NĂM NAY
+
+                  {/* KPI 2: CO2e */}
+                  <div className="bg-[#39B54A] text-white p-4 rounded-2xl flex flex-col justify-between shadow-md space-y-1.5">
+                    <span className="text-[11px] font-black uppercase tracking-wider block text-emerald-950">🍃 CO₂e GIẢM ƯỚC TÍNH</span>
+                    <div>
+                      <span className="text-2xl sm:text-3xl font-black text-white drop-shadow-sm">
+                        {resultReceipt.co2e_saved_trip_kg ?? (resultReceipt.co2SavedGrams ? (resultReceipt.co2SavedGrams / 1000).toFixed(2) : '1.1')} KG
+                      </span>
+                      <span className="text-xs font-black uppercase ml-1 text-emerald-950">/ HÀNH TRÌNH</span>
+                    </div>
+                    <div className="text-[11px] font-black text-emerald-950">
+                      ≈ {resultReceipt.co2e_saved_year_kg ?? Math.round((resultReceipt.co2SavedGrams || 1110) * (resultReceipt.annual_travel_days || 250) / 1000)} KG/NĂM*
+                    </div>
                   </div>
                 </div>
+
+                <p className="text-[10px] text-[#1C480C]/80 text-center italic pt-0.5">
+                  *Ước tính theo {resultReceipt.annual_travel_days || 250} ngày di chuyển/năm; hệ số được cấu hình trong hệ thống (xanhwrap-2026.08-v1).
+                </p>
 
                 {/* Barcode & Lucky number */}
                 <div className="pt-2 text-center space-y-3">

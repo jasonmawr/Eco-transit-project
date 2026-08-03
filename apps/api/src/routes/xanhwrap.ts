@@ -109,8 +109,9 @@ xanhwrapRouter.post('/receipts', async (req: Request, res: Response): Promise<vo
     }
 
     // 3. Compute Stats & Label
+    const { baselineMode, annualTravelDays } = req.body;
     const labelDef = assignXanhWrapLabel(parsedLegs);
-    const stats = calculateXanhWrapStats(parsedLegs);
+    const stats = calculateXanhWrapStats(parsedLegs, { baselineMode, annualTravelDays: annualTravelDays ? parseInt(annualTravelDays, 10) : 250 });
 
     // Soft warning flag check: totalKm > 120 or totalMin > 480 (8 hours)
     const needsReview = stats.totalKm > 120 || stats.totalMin > 480;
@@ -158,6 +159,13 @@ xanhwrapRouter.post('/receipts', async (req: Request, res: Response): Promise<vo
       labelDef,
       rarityPct,
       stats,
+      co2e_saved_trip_kg: stats.co2e_saved_trip_kg,
+      co2e_saved_year_kg: stats.co2e_saved_year_kg,
+      baseline_emission_kg: stats.baseline_emission_kg,
+      green_emission_kg: stats.green_emission_kg,
+      factor_version: stats.factor_version,
+      is_estimate: stats.is_estimate,
+      annual_travel_days: stats.annual_travel_days,
     });
   } catch (err: any) {
     console.error('Error creating XanhWrap receipt:', err);
@@ -167,7 +175,7 @@ xanhwrapRouter.post('/receipts', async (req: Request, res: Response): Promise<vo
 
 /**
  * GET /api/xanhwrap/receipts/:id
- * Retrieve a single receipt with calculated rarity
+ * Retrieve a single receipt with calculated rarity & CO2e stats
  */
 xanhwrapRouter.get('/receipts/:id', async (req: Request, res: Response): Promise<void> => {
   try {
@@ -183,6 +191,9 @@ xanhwrapRouter.get('/receipts/:id', async (req: Request, res: Response): Promise
 
     const labelDef = ALL_LABELS.find((l: XanhWrapLabelDef) => l.code === receipt.assignedLabel) || ALL_LABELS[15];
 
+    const legs = (receipt.legsJson as unknown as XanhWrapLeg[]) || [];
+    const stats = calculateXanhWrapStats(legs);
+
     const totalReceipts = await prisma.xanhWrapReceipt.count();
     let rarityPct: number | null = null;
     if (totalReceipts >= 100) {
@@ -196,6 +207,14 @@ xanhwrapRouter.get('/receipts/:id', async (req: Request, res: Response): Promise
       ...receipt,
       labelDef,
       rarityPct,
+      stats,
+      co2e_saved_trip_kg: stats.co2e_saved_trip_kg,
+      co2e_saved_year_kg: stats.co2e_saved_year_kg,
+      baseline_emission_kg: stats.baseline_emission_kg,
+      green_emission_kg: stats.green_emission_kg,
+      factor_version: stats.factor_version,
+      is_estimate: stats.is_estimate,
+      annual_travel_days: stats.annual_travel_days,
     });
   } catch (err: any) {
     console.error('Error fetching XanhWrap receipt:', err);
