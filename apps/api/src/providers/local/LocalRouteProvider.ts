@@ -245,11 +245,66 @@ export class LocalRouteProvider implements TransitRouteProvider {
       return [];
     }
 
+    // Helper functions for official HCMC transit fare calculation
+    const calculateMetroFare = (distanceMeters: number): number => {
+      const km = distanceMeters / 1000;
+      if (km <= 5) return 7000;
+      if (km <= 10) return 12000;
+      if (km <= 15) return 16000;
+      return 20000;
+    };
+
+    const consolidateLegs = (rawLegs: RouteLeg[]): { legs: RouteLeg[]; totalFare: number } => {
+      if (rawLegs.length === 0) return { legs: [], totalFare: 0 };
+
+      const consolidated: RouteLeg[] = [];
+      let current: RouteLeg | null = null;
+
+      for (const leg of rawLegs) {
+        if (!current) {
+          current = { ...leg };
+        } else if (current.mode === leg.mode && leg.mode !== 'walk') {
+          // Merge consecutive edges of the same transit line
+          current.toStationName = leg.toStationName;
+          current.distanceMeters += leg.distanceMeters;
+          current.durationMinutes += leg.durationMinutes;
+        } else {
+          // Finalize fare for previous leg
+          if (current.mode === 'metro') {
+            current.fareEstimate = calculateMetroFare(current.distanceMeters);
+          } else if (current.mode === 'bus') {
+            current.fareEstimate = 7000;
+          } else {
+            current.fareEstimate = 0;
+          }
+          consolidated.push(current);
+          current = { ...leg };
+        }
+      }
+
+      if (current) {
+        if (current.mode === 'metro') {
+          current.fareEstimate = calculateMetroFare(current.distanceMeters);
+        } else if (current.mode === 'bus') {
+          current.fareEstimate = 7000;
+        } else {
+          current.fareEstimate = 0;
+        }
+        consolidated.push(current);
+      }
+
+      const totalFare = consolidated.reduce((sum, l) => sum + l.fareEstimate, 0);
+      return { legs: consolidated, totalFare };
+    };
+
     // Deduplicate identical paths (same sequence of legs by station names and modes)
     const uniqueOptions: RouteOption[] = [];
     const pathKeys = new Set<string>();
 
     for (const raw of rawOptions) {
+      // Consolidate raw Dijkstra hops into clean continuous transit legs
+      const { legs: consolidatedRawLegs, totalFare: calculatedFare } = consolidateLegs(raw.legs);
+
       // Create walk connections from user start location to station and destination to location
       const walkLeg1: RouteLeg = {
         mode: 'walk',
@@ -269,7 +324,7 @@ export class LocalRouteProvider implements TransitRouteProvider {
         fareEstimate: 0,
       };
 
-      const completedLegs = [walkLeg1, ...raw.legs, walkLeg2];
+      const completedLegs = [walkLeg1, ...consolidatedRawLegs, walkLeg2];
       const pathKey = completedLegs.map(l => `${l.fromStationName}->${l.mode}->${l.toStationName}`).join('|');
 
       if (pathKeys.has(pathKey)) {
@@ -345,7 +400,7 @@ export class LocalRouteProvider implements TransitRouteProvider {
         id: `dijkstra-route-${uniqueOptions.length}-${Date.now()}`,
         score: Math.max(score, 15),
         totalTimeMinutes: totalMinutes,
-        totalFare: raw.totalFare,
+        totalFare: calculatedFare,
         walkingMinutes: totalWalkTime,
         waitingMinutes: 2 + raw.transferCount * 3,
         transferCount: raw.transferCount,
