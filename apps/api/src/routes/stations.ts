@@ -201,25 +201,97 @@ router.get('/stations/:id/experience', async (req: Request, res: Response) => {
         facilities: station.facilities ? station.facilities.split(',') : [],
         description: station.description || '',
       },
-      places: places.map((p: any) => ({
-        id: p.id,
-        slug: p.slug,
-        name: p.name,
-        category: p.category,
-        lat: p.lat,
-        lng: p.lng,
-        address: p.address || '',
-        shortDescription: p.shortDescription,
-        description: p.description || '',
-        district: p.district || '',
-        walkingMinutes: p.walkingMinutes || 0,
-        distanceMeters: p.distanceMeters || 0,
-        priceLevel: p.priceLevel || 1,
-        tags: p.tags,
-        highlights: p.highlights,
-        imageUrl: p.imageUrl || '',
-        featured: p.featured,
-      })),
+      places: places.map((p: any) => {
+        // Dynamic opening hours, ticket price, and transit directions generator based on location slug
+        const detailsMap: Record<string, { openingHours: string; ticketPrice: string; transitDirections: string[]; interestCount: number }> = {
+          'cho-ben-thanh-market': {
+            openingHours: '06:00 - 18:00 (khu ăn uống đến ~22:00)',
+            ticketPrice: 'Miễn phí',
+            transitDirections: [
+              'Metro số 1 → Ga Bến Thành (đi bộ 1-3 phút là tới chợ)',
+              'Bus điện 155 / 156 → trạm Bến Thành (cách ~3-5 phút đi bộ)'
+            ],
+            interestCount: 370
+          },
+          'pho-di-bo-nguyen-hue': {
+            openingHours: 'Mở tự do 24/7 (nhộn nhịp nhất từ 17:00 – 23:00)',
+            ticketPrice: 'Miễn phí',
+            transitDirections: [
+              'Metro số 1 → Ga Nhà hát Thành phố → đi bộ khoảng 3–5 phút',
+              'Bus điện tuyến 155 → xuống trạm Nhà hát Thành phố',
+              'Metro số 1 → Ga Bến Thành → đi bộ theo đường Lê Lợi khoảng 8–10 phút'
+            ],
+            interestCount: 980
+          },
+          'ben-bach-dang': {
+            openingHours: 'Tự do cả ngày, đẹp nhất vào sáng sớm và chiều tối',
+            ticketPrice: 'Miễn phí (Waterbus: 15.000 VNĐ/lượt)',
+            transitDirections: [
+              'Metro số 1 → Ga Ba Son → đi bộ khoảng 5–10 phút',
+              'Metro số 1 → Ga Nhà hát Thành phố → đi bộ khoảng 7–10 phút',
+              'Xe buýt điện → xuống trạm gần đường Tôn Đức Thắng'
+            ],
+            interestCount: 840
+          },
+          'toa-nha-bitexco': {
+            openingHours: '09:00 – 21:00 hàng ngày (Sky Deck)',
+            ticketPrice: 'Khoảng 200.000 – 250.000 VNĐ/người lớn',
+            transitDirections: [
+              'Metro số 1 → Ga Nhà hát Thành phố → đi bộ 5 phút',
+              'Metro số 1 → Ga Bến Thành → đi bộ 7-8 phút'
+            ],
+            interestCount: 620
+          },
+          'cong-vien-giot-nuoc': {
+            openingHours: '24/7 (Nhạc nước: 17:00-17:30 & 20:00-20:30)',
+            ticketPrice: 'Miễn phí cho mọi người',
+            transitDirections: [
+              'Metro số 1 → Ga Bến Thành → Bến bus Sài Gòn → bus điện 156 (xuống Maximark Lý Thái Tổ) → Đi bộ 8-12 phút',
+              'Xe buýt số 27 → trạm Bệnh viện Nhi Đồng 1 → Đi bộ 3-5 phút'
+            ],
+            interestCount: 510
+          },
+          'daddy-cool-cong-vien-anh-sang': {
+            openingHours: '17:00 – 22:30 hàng ngày',
+            ticketPrice: 'Vào cửa công viên tự do / Vé trò chơi theo niêm yết',
+            transitDirections: [
+              'Metro số 1 → Ga Rạch Chiếc / Ga An Phú → đi buýt điện hoặc xe công nghệ 5-7 phút'
+            ],
+            interestCount: 1120
+          }
+        };
+
+        const extra = detailsMap[p.slug] || {
+          openingHours: '08:00 - 22:00',
+          ticketPrice: 'Tham khảo tại quầy',
+          transitDirections: ['Đi bộ từ lối ra ga chính'],
+          interestCount: 250
+        };
+
+        return {
+          id: p.id,
+          slug: p.slug,
+          name: p.name,
+          category: p.category,
+          lat: p.lat,
+          lng: p.lng,
+          address: p.address || '',
+          shortDescription: p.shortDescription,
+          description: p.description || '',
+          district: p.district || '',
+          walkingMinutes: p.walkingMinutes || 0,
+          distanceMeters: p.distanceMeters || 0,
+          priceLevel: p.priceLevel || 1,
+          tags: p.tags,
+          highlights: p.highlights,
+          imageUrl: p.imageUrl || '',
+          featured: p.featured,
+          openingHours: extra.openingHours,
+          ticketPrice: extra.ticketPrice,
+          transitDirections: extra.transitDirections,
+          interestCount: extra.interestCount
+        };
+      }),
       categories,
       reviewsSummary: {
         averageRating,

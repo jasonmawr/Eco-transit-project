@@ -257,30 +257,41 @@ export default function StationExperience({
                     whileHover={{ y: -3 }}
                     className="flex flex-col bg-white border border-eco-primary/10 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-200 group"
                   >
-                    {/* Visual Placeholder Header (CSS Pattern to avoid copyright issues) */}
-                    <div className="h-32 bg-gradient-to-br from-eco-bgBeige to-eco-mint/40 relative flex items-center justify-center overflow-hidden border-b border-eco-primary/5">
-                      <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-                      <div className="absolute top-3 left-3 px-2 py-1 rounded-md text-[9px] font-bold bg-white text-eco-primary shadow-sm">
-                        {localizeCategory(place.category)}
-                      </div>
-                      {place.featured && (
-                        <div className="absolute top-3 right-3 px-2 py-1 rounded-md text-[9px] font-black uppercase bg-eco-accentGreen text-white shadow-sm tracking-wide">
-                          ⭐ Nổi bật
+                    {/* Visual Header Image or Pattern */}
+                    <div className="h-44 bg-slate-900 relative flex items-center justify-center overflow-hidden border-b border-eco-primary/5">
+                      {place.imageUrl ? (
+                        <img
+                          src={place.imageUrl}
+                          alt={place.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-eco-bgBeige to-eco-mint/40 flex items-center justify-center p-4 text-center">
+                          <span className="text-xl font-bold font-display-campaign text-eco-primary/70">{place.name}</span>
                         </div>
                       )}
                       
-                      {/* Stylized Visual Placeholder */}
-                      <div className="flex flex-col items-center justify-center p-4 text-center">
-                        <span className="text-xl font-bold font-display-campaign text-eco-primary/70">{place.name}</span>
-                        <span className="text-[9px] text-eco-muted font-bold mt-1 uppercase tracking-wider">{place.district}</span>
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30 pointer-events-none" />
+
+                      <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-[#7F56D9] text-white shadow-sm tracking-wider">
+                        {localizeCategory(place.category)}
+                      </div>
+                      {place.featured && (
+                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-eco-accentGreen text-white shadow-sm tracking-wide">
+                          ⭐ Nổi bật
+                        </div>
+                      )}
+
+                      <div className="absolute bottom-2.5 left-3 right-3 text-white">
+                        <span className="text-xs font-black truncate block drop-shadow-md">{place.name}</span>
+                        <span className="text-[9px] text-white/80 font-bold block uppercase tracking-wider">{place.district || 'TP.HCM'}</span>
                       </div>
                     </div>
 
                     {/* Place Body */}
                     <div className="p-4 flex-grow flex flex-col justify-between space-y-3">
                       <div>
-                        <h5 className="text-xs font-black text-eco-ink group-hover:text-eco-primary transition-colors">{place.name}</h5>
-                        <p className="text-[10px] text-eco-muted leading-relaxed mt-1 font-medium line-clamp-2">
+                        <p className="text-[10px] text-eco-muted leading-relaxed font-medium line-clamp-2">
                           {place.shortDescription}
                         </p>
                       </div>
@@ -288,17 +299,17 @@ export default function StationExperience({
                       {/* Distance / Highlights */}
                       <div className="space-y-2.5">
                         <div className="flex items-center justify-between text-[9px] text-eco-muted font-bold">
-                          <span className="flex items-center gap-1">
-                            🚶 {place.walkingMinutes} phút đi bộ ({place.distanceMeters}m)
+                          <span className="flex items-center gap-1 text-eco-primary font-extrabold">
+                            🚶 {place.walkingMinutes || 3} phút đi bộ ({place.distanceMeters || 200}m)
                           </span>
                           <span>
-                            {'💵'.repeat(place.priceLevel)}
+                            {'💵'.repeat(place.priceLevel || 1)}
                           </span>
                         </div>
 
                         {/* Highlights list */}
                         <div className="flex flex-wrap gap-1">
-                          {place.highlights.slice(0, 2).map((h: string, idx: number) => (
+                          {(place.highlights || []).slice(0, 2).map((h: string, idx: number) => (
                             <span
                               key={idx}
                               className="text-[8px] font-bold text-eco-accentGreen bg-eco-accentGreen/10 border border-eco-accentGreen/20 px-1.5 py-0.5 rounded-md"
@@ -311,7 +322,7 @@ export default function StationExperience({
 
                       <button
                         onClick={() => setActivePlace(place)}
-                        className="w-full flex items-center justify-center py-2 px-3 border border-eco-primary/10 hover:border-eco-primary hover:bg-eco-primary hover:text-white transition-all duration-200 text-[10px] font-bold rounded-xl text-eco-primary space-x-1 mt-1"
+                        className="w-full flex items-center justify-center py-2 px-3 border border-eco-primary/20 hover:border-eco-primary hover:bg-eco-primary hover:text-white transition-all duration-200 text-[10px] font-bold rounded-xl text-eco-primary space-x-1 mt-1 shadow-xs cursor-pointer"
                       >
                         <span>Xem chi tiết</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -373,7 +384,7 @@ export default function StationExperience({
                           console.error(err);
                         }
                       }}
-                      className="flex items-center space-x-1 text-[10px] font-bold text-eco-primary hover:text-eco-primaryDeep mt-4"
+                      className="flex items-center space-x-1 text-[10px] font-bold text-eco-primary hover:text-eco-primaryDeep mt-4 cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5 mr-0.5" />
                       <span>Đọc bài viết</span>
@@ -492,7 +503,7 @@ export default function StationExperience({
                     <button
                       type="submit"
                       disabled={submittingReview}
-                      className="flex items-center space-x-2 px-5 py-2.5 bg-eco-primary hover:bg-eco-primaryDeep text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm disabled:opacity-40 transition-all duration-200"
+                      className="flex items-center space-x-2 px-5 py-2.5 bg-eco-primary hover:bg-eco-primaryDeep text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-sm disabled:opacity-40 transition-all duration-200 cursor-pointer"
                     >
                       {submittingReview ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -507,7 +518,7 @@ export default function StationExperience({
                     <p className="text-xs text-eco-muted font-medium">Bạn cần đăng nhập để gửi nhận xét công khai.</p>
                     <button
                       onClick={onLoginClick}
-                      className="inline-flex items-center space-x-1.5 px-4 py-2 bg-eco-primary hover:bg-eco-primaryDeep text-white text-[11px] font-black uppercase tracking-wider rounded-full shadow-sm transition-all duration-200"
+                      className="inline-flex items-center space-x-1.5 px-4 py-2 bg-eco-primary hover:bg-eco-primaryDeep text-white text-[11px] font-black uppercase tracking-wider rounded-full shadow-sm transition-all duration-200 cursor-pointer"
                     >
                       <LogIn className="w-3.5 h-3.5" />
                       <span>Đăng nhập để nhận xét</span>
@@ -566,100 +577,195 @@ export default function StationExperience({
         </div>
       )}
 
-      {/* Place Details Modal Overlay */}
+      {/* Place Details Modal Overlay - 2-COLUMN SCREENSHOT ALIGNED LAYOUT */}
       <AnimatePresence>
         {activePlace && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setActivePlace(null)}
-              className="absolute inset-0 bg-eco-ink/60 backdrop-blur-sm"
+              className="fixed inset-0 bg-slate-950/70 backdrop-blur-md"
             />
             
             <motion.div
-              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              initial={{ scale: 0.96, opacity: 0, y: 15 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="relative w-full max-w-lg bg-white border border-eco-mint rounded-3xl shadow-2xl overflow-hidden z-10 font-inter max-h-[90vh] flex flex-col"
+              exit={{ scale: 0.96, opacity: 0, y: 15 }}
+              className="relative w-full max-w-4xl bg-slate-50 border border-slate-200 rounded-3xl shadow-2xl overflow-hidden z-10 font-inter max-h-[92vh] flex flex-col my-auto"
             >
-              {/* Header Branding */}
-              <div className="p-6 pb-4 bg-gradient-to-br from-eco-bgBeige via-white to-eco-mint/20 border-b border-eco-primary/10 flex justify-between items-start">
-                <div>
-                  <span className="text-[9px] font-black uppercase bg-eco-primary text-white px-2 py-0.5 rounded">
+              {/* Hero Banner Header */}
+              <div className="relative h-44 sm:h-56 bg-slate-900 shrink-0">
+                {activePlace.imageUrl ? (
+                  <img
+                    src={activePlace.imageUrl}
+                    alt={activePlace.name}
+                    className="w-full h-full object-cover opacity-85"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-r from-eco-primary to-eco-primaryDeep flex items-center justify-center text-white font-bold text-2xl">
+                    {activePlace.name}
+                  </div>
+                )}
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent pointer-events-none" />
+
+                {/* Floating Top Badges */}
+                <div className="absolute top-4 left-4 right-14 flex flex-wrap gap-2 items-center z-10">
+                  <span className="bg-[#7F56D9] text-white text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
                     {localizeCategory(activePlace.category)}
                   </span>
-                  <h3 className="text-lg font-black text-eco-ink uppercase mt-1.5">{activePlace.name}</h3>
-                  <p className="text-[10px] text-eco-muted font-bold mt-0.5 uppercase tracking-wide">
-                    📍 {activePlace.address} ({activePlace.district})
-                  </p>
+                  <span className="bg-slate-900/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
+                    🚆 Gần ga {experienceData?.station?.name || 'trung tâm'}
+                  </span>
                 </div>
+
                 <button
                   onClick={() => setActivePlace(null)}
-                  className="p-1.5 rounded-full text-eco-muted hover:bg-eco-mint/40 transition-colors"
+                  className="absolute top-4 right-4 bg-white/20 backdrop-blur-md hover:bg-white/40 text-white p-2 rounded-full transition-all z-20 cursor-pointer shadow-md"
+                  aria-label="Đóng"
                 >
                   <X className="w-5 h-5" />
                 </button>
+
+                {/* Banner Title */}
+                <div className="absolute bottom-4 left-5 right-5 z-10">
+                  <h2 className="text-xl sm:text-3xl font-black text-white drop-shadow-md">{activePlace.name}</h2>
+                </div>
               </div>
 
-              {/* Detail content */}
-              <div className="p-6 overflow-y-auto space-y-5 flex-grow">
-                
-                {/* Visual Placeholder in detail modal */}
-                <div className="h-44 bg-gradient-to-br from-eco-bgBeige to-eco-mint/30 rounded-2xl flex items-center justify-center border border-eco-mint/20 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-                  <Sparkles className="w-8 h-8 text-eco-accentGreen animate-pulse opacity-45" />
-                </div>
-
-                <div className="space-y-2.5">
-                  <span className="text-[10px] font-bold text-eco-muted uppercase tracking-wider block">Mô tả địa điểm:</span>
-                  <p className="text-xs text-eco-muted leading-relaxed font-medium">
-                    {activePlace.description || activePlace.shortDescription}
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 border-y border-eco-primary/10 py-4">
-                  <div>
-                    <span className="text-[10px] font-bold text-eco-muted uppercase tracking-wider block">Thời gian đi bộ:</span>
-                    <span className="text-xs font-bold text-eco-ink flex items-center gap-1 mt-0.5">
-                      🚶 {activePlace.walkingMinutes} phút ({activePlace.distanceMeters} mét)
-                    </span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-eco-muted uppercase tracking-wider block">Mức chi phí:</span>
-                    <span className="text-xs font-bold text-eco-primary mt-0.5 block">
-                      {'💵'.repeat(activePlace.priceLevel)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Highlights List */}
-                <div className="space-y-3">
-                  <span className="text-[10px] font-bold text-eco-muted uppercase tracking-wider block">Điểm nhấn dịch vụ:</span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {activePlace.highlights.map((h: string, idx: number) => (
-                      <div
-                        key={idx}
-                        className="flex items-center gap-2 p-2 bg-eco-accentGreen/5 border border-eco-accentGreen/15 rounded-xl text-[10px] font-bold text-eco-ink"
-                      >
-                        <span className="text-eco-accentGreen">✓</span>
-                        <span>{h}</span>
+              {/* 2-Column Responsive Body */}
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-grow">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+                  
+                  {/* LEFT COLUMN: (i) Giới thiệu Card (65% width / 2 Cols) */}
+                  <div className="md:col-span-2 bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-6 shadow-sm space-y-5">
+                    
+                    {/* Header */}
+                    <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
+                        ℹ️
                       </div>
-                    ))}
-                  </div>
-                </div>
+                      <h3 className="text-base sm:text-lg font-black text-slate-900">Giới thiệu</h3>
+                    </div>
 
-                {/* Tags List */}
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  {activePlace.tags.map((tag: string) => (
-                    <span
-                      key={tag}
-                      className="text-[9px] font-bold text-eco-muted bg-eco-bgBeige/60 border border-eco-primary/5 px-2.5 py-1 rounded-md"
-                    >
-                      #{tag}
-                    </span>
-                  ))}
+                    {/* Article Description Paragraphs */}
+                    <div className="text-xs sm:text-sm text-slate-700 leading-relaxed space-y-4">
+                      {activePlace.description ? (
+                        activePlace.description.split('\n\n').map((paragraph: string, idx: number) => (
+                          <p key={idx} className="text-justify font-medium">
+                            {paragraph}
+                          </p>
+                        ))
+                      ) : (
+                        <p className="text-justify font-medium">{activePlace.shortDescription}</p>
+                      )}
+                    </div>
+
+                    {/* Highlights list */}
+                    {activePlace.highlights && activePlace.highlights.length > 0 && (
+                      <div className="pt-3 border-t border-slate-100 space-y-2.5">
+                        <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider block">Điểm nổi bật & Trải nghiệm:</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {activePlace.highlights.map((h: string, idx: number) => (
+                            <div
+                              key={idx}
+                              className="flex items-center gap-2 p-2.5 bg-emerald-50/70 border border-emerald-200/60 rounded-xl text-xs font-bold text-emerald-950"
+                            >
+                              <span className="text-emerald-600 font-black">✓</span>
+                              <span>{h}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Tags List */}
+                    {activePlace.tags && activePlace.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-2">
+                        {activePlace.tags.map((tag: string) => (
+                          <span
+                            key={tag}
+                            className="text-[10px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* RIGHT COLUMN: ✨ Thông tin liên hệ Card (35% width / 1 Col) */}
+                  <div className="md:col-span-1 bg-white border border-slate-200/80 rounded-3xl p-5 shadow-sm space-y-5 flex flex-col justify-between">
+                    <div className="space-y-4">
+                      
+                      {/* Card Header */}
+                      <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                        <span className="text-amber-500 text-base">✨</span>
+                        <h3 className="text-xs sm:text-sm font-black text-slate-900 uppercase tracking-wider">Thông tin liên hệ</h3>
+                      </div>
+
+                      {/* Địa chỉ */}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>ĐỊA CHỈ</span>
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 leading-snug">
+                          {activePlace.address || 'Khu vực Quận 1, TP.HCM'}
+                        </p>
+                      </div>
+
+                      {/* Giờ mở cửa */}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                          <Compass className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          <span>GIỜ MỞ CỬA</span>
+                        </div>
+                        <p className="text-xs font-black text-emerald-600 leading-snug">
+                          {activePlace.openingHours || '07:00 - 19:00'}
+                        </p>
+                      </div>
+
+                      {/* Giá vé */}
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                          <span>🎟️ GIÁ VÉ</span>
+                        </div>
+                        <p className="text-xs font-bold text-slate-800 leading-snug">
+                          {activePlace.ticketPrice || 'Miễn phí'}
+                        </p>
+                      </div>
+
+                      {/* Cách di chuyển */}
+                      {activePlace.transitDirections && activePlace.transitDirections.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-slate-100">
+                          <div className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider">
+                            🚌 CÁCH DI CHUYỂN
+                          </div>
+                          <div className="space-y-1.5 text-[11px] text-slate-700 font-medium">
+                            {activePlace.transitDirections.map((dir: string, idx: number) => (
+                              <div key={idx} className="flex items-start gap-1.5">
+                                <span className="text-emerald-500 font-black">•</span>
+                                <span>{dir}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* View/Interest Count badge at bottom */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-2xl py-2 px-3 text-center mt-3">
+                      <span className="text-[11px] font-bold text-slate-500 flex items-center justify-center gap-1.5">
+                        <span>👁️</span>
+                        <span>{activePlace.interestCount || 370} lượt quan tâm</span>
+                      </span>
+                    </div>
+
+                  </div>
+
                 </div>
               </div>
             </motion.div>
