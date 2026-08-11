@@ -294,11 +294,15 @@ export default function StationExperience({
                       <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-[#7F56D9] text-white shadow-sm tracking-wider">
                         {localizeCategory(place.category)}
                       </div>
-                      {place.featured && (
+                      {place.isUpcoming || place.tags?.includes('upcoming') ? (
+                        <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm tracking-wide flex items-center gap-1">
+                          🔒 Sắp mở khóa
+                        </div>
+                      ) : place.featured ? (
                         <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[9px] font-black uppercase bg-eco-accentGreen text-white shadow-sm tracking-wide">
                           ⭐ Nổi bật
                         </div>
-                      )}
+                      ) : null}
 
                       <div className="absolute bottom-2.5 left-3 right-3 text-white">
                         <span className="text-xs font-black truncate block drop-shadow-md">{place.name}</span>
@@ -635,9 +639,15 @@ export default function StationExperience({
                     <span className="bg-[#7F56D9] text-white text-[10px] sm:text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-md">
                       {localizeCategory(activePlace.category)}
                     </span>
-                    <span className="bg-slate-900/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
-                      🚆 Gần ga {experienceData?.station?.name || 'trung tâm'}
-                    </span>
+                    {activePlace.isUpcoming || activePlace.tags?.includes('upcoming') ? (
+                      <span className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full shadow-md border border-white/20 flex items-center gap-1">
+                        🔒 SẮP MỞ KHÓA (CẤP SAU)
+                      </span>
+                    ) : (
+                      <span className="bg-slate-900/80 backdrop-blur-md text-white text-[10px] sm:text-xs font-bold px-3 py-1 rounded-full border border-white/20 flex items-center gap-1 shadow-md">
+                        🚆 Gần ga {experienceData?.station?.name || 'trung tâm'}
+                      </span>
+                    )}
                   </div>
 
                   <button
@@ -661,6 +671,22 @@ export default function StationExperience({
                     {/* LEFT COLUMN: (i) Giới thiệu Card (65% width / 2 Cols) */}
                     <div className="md:col-span-2 bg-white border border-slate-200/80 rounded-3xl p-5 sm:p-6 shadow-sm space-y-5">
                       
+                      {/* Gamified Level Lock Banner if Upcoming */}
+                      {(activePlace.isUpcoming || activePlace.tags?.includes('upcoming')) && (
+                        <div className="bg-gradient-to-br from-purple-50 via-indigo-50/60 to-white border border-purple-200/80 rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+                          <div className="flex items-center gap-2 text-purple-900">
+                            <span className="text-xl">🎮</span>
+                            <span className="text-xs font-black uppercase tracking-wider">Hành trình khám phá – Cấp độ tiếp theo</span>
+                          </div>
+                          <p className="text-xs text-purple-950 font-medium leading-relaxed">
+                            Địa điểm này đang trong quá trình biên soạn bài viết & chụp ảnh thực tế bởi Ban biên tập EcoTransit. Hãy tích cực tích lũy lượt đi xanh để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo!
+                          </p>
+                          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-bold rounded-xl shadow-xs">
+                            <span>🔒 Sắp cập nhật bài viết chính thức (Cấp độ tiếp theo)</span>
+                          </div>
+                        </div>
+                      )}
+
                       {/* Header */}
                       <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
                         <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm shrink-0 shadow-xs">

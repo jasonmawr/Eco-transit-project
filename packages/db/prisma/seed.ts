@@ -405,17 +405,19 @@ Nơi đây sở hữu Vịnh Tình Yêu với kênh nhạc nước dài 2km trì
       lat: 10.7699,
       lng: 106.6993,
       address: '97 Phó Đức Chính, Phường Nguyễn Thái Bình, Quận 1, TP. Hồ Chí Minh',
-      shortDescription: 'Tòa dinh thự cổ kính phong cách Art Deco kết hợp kiến trúc Pháp - Á Đông, nơi lưu giữ hơn 22.000 tác phẩm nghệ thuật vô giá.',
-      description: `Bảo tàng Mỹ thuật TP.HCM từng là dinh thự của thương gia người Hoa giàu có bậc nhất Sài Gòn xưa - Chú Hỏa (Hứa Bon Hòa). Tòa nhà được xây dựng vào thập niên 1920 theo phong cách Art Deco hòa quyện với đường nét kiến trúc Á Đông thanh lịch.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Nơi đây trưng bày hơn 22.000 hiện vật nghệ thuật hội họa, điêu khắc qua các thời kỳ lịch sử Việt Nam, nổi bật với kiệt tác "Vườn xuân Trung Nam Bắc" của danh họa Nguyễn Gia Trí (Bảo vật Quốc gia). Ngoài ra, cầu thang xoắn ốc cổ kính và các ô cửa kính màu hoa văn Pháp làm nên góc check-in nghệ thuật hàng đầu Sài Thành.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận 1',
       walkingMinutes: 4,
       distanceMeters: 250,
       priceLevel: 1,
-      tags: ["attraction","museum","art","architecture"],
-      highlights: ["Bảo vật Quốc gia Vườn xuân Trung Nam Bắc","Kiến trúc biệt thự Art Deco cổ kính","Thang máy cổ xưa độc đáo","Cách Ga Bến Thành 250m"],
-      featured: true,
+      tags: ["attraction","museum","art","architecture","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/cho_ben_thanh_arch.png',
       isPublished: true,
     },
@@ -427,16 +429,18 @@ Nơi đây trưng bày hơn 22.000 hiện vật nghệ thuật hội họa, đi�
       lat: 10.8062,
       lng: 106.7325,
       address: '212 Nguyễn Văn Hưởng, Phường Thảo Điền, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Tổ hợp Cafe & Concept Studio phong cách Minimalism sang chảnh, không gian ngập ánh sáng tự nhiên cho giới trẻ.',
-      description: `Nằm tại tâm điểm bán đảo Thảo Điền ngợp màu xanh, Slay Concept là quán cà phê tích hợp Studio chụp ảnh mang ngôn ngữ thiết kế tối giản Hàn Quốc sang trọng. Với tone màu kem beige dịu mắt và nội thất thiết kế đương đại, nơi đây thu hút đông đảo tín đồ mê chụp ảnh sống ảo.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Menu phục vụ các món Cold Brew tuyển chọn, trà trái cây nhiệt đới tươi mát và bánh ngọt chuẩn vị Pháp. Không gian yên tĩnh phù hợp cho học tập, gặp gỡ đối tác hoặc thư giãn cuối tuần.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 5,
       distanceMeters: 380,
       priceLevel: 2,
-      tags: ["cafe","study/work friendly","photo","thaodien"],
-      highlights: ["Góc sống ảo phong cách Minimalism","Trà trái cây tươi & Cà phê Specialty","Không gian yên tĩnh nhiều ổ cắm","Gần Ga Thảo Điền"],
+      tags: ["cafe","study/work friendly","photo","thaodien","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/lusine_thao_dien.webp',
       isPublished: true,
@@ -449,17 +453,19 @@ Menu phục vụ các món Cold Brew tuyển chọn, trà trái cây nhiệt đ�
       lat: 10.8355,
       lng: 106.7188,
       address: 'Quốc lộ 13, Phường Hiệp Bình Phước, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Đại đô thị sinh thái ven sông Sài Gòn với hồ Đại Nhật, công viên Ocean World và quảng trường nhạc nước 16ha.',
-      description: `Vạn Phúc City được ví như một bán đảo xanh mát bao bọc bởi 3 mặt sông Sài Gòn tại Thủ Đức. Điểm nhấn trung tâm là Hồ Đại Nhật rộng 16ha kết nối Công viên ven sông The Long Park dài 3,4km – dài nhất TP.HCM.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Tại quảng trường trung tâm, du khách có thể thưởng thức màn trình diễn nhạc nước kết hợp màn chiếu ánh sáng laser trên mặt nước rộng lớn, dạo bộ ngắm tháp đồng hồ và thưởng thức ẩm thực tại tuyến phố thương mại sầm uất.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 7,
       distanceMeters: 450,
       priceLevel: 1,
-      tags: ["attraction","park","waterfront","fountain"],
-      highlights: ["Hồ sinh thái Đại Nhật 16ha","Công viên ven sông 3,4km dài nhất","Quảng trường nhạc nước ánh sáng","Tổ hợp ẩm thực đường phố"],
-      featured: true,
+      tags: ["attraction","park","waterfront","fountain","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/daddy_cool_main.png',
       isPublished: true,
     },
@@ -471,16 +477,18 @@ Tại quảng trường trung tâm, du khách có thể thưởng thức màn tr
       lat: 10.7765,
       lng: 106.6715,
       address: '41 Hoàng Dư Khương, Phường 12, Quận 10, TP. Hồ Chí Minh',
-      shortDescription: 'Bảo tàng tư nhân 6 tầng độc đáo bằng gỗ chạm khắc hoa văn cổ, bảo tồn hơn 3.000 hiện vật y học cổ truyền Đông Y.',
-      description: `FITO Museum là bảo tàng y học cổ truyền tư nhân đầu tiên tại Việt Nam, gồm 6 tầng với 18 phòng trưng bày tái hiện không gian nhà thuốc Đông Y từ thế kỷ 17. Toàn bộ nội thất được dựng bằng gỗ quý chạm khắc công phu theo kiến trúc tháp Chàm và nhà rường Huế.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Du khách được tận mắt chiêm ngưỡng các dụng cụ bào chế thuốc cổ xưa, bộ sưu tập ấm sắc thuốc bằng gốm sứ đa dạng, tìm hiểu các bài thuốc dân gian của Hải Thượng Lãn Ông và trải nghiệm dùng thử trà thảo dược thanh nhiệt.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận 10',
       walkingMinutes: 9,
       distanceMeters: 600,
       priceLevel: 2,
-      tags: ["attraction","museum","heritage","medicine"],
-      highlights: ["Kiến trúc nhà gỗ 6 tầng cổ kính","Hơn 3.000 hiện vật Đông Y quý hiếm","Thưởng thức trà thảo dược miễn phí","Không gian trải nghiệm văn hóa"],
+      tags: ["attraction","museum","heritage","medicine","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/cho_ben_thanh_history.png',
       isPublished: true,
@@ -493,17 +501,19 @@ Du khách được tận mắt chiêm ngưỡng các dụng cụ bào chế thu�
       lat: 10.7798,
       lng: 106.6998,
       address: '2 Công xã Paris, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-      shortDescription: 'Công trình kiến trúc Phục Hưng Châu Âu lẫy lừng xây dựng từ 1886, công trình bưu chính biểu tượng của Sài Gòn.',
-      description: `Nằm đối diện Nhà thờ Đức Bà, Bưu điện Thành phố Hồ Chí Minh được thiết kế bởi kiến trúc sư vĩ đại Gustave Eiffel kết hợp với Foulhoux. Xây dựng trong khoảng năm 1886 – 1891, công trình mang phong cách Châu Âu cổ điển kết hợp mái vòm kính kim loại uốn cong lộng lẫy.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Bên trong là vòm trần cao vút mạ vàng, bản đồ lịch sử Sài Gòn cổ được vẽ tay trên tường và các quầy điện thoại gỗ cổ xưa. Du khách có thể gửi bưu thiếp lưu niệm về tận quê nhà và mua quà lưu niệm thủ công mỹ nghệ tinh xảo.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận 1',
       walkingMinutes: 4,
       distanceMeters: 280,
       priceLevel: 1,
-      tags: ["attraction","landmark","history","architecture"],
-      highlights: ["Kiến trúc mái vòm kính Eiffel","Bản đồ vẽ tay Sài Gòn cổ xưa","Đối diện Nhà thờ Đức Bà","Vào cửa tham quan tự do"],
-      featured: true,
+      tags: ["attraction","landmark","history","architecture","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/pho_di_bo_nguyen_hue_history.png',
       isPublished: true,
     },
@@ -515,17 +525,19 @@ Bên trong là vòm trần cao vút mạ vàng, bản đồ lịch sử Sài Gò
       lat: 10.7769,
       lng: 106.6953,
       address: '135 Nam Kỳ Khởi Nghĩa, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
-      shortDescription: 'Di tích lịch sử Quốc gia đặc biệt, công trình kiến trúc hiện đại độc bản của KTS Ngô Kế Thừa chứng kiến mốc son 30/04/1975.',
-      description: `Dinh Độc Lập rộng hơn 12ha xanh rợp bóng cây cổ thụ giữa trung tâm Quận 1. Thiết kế bởi KTS Ngô Kế Thừa theo hình chữ "CÁT" mang triết lý phong thủy Phương Đông, tòa dinh thự từng là đại bản doanh chính trị thời kỳ chiến tranh.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Du khách có thể tham quan các phòng khánh tiết lộng lẫy, phòng họp Hội đồng Bộ trưởng, hầm chỉ huy quân sự kiên cố ngầm dưới lòng đất và ngắm nhìn chiếc xe tăng 390 lịch sử ghi dấu ngày giải phóng miền Nam 30/4/1975.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận 1',
       walkingMinutes: 6,
       distanceMeters: 420,
       priceLevel: 1,
-      tags: ["attraction","history","landmark","park"],
-      highlights: ["Khu di tích Lịch sử Quốc gia đặc biệt","Hầm chỉ huy quân sự dưới lòng đất","Chiếc xe tăng lịch sử 390","Công viên xanh 12ha ngợp mát"],
-      featured: true,
+      tags: ["attraction","history","landmark","park","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/cho_ben_thanh_main.png',
       isPublished: true,
     },
@@ -537,16 +549,18 @@ Du khách có thể tham quan các phòng khánh tiết lộng lẫy, phòng h�
       lat: 10.8288,
       lng: 106.8455,
       address: '206/19/30 Long Thuận, Phường Long Phước, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Bảo tàng sinh thái miệt vườn miền Tây duyên dáng của NTK Sĩ Hoàng, nơi tôn vinh nét đẹp Áo dài qua các thời kỳ.',
-      description: `Sáng lập bởi nhà thiết kế Sĩ Hoàng, Bảo tàng Áo Dài trải rộng trên thảm xanh rợp bóng dừa, ao sen và nhà gỗ cổ Nam Bộ. Nơi đây lưu giữ hàng trăm mẫu áo dài từ thời xa xưa, áo dài của các nữ anh hùng lịch sử, nghệ sĩ nhân dân nổi tiếng và các bộ sưu tập đoạt giải quốc tế.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Du khách được trải nghiệm mặc áo dài chụp ảnh tại bến thuyền gỗ thô sơ, chèo thuyền trên rạch nước miệt vườn và tự tay vẽ hoa văn lên áo dài lưu niệm.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 8,
       distanceMeters: 500,
       priceLevel: 1,
-      tags: ["attraction","museum","aodai","culture"],
-      highlights: ["Không gian sinh thái miệt vườn Nam Bộ","Bộ sưu tập Áo dài lịch sử vô giá","Dịch vụ thuê Áo dài chụp ảnh","Gần Ga Khu Công nghệ cao"],
+      tags: ["attraction","museum","aodai","culture","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/pho_di_bo_nguyen_hue_spring.png',
       isPublished: true,
@@ -559,16 +573,18 @@ Du khách được trải nghiệm mặc áo dài chụp ảnh tại bến thuy�
       lat: 10.8755,
       lng: 106.8188,
       address: 'Công viên Lịch sử Văn hóa Dân tộc, Phường Long Bình, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Công trình tưởng niệm Quốc Tổ thiêng liêng trên đồi cao ngợp màu xanh, điểm hội tụ tâm linh người phương Nam.',
-      description: `Tọa lạc trên ngọn đồi cao thuộc Công viên Lịch sử Văn hóa Dân tộc, Đền Quốc Tổ Hùng Vương được thiết kế theo lối kiến trúc truyền thống uy nghiêm. Lối lên đền gồm 107 bậc đá uốn lượn qua các tầng tượng trưng cho sự gắn kết dân tộc.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Nhà bái đường uy nghi trưng bày trống đồng Đông Sơn, bánh chưng bánh giầy khổng lồ mô phỏng và lư hương rồng mạ vàng. Đây là trung tâm diễn ra Giỗ Tổ Hùng Vương (10/3 âm lịch) thu hút hàng vạn đồng bào dâng hương.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 7,
       distanceMeters: 450,
       priceLevel: 1,
-      tags: ["attraction","temple","history","spiritual"],
-      highlights: ["Tượng đài Quốc Tổ Hùng Vương uy nghiêm","107 bậc đá công phu uốn lượn","Không gian cây xanh thanh tĩnh","Đối diện Ga Bến xe Miền Đông mới"],
+      tags: ["attraction","temple","history","spiritual","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/ben_bach_dang_main.png',
       isPublished: true,
@@ -581,16 +597,18 @@ Nhà bái đường uy nghi trưng bày trống đồng Đông Sơn, bánh chưn
       lat: 11.0255,
       lng: 106.5188,
       address: 'Ấp Ngã Tư, Xã Nhuận Đức, Huyện Củ Chi, TP. Hồ Chí Minh',
-      shortDescription: 'Làng sinh thái văn hóa Tây Nguyên thu nhỏ giữa lòng Củ Chi với nhà rông, điệu múa cồng chiêng và ẩm thực cơm lam.',
-      description: `Fosaco được ví như một "Tây Nguyên thu nhỏ" nằm yên bình giữa rừng cây xanh mát tại Củ Chi. Điểm đặc sắc là quần thể kiến trúc nhà rông gầm cao, nhà dài dệt thổ cẩm của đồng bào M'Nông, Mạ, Ê Đê.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Du khách tới đây được thưởng thức vũ điệu cồng chiêng bên lửa trại, thưởng thức thịt nướng ống tre, cơm lam thơm lừng và trải nghiệm cưỡi ngựa ngắm cảnh hồ sinh thái.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Huyện Củ Chi',
       walkingMinutes: 12,
       distanceMeters: 800,
       priceLevel: 2,
-      tags: ["attraction","ecotourism","culture","cuchi"],
-      highlights: ["Nhà rông Tây Nguyên nguyên bản","Biểu diễn cồng chiêng & Đốt lửa trại","Ẩm thực Cơm lam & Gà nướng","Không gian dã ngoại ngoài trời"],
+      tags: ["attraction","ecotourism","culture","cuchi","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/thao_dien_garden.webp',
       isPublished: true,
@@ -603,17 +621,19 @@ Du khách tới đây được thưởng thức vũ điệu cồng chiêng bên 
       lat: 10.8255,
       lng: 106.7088,
       address: '173/1 Bình Lợi, Phường 13, Quận Bình Thạnh, TP. Hồ Chí Minh',
-      shortDescription: 'Nông trại cừu ven sông phong cách Đà Lạt giữa lòng Sài Gòn với nấc thang lên thiên đường và quán cafe hoàng hôn.',
-      description: `Sunny Farm mang không khí mộng mơ của Đà Lạt về với Sài Gòn năng động. Điểm nhấn hot nhất là đồng cỏ xanh với bầy cừu trắng muốt thân thiện cho du khách vuốt ve và chụp ảnh.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Ngoài ra, quán sở hữu "Nấc thang lên thiên đường" view trọn hoàng hôn ven sông, nhà gỗ hoa mười giờ rực rỡ và khu BBQ nướng ngoài trời thoáng đãng buổi tối.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận Bình Thạnh',
       walkingMinutes: 6,
       distanceMeters: 400,
       priceLevel: 2,
-      tags: ["attraction","farm","dalatstyle","sunset"],
-      highlights: ["Trại cừu trắng thân thiện","Nấc thang lên thiên đường Check-in","View ngắm hoàng hôn sông đẹp","Gần Ga Tân Cảng"],
-      featured: true,
+      tags: ["attraction","farm","dalatstyle","sunset","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/lusine_thao_dien.webp',
       isPublished: true,
     },
@@ -625,17 +645,19 @@ Ngoài ra, quán sở hữu "Nấc thang lên thiên đường" view trọn hoà
       lat: 10.8588,
       lng: 106.803,
       address: '120 Xa lộ Hà Nội, Phường Tân Phú, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Công viên giải trí chủ đề văn hóa thần thoại lớn nhất Nam Bộ, kết nối trực tiếp ga Metro Tuyến 1.',
-      description: `Suối Tiên là công viên giải trí chủ đề văn hóa huyền thoại lâu đời bậc nhất Việt Nam với diện tích rộng hơn 105ha. Các công trình được thiết kế mô phỏng các mốc lịch sử và truyền thuyết như Sơn Tinh Thủy Tinh, Lạc Long Quân - Âu Cơ.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Nổi bật là Biển Tiên Đồng - Ngọc Nữ (biển nhân tạo nước mặn đầu tiên tại Việt Nam), Tàu lượn siêu tốc 1,2km, Thủy cung dưới lòng đất và Vương quốc cá sấu với hơn 25.000 con.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 3,
       distanceMeters: 180,
       priceLevel: 2,
-      tags: ["attraction","themepark","family","metro1"],
-      highlights: ["Biển nhân tạo Tiên Đồng Ngọc Nữ","Kết nối thẳng Ga Metro Suối Tiên","Tàu lượn siêu tốc cảm giác mạnh","Lễ hội Trái cây Mùa hè"],
-      featured: true,
+      tags: ["attraction","themepark","family","metro1","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/suoi_tien.webp',
       isPublished: true,
     },
@@ -647,17 +669,19 @@ Nổi bật là Biển Tiên Đồng - Ngọc Nữ (biển nhân tạo nước m
       lat: 10.7788,
       lng: 106.7099,
       address: 'Đường Trần Bạch Đằng, Phường Thủ Thiêm, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Công viên ven sông 20ha hiện đại bậc nhất view ôm trọn Landmark 81 và chuỗi cao ốc trung tâm Quận 1.',
-      description: `Công viên Bờ sông Thủ Đức rộng gần 20ha kéo dài từ chân cầu Ba Son đến dốc cầu Thủ Thiêm 1. Đây là không gian xanh đa chức năng mới hiện đại bậc nhất dành cho cư dân và du khách.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Điểm nhấn là Cánh đồng hoa hướng dương rộng lớn, chuỗi mảng xanh dạo bộ ngợp gió, cầu đi bộ ngắm cảnh sông Sài Gòn rực rỡ ánh đèn đêm và khu ẩm thực container sôi động.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 5,
       distanceMeters: 350,
       priceLevel: 1,
-      tags: ["attraction","park","sunflower","skyline"],
-      highlights: ["Cánh đồng hoa hướng dương","View Landmark 81 & Skyline Quận 1","Kết nối qua Cầu Ba Son","Không gian dạo bộ ngợp gió"],
-      featured: true,
+      tags: ["attraction","park","sunflower","skyline","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/ben_bach_dang_main.png',
       isPublished: true,
     },
@@ -669,16 +693,18 @@ Nổi bật là Biển Tiên Đồng - Ngọc Nữ (biển nhân tạo nước m
       lat: 10.7725,
       lng: 106.7125,
       address: 'Khu đô thị mới Thủ Thiêm (gần chân cầu Ba Son), TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Bãi cỏ xanh lộng gió rợp trời diều ngộ nghĩnh mỗi chiều hoàng hôn, điểm hẹn thư giãn yêu thích của giới trẻ.',
-      description: `Bãi thả diều Thủ Thiêm là khoảng thảm cỏ tự nhiên lộng gió nằm sát bờ sông Sài Gòn. Mỗi chiều từ 16h00, hàng trăm chiếc diều đủ hình dáng cá voi, đại bàng, siêu nhân rực rỡ bay lượn trên bầu trời.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Nơi đây thu hút gia đình và bạn trẻ đến ngắm hoàng hôn buông xuống phía sau các tòa cao ốc Quận 1, thưởng thức cá viên chiên và trà chanh lề đường ngợp gió.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 7,
       distanceMeters: 450,
       priceLevel: 1,
-      tags: ["attraction","kite","chill","sunset"],
-      highlights: ["Hàng trăm chiếc diều rực rỡ","Không gian lộng gió mát mẻ","View ngắm hoàng hôn lãng mạn","Đi bộ ngắn từ Ga Ba Son"],
+      tags: ["attraction","kite","chill","sunset","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/giot_nuoc_park_main.png',
       isPublished: true,
@@ -691,16 +717,18 @@ Nơi đây thu hút gia đình và bạn trẻ đến ngắm hoàng hôn buông 
       lat: 10.8622,
       lng: 106.8088,
       address: 'Khu Bảo tồn Sinh thái Suối Tiên, Xa lộ Hà Nội, TP. Thủ Đức, TP. Hồ Chí Minh',
-      shortDescription: 'Không gian trải nghiệm giáo dục môi trường tái hiện hệ sinh thái rừng mưa nhiệt đới Vườn Quốc gia Cúc Phương.',
-      description: `Không gian trưng bày triển lãm mô phỏng lại những nét đặc trưng độc đáo của rừng nguyên sinh Cúc Phương với bộ sưu tập tiêu bản bướm rừng rực rỡ, cây cổ thụ nghìn năm tuổi và các chương trình giáo dục bảo tồn thiên nhiên.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Du khách trẻ em và học sinh được tham gia các buổi workshop tìm hiểu về thế giới động thực vật hoang dã, trồng cây mầm bảo vệ Trái Đất và lan tỏa thông điệp sống xanh.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Thành phố Thủ Đức',
       walkingMinutes: 5,
       distanceMeters: 320,
       priceLevel: 1,
-      tags: ["attraction","nature","education","greenlife"],
-      highlights: ["Mô hình rừng mưa nhiệt đới","Bộ sưu tập bướm rừng phong phú","Workshop giáo dục bảo vệ môi trường","Gần Ga Suối Tiên"],
+      tags: ["attraction","nature","education","greenlife","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
       featured: false,
       imageUrl: '/images/places/suoi_tien.webp',
       isPublished: true,
@@ -713,17 +741,19 @@ Du khách trẻ em và học sinh được tham gia các buổi workshop tìm hi
       lat: 10.776,
       lng: 106.7022,
       address: '171 Đồng Khởi & 116 Nguyễn Huệ, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-      shortDescription: 'Thiên đường mua sắm xa xỉ kiến trúc Pháp cổ tráng lệ, điểm hẹn thời trang cao cấp ngay trên phố đi bộ.',
-      description: `Union Square sở hữu vị trí vàng đắc địa nhất Sài Gòn với 4 mặt tiền ôm trọn Đồng Khởi, Nguyễn Huệ, Lê Lợi và Lê Thánh Tôn. Tòa nhà mang phong cách kiến trúc Pháp cổ điển sang trọng và đẳng cấp.
+      shortDescription: '🔒 Địa điểm bí ẩn đang được biên soạn – Sẽ mở khóa trong chặng hành trình tiếp theo!',
+      description: `🔒 **ĐỊA ĐIỂM SẮP MỞ KHÓA (CẤP TIẾP THEO)**
 
-Bên trong quy tụ các thương hiệu thời trang xa xỉ hàng đầu thế giới như Hermès, Chanel, Dior, Louis Vuitton cùng chuỗi nhà hàng fine-dining Pháp và quán cafe ngoài trời ngắm trọn Nhà hát Lớn.`,
+Địa điểm này nằm trong danh mục cẩm nang trải nghiệm mở rộng của EcoTransit. Ban biên tập đang thực hiện chụp ảnh thực tế và biên soạn nội dung chất lượng nhất.
+
+Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo trong thời gian sớm nhất!`,
       district: 'Quận 1',
       walkingMinutes: 1,
       distanceMeters: 50,
       priceLevel: 3,
-      tags: ["shopping","luxury","fashion","landmark"],
-      highlights: ["Kết nối trực tiếp Lối ra Ga Nhà hát TP","Quy tụ thương hiệu xa xỉ thế giới","Kiến trúc Pháp tráng lệ 4 mặt tiền","Nhà hàng Fine-Dining đẳng cấp"],
-      featured: true,
+      tags: ["shopping","luxury","fashion","landmark","sap-mo-khoa","upcoming"],
+      highlights: ["🔒 Sắp mở khóa trong Giai đoạn 2","🎮 Tích lũy điểm lượt đi xanh để mở sớm","📍 Thông tin địa chỉ & ga gần nhất"],
+      featured: false,
       imageUrl: '/images/places/nha_hat.webp',
       isPublished: true,
     }
