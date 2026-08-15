@@ -20,6 +20,8 @@ async function main() {
   await prisma.routeLine.deleteMany();
   await prisma.station.deleteMany();
   await prisma.userWallet.deleteMany();
+  await prisma.xanhWrapReceipt.deleteMany();
+  await prisma.visitorLog.deleteMany();
 
   // Hash passwords
   const passwordHash = await argon2.hash('User@123456');
@@ -1314,6 +1316,105 @@ Hãy tích cực tích lũy vé xe xanh và điểm thưởng lượt đi để 
         status: 'approved',
       },
     });
+  }
+
+
+
+
+
+
+  // 10. Seed Visitor Logs for Admin Analytics (937 records)
+  console.log('Seeding Visitor Logs (937 visits)...');
+  const visitorLogsData = Array.from({ length: 937 }).map((_, idx) => ({
+    ipHash: `ip_hash_${(idx % 764) + 1}`,
+    path: idx % 5 === 0 ? '/#stations' : idx % 7 === 0 ? '/#xanhwrap' : idx % 9 === 0 ? '/#vouchers' : '/',
+    userAgent: idx % 2 === 0 ? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/125.0.0.0' : 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4 like Mac OS X) Safari/604.1',
+    userEmail: idx % 10 === 0 ? 'user@ecotransit.vn' : null,
+    createdAt: new Date(Date.now() - (937 - idx) * 3600000),
+  }));
+  await prisma.visitorLog.createMany({ data: visitorLogsData });
+
+  // 11. Seed XanhWrap Submissions (132 records)
+  console.log('Seeding XanhWrap Submissions (132 records)...');
+  const xanhwrapData = Array.from({ length: 132 }).map((_, idx) => ({
+    nickname: `Đại sứ Xanh #${idx + 1}`,
+    luckyNumber: (idx * 7) % 999 + 1,
+    assignedLabel: idx % 3 === 0 ? 'bus_master' : idx % 3 === 1 ? 'metro_pass' : 'river_pioneer',
+    assignedLabelName: idx % 3 === 0 ? 'Thần Xe Bus Điện' : idx % 3 === 1 ? 'Hành Khách Metro Chuẩn Gu' : 'Tay Chèo Sông Sài Gòn',
+    labelGroup: 'green',
+    metricValue: (idx * 5 + 10),
+    daysPerYear: 260,
+    episodesPerYear: 520,
+    recordDate: '2026-08-10',
+    totalKm: (idx * 2.5 + 5),
+    totalMin: (idx * 3 + 20),
+    transitMin: (idx * 2 + 10),
+    handsFreeMin: (idx * 3 + 10),
+    co2SavedGrams: (idx * 150 + 500),
+    legsJson: '[]',
+    postUrl: `https://facebook.com/xanhwrap/post/${1000 + idx}`,
+    reflection: 'Trải nghiệm di chuyển xanh bằng Metro 1 cực kỳ tiện lợi và thoáng mát!',
+    confirmationCode: `XANH-${1000 + idx}`,
+    status: idx < 120 ? 'valid' : 'pending',
+    submittedAt: new Date(Date.now() - (132 - idx) * 7200000),
+  }));
+  await prisma.xanhWrapReceipt.createMany({ data: xanhwrapData });
+
+  // 12. Seed Xanh SM Voucher & 45 Redemptions
+  console.log('Seeding Xanh SM Voucher & 45 Redemptions...');
+  const targetUser = await prisma.user.findFirst({ where: { email: 'user@ecotransit.vn' } }) || await prisma.user.findFirst();
+
+  const xanhSmVoucher = await prisma.voucher.create({
+    data: {
+      name: 'Voucher Xanh SM 30,000 VND (Xe Ô Tô Điện Xanh SM)',
+      cost: 50,
+      quantity: 100,
+      status: 'active',
+      encryptedCodes: 'XANHSM-30K-001,XANHSM-30K-002,XANHSM-30K-003',
+      slug: 'xanh-sm-30k',
+      description: 'Mã ưu đãi giảm 30,000 VND khi di chuyển bằng taxi điện Xanh SM / Green SM kết nối các nhà ga Metro Tuyến 1.',
+      brandName: 'Xanh SM',
+      category: 'transit',
+      pointsCost: 50,
+      stockTotal: 100,
+      stockRemaining: 55,
+      perUserLimit: 5,
+      terms: 'Áp dụng cho mọi chuyến xe điện Xanh SM taxi & motorbike.',
+      imageUrl: '/images/vouchers/vinbus.png',
+      isActive: true,
+      validFrom: new Date('2026-01-01'),
+      validUntil: new Date('2026-12-31'),
+    } as any,
+  });
+
+  if (targetUser) {
+    const redemptionsData = Array.from({ length: 45 }).map((_, idx) => ({
+      userId: targetUser.id,
+      voucherId: xanhSmVoucher.id,
+      code: `XANHSM-${100 + idx}`,
+      pointsSpent: 50,
+      idempotencyKey: `xanhsm_redemption_${idx + 1}`,
+      redeemedAt: new Date(Date.now() - (45 - idx) * 86400000),
+    }));
+    await prisma.voucherRedemption.createMany({ data: redemptionsData });
+  }
+
+  // 13. Seed Tickets (48 uploaded, 45 verified)
+  console.log('Seeding 48 Tickets (45 verified, 3 pending)...');
+  if (targetUser && stations.length > 0) {
+    const ticketsData = Array.from({ length: 48 }).map((_, idx) => ({
+      userId: targetUser.id,
+      type: idx % 2 === 0 ? 'metro' : 'bus',
+      stationId: stations[idx % stations.length].id,
+      routeLabel: idx % 2 === 0 ? 'Metro Tuyến 1 (Bến Thành - Suối Tiên)' : 'Tuyến Xe Buýt 19',
+      tripDate: new Date('2026-08-01'),
+      ocrStatus: 'completed',
+      ocrText: 'Vé Metro hợp lệ ga Bến Thành',
+      status: idx < 45 ? 'verified' : 'pending',
+      sizeBytes: 154200,
+      createdAt: new Date(Date.now() - (48 - idx) * 14400000),
+    }));
+    await prisma.ticket.createMany({ data: ticketsData });
   }
 
   console.log('Database seeded successfully.');

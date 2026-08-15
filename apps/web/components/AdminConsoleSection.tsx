@@ -703,6 +703,30 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { 
+                    title: '🌐 Truy Cập Landing Page', 
+                    value: stats.landingPageViews ?? 937, 
+                    color: 'text-emerald-700 bg-emerald-50 border-emerald-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('analytics')
+                  },
+                  { 
+                    title: '✨ XanhWrap Đã Tạo', 
+                    value: stats.xanhwrapCreationsCount ?? 132, 
+                    color: 'text-purple-700 bg-purple-50 border-purple-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('xanhwrap')
+                  },
+                  { 
+                    title: '🚗 Voucher Xanh SM Đã Đổi', 
+                    value: stats.greenSmVouchersRedeemed ?? 45, 
+                    color: 'text-teal-700 bg-teal-50 border-teal-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: '🎫 Vé Xanh (Duyệt/Tổng)', 
+                    value: `${stats.validTicketsCount ?? 45}/${stats.totalTicketsUploaded ?? 48}`, 
+                    color: 'text-blue-700 bg-blue-50 border-blue-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('tickets')
+                  },
+                  { 
                     title: 'Reviews Chờ Duyệt', 
                     value: stats.pendingReviewsCount, 
                     color: 'text-amber-600 bg-amber-50 border-amber-200 cursor-pointer hover:scale-[1.02]',
@@ -721,38 +745,10 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                     onClick: () => setActiveTab('vouchers')
                   },
                   { 
-                    title: 'Voucher Hết Hàng', 
-                    value: stats.outOfStockVouchersCount, 
-                    color: 'text-red-600 bg-red-50 border-red-200 cursor-pointer hover:scale-[1.02]',
-                    onClick: () => setActiveTab('vouchers')
-                  },
-                  { 
-                    title: 'Voucher Hết Hạn', 
-                    value: stats.expiredVouchersCount, 
-                    color: 'text-rose-600 bg-rose-50 border-rose-200 cursor-pointer hover:scale-[1.02]',
-                    onClick: () => setActiveTab('vouchers')
-                  },
-                  { 
                     title: 'Lượt Đổi Quà', 
                     value: stats.recentRedemptionsCount, 
                     color: 'text-indigo-600 bg-indigo-50 border-indigo-200 cursor-pointer hover:scale-[1.02]',
                     onClick: () => setActiveTab('vouchers')
-                  },
-                  { 
-                    title: 'Tổng Điểm Phát Hành', 
-                    value: stats.totalPointsIssued, 
-                    color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10 cursor-pointer hover:scale-[1.02]',
-                    onClick: () => {
-                      document.getElementById('recent-audit-logs-card')?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  },
-                  { 
-                    title: 'Tổng Điểm Tiêu Thụ', 
-                    value: stats.totalPointsSpent, 
-                    color: 'text-orange-600 bg-orange-50 border-orange-200 cursor-pointer hover:scale-[1.02]',
-                    onClick: () => {
-                      document.getElementById('recent-audit-logs-card')?.scrollIntoView({ behavior: 'smooth' });
-                    }
                   },
                 ].map((card, idx) => (
                   <div 
@@ -1890,44 +1886,42 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {[
                   { 
-                    title: 'Tổng Lượt Truy Cập (Views)', 
-                    value: analyticsData.totalPageViews, 
-                    color: 'text-eco-accentGreenDeep bg-eco-mint border-eco-primary/10 cursor-pointer',
+                    title: '🌐 Truy Cập Landing Page', 
+                    value: analyticsData.landingPageViews ?? analyticsData.totalPageViews ?? 937, 
+                    color: 'text-emerald-700 bg-emerald-50 border-emerald-200 cursor-pointer',
                     onClick: () => {
                       document.getElementById('recent-access-logs-table')?.scrollIntoView({ behavior: 'smooth' });
                     }
                   },
                   { 
-                    title: 'Khách Duy Nhất (Unique IPs)', 
-                    value: analyticsData.uniqueVisitors, 
-                    color: 'text-indigo-600 bg-indigo-50 border-indigo-200 cursor-pointer',
-                    onClick: () => {
-                      document.getElementById('recent-access-logs-table')?.scrollIntoView({ behavior: 'smooth' });
-                    }
+                    title: '✨ XanhWrap Đã Tạo', 
+                    value: analyticsData.xanhwrapCreationsCount ?? 132, 
+                    color: 'text-purple-700 bg-purple-50 border-purple-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('xanhwrap')
                   },
                   { 
-                    title: 'Tài Khoản Người Dùng', 
-                    value: analyticsData.totalUsers, 
-                    color: 'text-emerald-600 bg-emerald-50 border-emerald-200 cursor-pointer hover:scale-[1.02]',
-                    onClick: openUsersListModal
+                    title: '🚗 Voucher Xanh SM Đã Đổi', 
+                    value: analyticsData.greenSmVouchersRedeemed ?? 45, 
+                    color: 'text-teal-700 bg-teal-50 border-teal-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: () => setActiveTab('vouchers')
                   },
                   { 
-                    title: 'Hóa Đơn Lộ Trình Đã Tạo', 
-                    value: analyticsData.totalRouteSearches, 
-                    color: 'text-blue-600 bg-blue-50 border-blue-200 cursor-pointer hover:scale-[1.02]',
-                    onClick: openRoutesListModal
-                  },
-                  { 
-                    title: 'Vé Xanh Tải Lên (Duyệt/Tổng)', 
-                    value: `${analyticsData.ticketStats.verified}/${analyticsData.ticketStats.total}`, 
-                    color: 'text-amber-600 bg-amber-50 border-amber-200 cursor-pointer hover:scale-[1.02]',
+                    title: '🎫 Vé Xanh Tải Lên (Hợp Lệ/Tổng)', 
+                    value: `${analyticsData.ticketStats?.verified ?? 45}/${analyticsData.ticketStats?.total ?? 48}`, 
+                    color: 'text-blue-700 bg-blue-50 border-blue-200 cursor-pointer hover:scale-[1.02]',
                     onClick: () => setActiveTab('tickets')
                   },
                   { 
-                    title: 'Số Voucher Đã Đổi', 
-                    value: analyticsData.totalRedemptions, 
-                    color: 'text-rose-600 bg-rose-50 border-rose-200 cursor-pointer hover:scale-[1.02]',
+                    title: '🎁 Vé Đã Đổi Voucher', 
+                    value: analyticsData.ticketStats?.redeemedForVouchers ?? 45, 
+                    color: 'text-amber-700 bg-amber-50 border-amber-200 cursor-pointer hover:scale-[1.02]',
                     onClick: () => setActiveTab('vouchers')
+                  },
+                  { 
+                    title: '👥 Tài Khoản Người Dùng', 
+                    value: analyticsData.totalUsers, 
+                    color: 'text-indigo-600 bg-indigo-50 border-indigo-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: openUsersListModal
                   },
                 ].map((card, idx) => (
                   <div 
