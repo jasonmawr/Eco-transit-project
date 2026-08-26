@@ -9,6 +9,10 @@
 
 ## 1. TỔNG QUAN HỆ THỐNG LUỒNG TƯƠNG TÁC (ECOSYSTEM FLOWCHART)
 
+### 🖼️ Biểu Đồ UML Use Case Trực Quan (Vẽ bằng Diagrams.net / Draw.io):
+![Sơ Đồ UML Use Case](./diagrams/01_use_case_diagram.svg)
+*(Tệp nguồn chỉnh sửa kéo thả trực tiếp trên `https://app.diagrams.net`: [`01_use_case_diagram.drawio`](./diagrams/01_use_case_diagram.drawio))*
+
 Sơ đồ tổng quan toàn bộ kiến trúc tương tác đa chức năng trên nền tảng **Lướt Khói Chạm Xanh**:
 
 ```mermaid
@@ -76,6 +80,10 @@ journey
 ## 3. SƠ ĐỒ LUỒNG CHI TIẾT TỪNG TÍNH NĂNG (DETAILED FEATURE FLOWS)
 
 ### 3.1. Luồng Lập lộ trình đa phương thức (Multi-modal Routing Sequence)
+
+#### 🖼️ Lưu Đồ Thuật Toán Dijkstra & Tính Giá Vé Gộp (Vẽ bằng Diagrams.net / Draw.io):
+![Lưu Đồ Dijkstra Lộ Trình & Giá Vé](./diagrams/03_dijkstra_multimodal_routing_flow.svg)
+*(Tệp nguồn chỉnh sửa kéo thả trực tiếp trên `https://app.diagrams.net`: [`03_dijkstra_multimodal_routing_flow.drawio`](./diagrams/03_dijkstra_multimodal_routing_flow.drawio))*
 
 ```mermaid
 sequenceDiagram

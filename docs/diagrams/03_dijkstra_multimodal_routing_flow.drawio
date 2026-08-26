@@ -1,0 +1,13 @@
+<mxfile host="app.diagrams.net" modified="2026-08-26T00:00:00.000Z" agent="Mozilla/5.0" version="24.0.0" type="device">
+  <diagram id="luot-khoi-cham-xanh" name="Dijkstra Tariff Flowchart - Luot Khoi Cham Xanh">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="title" value="Dijkstra Tariff Flowchart - Luot Khoi Cham Xanh" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#0F3E31;" vertex="1" parent="1">
+          <mxGeometry x="300" y="30" width="560" height="40" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

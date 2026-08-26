@@ -161,7 +161,11 @@ BUTTON COMPONENT STATES:
      giúp Googlebot nhận diện chính xác danh mục ứng dụng giao thông xanh.
   3. **Lời khuyên thực tế**: Khi dự án đi vào giai đoạn quảng bá diện rộng, việc gắn thêm **Custom Domain** (ví dụ `luotkhoichamxanh.vn`) sẽ giúp tăng độ uy tín thương hiệu (Brand Authority) và đẩy thứ hạng từ khóa lên vị trí Top 1 nhanh hơn.
 
-### 5.2. Luồng CI/CD Tự Động Hóa Vercel & Render
+### 5.2. Sơ Đồ Kiến Trúc Hệ Thống & Luồng CI/CD Tự Động Hóa
+
+#### 🖼️ Sơ Đồ Kiến Trúc 3 Tầng Chi Tiết (Vẽ bằng Diagrams.net / Draw.io):
+![Sơ Đồ Kiến Trúc 3 Tầng](./diagrams/02_system_architecture_diagram.svg)
+*(Tệp nguồn chỉnh sửa kéo thả trực tiếp trên `https://app.diagrams.net`: [`02_system_architecture_diagram.drawio`](./diagrams/02_system_architecture_diagram.drawio))*
 
 ```mermaid
 flowchart LR
