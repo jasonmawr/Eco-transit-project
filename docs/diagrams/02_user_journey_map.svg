@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
+    HÌNH 2. BẢN ĐỒ HÀNH TRÌNH TRẢI NGHIỆM NGƯỜI DÙNG (USER JOURNEY MAP — GEN Z)
+  </text>
+
+  <!-- 4 PHASES -->
+  <g transform="translate(30, 75)">
+    <!-- Phase 1 -->
+    <rect x="0" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="0" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="105" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
+    
+    <text x="15" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="25" y="85" fill="#333" font-size="11.5">- Mở web trên điện thoại</text>
+    <text x="25" y="105" fill="#333" font-size="11.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
+    <text x="25" y="125" fill="#333" font-size="11.5">- Xem gợi ý tránh mưa</text>
+
+    <text x="15" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="25" y="180" fill="#0F3E31" font-size="11.5">- Biểu giá chuẩn: 12.000đ</text>
+    <text x="25" y="200" fill="#0F3E31" font-size="11.5">- Tiết kiệm 450g CO₂</text>
+
+    <text x="105" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 2 -->
+    <rect x="230" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="230" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="335" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. Trải Nghiệm Đi Tàu</text>
+    
+    <text x="245" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="255" y="85" fill="#333" font-size="11.5">- Lên tàu Metro Tuyến 1</text>
+    <text x="255" y="105" fill="#333" font-size="11.5">- Check-in ga Tân Cảng, Ba Son</text>
+    <text x="255" y="125" fill="#333" font-size="11.5">- Chụp ảnh lưu cuống vé</text>
+
+    <text x="245" y="160" fill="#111" font-size="12" font-weight="bold">• Cảm nhận:</text>
+    <text x="255" y="180" fill="#0F3E31" font-size="11.5">- Tàu êm, máy lạnh mát</text>
+    <text x="255" y="200" fill="#0F3E31" font-size="11.5">- Ga sạch đẹp văn minh</text>
+
+    <text x="335" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 3 -->
+    <rect x="460" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="460" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="565" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
+    
+    <text x="475" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="485" y="85" fill="#333" font-size="11.5">- Tải ảnh chụp vé lên web</text>
+    <text x="485" y="105" fill="#333" font-size="11.5">- OCR duyệt tự động</text>
+    <text x="485" y="125" fill="#333" font-size="11.5">- Đổi Voucher Xanh SM 30k</text>
+
+    <text x="475" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="485" y="180" fill="#0F3E31" font-size="11.5">- Cộng 10 Điểm Xanh</text>
+    <text x="485" y="200" fill="#0F3E31" font-size="11.5">- Nhận mã barcode ngay</text>
+
+    <text x="565" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 4 -->
+    <rect x="690" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="690" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="795" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">4. XanhWrap &amp; Lan Tỏa</text>
+    
+    <text x="705" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="715" y="85" fill="#333" font-size="11.5">- Tạo thẻ tổng kết XanhWrap</text>
+    <text x="715" y="105" fill="#333" font-size="11.5">- Xuất ảnh poster cá nhân hóa</text>
+    <text x="715" y="125" fill="#333" font-size="11.5">- Chia sẻ Story Facebook</text>
+
+    <text x="705" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="715" y="180" fill="#0F3E31" font-size="11.5">- Hashtag #LuotKhoiChamXanh</text>
+    <text x="715" y="200" fill="#0F3E31" font-size="11.5">- Lan tỏa thông điệp xanh</text>
+
+    <text x="795" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+  </g>
+</svg>

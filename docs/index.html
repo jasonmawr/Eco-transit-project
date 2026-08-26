@@ -3,632 +3,677 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HỒ SƠ THIẾT KẾ UX/UI &amp; USER FLOW — LƯỚT KHÓI CHẠM XANH TP.HCM</title>
-  
-  <!-- Google Fonts: Outfit & Inter -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <!-- Mermaid.js for Dynamic Interactive Diagram Rendering -->
-  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: 'neutral',
-      fontFamily: 'Inter, sans-serif',
-      themeVariables: {
-        primaryColor: '#E6F7F0',
-        primaryTextColor: '#0F3E31',
-        primaryBorderColor: '#10B981',
-        lineColor: '#059669',
-        secondaryColor: '#FAF5FF',
-        tertiaryColor: '#FEF3C7'
-      }
-    });
-  </script>
-
+  <title>BÁO CÁO ĐẶC TẢ THIẾT KẾ UX/UI &amp; HỆ THỐNG — LƯỚT KHÓI CHẠM XANH</title>
   <style>
     :root {
       --primary: #0F3E31;
-      --primary-deep: #082820;
+      --primary-dark: #082820;
       --accent: #10B981;
-      --accent-deep: #059669;
-      --mint: #E6F7F0;
-      --soft: #F4FBF7;
-      --ink: #111827;
-      --muted: #6B7280;
-      --border: #E5E7EB;
-      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      --text-main: #1F2937;
+      --text-muted: #4B5563;
+      --bg-light: #F9FAFB;
+      --border-color: #D1D5DB;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: var(--soft);
-      color: var(--ink);
+      font-family: 'Times New Roman', Times, serif;
+      background-color: #F3F4F6;
+      color: var(--text-main);
       line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      font-size: 15pt;
     }
 
-    h1, h2, h3, h4, h5, h6 {
-      font-family: 'Outfit', sans-serif;
-      font-weight: 800;
-      color: var(--primary);
-    }
-
-    /* Top Sticky Header */
+    /* Top Action Bar */
     .top-bar {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(15, 62, 49, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow-md);
-    }
-    .top-bar .brand {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      color: #ffffff;
-    }
-    .top-bar .brand-title {
-      font-size: 1.35rem;
-      font-weight: 900;
-      letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #A7F3D0 0%, #ffffff 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .top-bar .brand-sub {
-      font-size: 0.75rem;
-      color: #A7F3D0;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 0.75rem;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.55rem 1.2rem;
-      border-radius: 9999px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.875rem;
-      font-weight: 700;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #ffffff;
-      border: none;
-    }
-    .btn-primary:hover {
-      background: var(--accent-deep);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
-    }
-    .btn-outline {
-      background: rgba(255, 255, 255, 0.1);
-      color: #ffffff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .btn-outline:hover {
-      background: rgba(255, 255, 255, 0.2);
-    }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2.5rem 1.5rem 5rem;
-    }
-
-    /* Hero Banner */
-    .hero-banner {
-      background: linear-gradient(135deg, #0F3E31 0%, #082820 100%);
-      border-radius: 1.5rem;
-      padding: 3rem 2.5rem;
-      color: #ffffff;
-      margin-bottom: 2.5rem;
-      box-shadow: var(--shadow-xl);
-      position: relative;
-      overflow: hidden;
-      border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-    .hero-banner::after {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -10%;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(0,0,0,0) 70%);
-      pointer-events: none;
-    }
-    .hero-badge {
-      display: inline-block;
-      padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-      background: rgba(16, 185, 129, 0.2);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #A7F3D0;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin-bottom: 1rem;
-    }
-    .hero-title {
-      font-size: 2.5rem;
-      font-weight: 900;
-      line-height: 1.15;
-      margin-bottom: 1rem;
-      color: #ffffff;
-    }
-    .hero-desc {
-      font-size: 1.1rem;
-      color: #D1FAE5;
-      max-width: 780px;
-      margin-bottom: 1.5rem;
-    }
-
-    /* Tab Navigation Rail */
-    .nav-tabs {
-      display: flex;
-      gap: 0.5rem;
-      background: #ffffff;
-      padding: 0.5rem;
-      border-radius: 1rem;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      margin-bottom: 2.5rem;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      border-radius: 0.75rem;
-      border: none;
-      background: transparent;
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--muted);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-    .tab-btn:hover {
-      color: var(--primary);
-      background: var(--soft);
-    }
-    .tab-btn.active {
       background: var(--primary);
       color: #ffffff;
-      box-shadow: 0 4px 10px rgba(15, 62, 49, 0.25);
-    }
-
-    /* Tab Content Section */
-    .tab-pane {
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    .tab-pane.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Card Box */
-    .spec-card {
-      background: #ffffff;
-      border-radius: 1.25rem;
-      border: 1px solid var(--border);
-      padding: 2rem;
-      margin-bottom: 2rem;
-      box-shadow: var(--shadow-sm);
-    }
-    .spec-card-header {
+      padding: 0.8rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid var(--soft);
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
-    .spec-card-title {
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--primary);
+    .top-bar .title-group h1 {
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+    }
+    .top-bar .title-group p {
+      font-size: 0.85rem;
+      color: #A7F3D0;
+    }
+    .btn-group {
       display: flex;
-      align-items: center;
       gap: 0.6rem;
     }
-
-    /* Diagram Viewer Box */
-    .diagram-container {
-      background: #FAFCFB;
-      border: 1.5px solid #D1FAE5;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      margin: 1.5rem 0;
-      overflow-x: auto;
-      box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+    .btn {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 10.5pt;
+      font-weight: bold;
+      padding: 0.45rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
     }
-    .diagram-container svg {
+    .btn-print {
+      background: #ffffff;
+      color: var(--primary);
+      border: 1px solid #ffffff;
+    }
+    .btn-print:hover {
+      background: #E5E7EB;
+    }
+    .btn-live {
+      background: var(--accent);
+      color: #ffffff;
+      border: 1px solid var(--accent);
+    }
+    .btn-live:hover {
+      background: #059669;
+    }
+
+    /* Document Sheet Wrapper */
+    .doc-page {
+      max-width: 1050px;
+      margin: 2rem auto 4rem;
+      background: #ffffff;
+      padding: 3.5rem 3.5rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      border: 1px solid #E5E7EB;
+    }
+
+    /* Formal Header */
+    .doc-header {
+      text-align: center;
+      border-bottom: 2px solid var(--primary);
+      padding-bottom: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .doc-org {
+      font-size: 11pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .doc-title {
+      font-size: 20pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    .doc-sub {
+      font-size: 12pt;
+      font-style: italic;
+      color: var(--text-muted);
+    }
+
+    /* Section Styles */
+    h2.section-heading {
+      font-size: 14pt;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: var(--primary);
+      border-left: 5px solid var(--primary);
+      padding-left: 0.75rem;
+      margin: 2rem 0 1rem;
+    }
+    h3.sub-heading {
+      font-size: 12.5pt;
+      font-weight: bold;
+      color: var(--primary-dark);
+      margin: 1.5rem 0 0.6rem;
+    }
+    p, li {
+      text-align: justify;
+      margin-bottom: 0.75rem;
+      font-size: 12pt;
+    }
+    ul, ol {
+      margin-left: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Diagram Frame */
+    .figure-frame {
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #FFFFFF;
+      padding: 1rem;
+      margin: 1.25rem 0 1.5rem;
+      text-align: center;
+    }
+    .figure-frame svg {
       width: 100%;
       height: auto;
-      min-width: 600px;
+      display: block;
+      margin: 0 auto;
+    }
+    .figure-caption {
+      font-size: 10.5pt;
+      font-style: italic;
+      color: var(--text-muted);
+      margin-top: 0.6rem;
+      text-align: center;
     }
 
-    /* Browser Mockup Window */
-    .browser-mockup {
-      border: 1px solid #D1D5DB;
-      border-radius: 1rem;
-      overflow: hidden;
-      background: #ffffff;
-      box-shadow: var(--shadow-md);
-      margin: 1.5rem 0;
-    }
-    .browser-header {
-      background: #F3F4F6;
-      padding: 0.65rem 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      border-bottom: 1px solid #E5E7EB;
-    }
-    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
-    .dot-red { background: #EF4444; }
-    .dot-yellow { background: #F59E0B; }
-    .dot-green { background: #10B981; }
-    .browser-url {
-      margin-left: 0.75rem;
-      background: #ffffff;
-      padding: 0.25rem 0.85rem;
-      border-radius: 0.5rem;
-      font-size: 0.75rem;
-      font-family: monospace;
-      color: var(--muted);
-      border: 1px solid #E5E7EB;
-      flex: 1;
-      max-width: 450px;
-    }
-    .browser-body {
-      padding: 1.75rem;
-      background: var(--soft);
-    }
-
-    /* ASCII Wireframe Frame */
-    pre.wireframe-code {
-      background: #082820;
-      color: #A7F3D0;
-      font-family: 'Consolas', 'Courier New', monospace;
-      font-size: 0.85rem;
-      line-height: 1.45;
-      padding: 1.5rem;
-      border-radius: 0.75rem;
-      overflow-x: auto;
-      border: 1px solid #0F3E31;
-    }
-
-    /* Table */
-    table.data-table {
+    /* Formal Table */
+    table.formal-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 1rem 0;
+      margin: 1.2rem 0;
+      font-size: 11pt;
     }
-    table.data-table th, table.data-table td {
-      padding: 0.85rem 1rem;
+    table.formal-table th, table.formal-table td {
+      border: 1px solid #9CA3AF;
+      padding: 0.6rem 0.75rem;
       text-align: left;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.9rem;
     }
-    table.data-table th {
-      background: var(--mint);
+    table.formal-table th {
+      background: #F3F4F6;
       color: var(--primary);
-      font-weight: 700;
-      font-family: 'Outfit', sans-serif;
+      font-weight: bold;
+      text-align: center;
     }
 
-    /* Tag Badges */
-    .tag {
-      display: inline-block;
-      padding: 0.2rem 0.6rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 700;
+    /* Code & Wireframe Box */
+    pre.code-box {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: #F9FAFB;
+      border: 1px solid #D1D5DB;
+      border-radius: 4px;
+      padding: 1rem;
+      font-size: 9.5pt;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 1rem 0;
+      color: #111827;
     }
-    .tag-green { background: #D1FAE5; color: #065F46; }
-    .tag-purple { background: #FAF5FF; color: #6B21A8; }
-    .tag-amber { background: #FEF3C7; color: #92400E; }
 
     /* Footer */
-    footer.page-footer {
-      text-align: center;
-      padding: 3rem 1rem 2rem;
-      color: var(--muted);
-      font-size: 0.875rem;
-      border-top: 1px solid var(--border);
-      margin-top: 4rem;
+    .doc-footer {
+      border-top: 1px solid #D1D5DB;
+      margin-top: 3rem;
+      padding-top: 1.2rem;
+      font-size: 10pt;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
     }
 
-    /* Print Stylesheet */
+    /* Print Setup */
     @media print {
-      .top-bar, .nav-tabs, .top-actions { display: none !important; }
-      .tab-pane { display: block !important; margin-bottom: 3rem; }
-      .container { max-width: 100% !important; padding: 0 !important; }
-      .hero-banner { break-inside: avoid; }
-      .spec-card { break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
+      .top-bar { display: none !important; }
+      body { background: #ffffff; font-size: 12pt; }
+      .doc-page { max-width: 100%; margin: 0; padding: 0; border: none; box-shadow: none; }
+      .figure-frame { break-inside: avoid; border: 1px solid #999; }
+      table.formal-table { break-inside: avoid; }
+      h2.section-heading { break-after: avoid; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Sticky Top Header -->
+  <!-- Top Action Bar -->
   <header class="top-bar">
-    <div class="brand">
-      <div>
-        <div class="brand-title">🌿 LƯỚT KHÓI CHẠM XANH</div>
-        <div class="brand-sub">Hồ Sơ Đặc Tả Thiết Kế UX/UI &amp; Kiến Trúc Hệ Thống (Master Spec)</div>
-      </div>
+    <div class="title-group">
+      <h1>LƯỚT KHÓI CHẠM XANH — BÁO CÁO ĐẶC TẢ THIẾT KẾ</h1>
+      <p>Nền Tảng Giao Thông Đô Thị Xanh TP. Hồ Chí Minh</p>
     </div>
-    <div class="top-actions">
-      <button class="btn btn-outline" onclick="window.print()">🖨️ In / Xuất PDF Báo Cáo</button>
-      <a href="https://luotkhoichamxanh.vercel.app" target="_blank" class="btn btn-primary">🌐 Mở Trang Web Live</a>
+    <div class="btn-group">
+      <button class="btn btn-print" onclick="window.print()">🖨️ In / Xuất File PDF</button>
+      <a href="https://luotkhoichamxanh.vercel.app" target="_blank" class="btn btn-live">🌐 Mở Trang Web Live</a>
     </div>
   </header>
 
-  <div class="container">
+  <!-- Document Sheet -->
+  <div class="doc-page">
     
-    <!-- Hero Banner -->
-    <div class="hero-banner">
-      <div class="hero-badge">Enterprise Product Specification Dossier • Version 2.0</div>
-      <h1 class="hero-title">ĐẶC TẢ THIẾT KẾ UX/UI, USER FLOWS &amp; KIẾN TRÚC GIAO DIỆN</h1>
-      <p class="hero-desc">
-        Hồ sơ tổng hợp trực quan chuẩn quốc tế dành cho Ban điều hành chiến dịch, Đối tác vận tải (Metro Tuyến 1, VinBus, Xanh SM) và Đội ngũ phát triển công nghệ <strong>Lướt Khói Chạm Xanh TP.HCM</strong>.
-      </p>
+    <!-- Title Header -->
+    <div class="doc-header">
+      <div class="doc-org">CHIẾN DỊCH GIAO THÔNG ĐÔ THỊ BỀN VỮNG TP. HỒ CHÍ MINH</div>
+      <h1 class="doc-title">HỒ SƠ ĐẶC TẢ THIẾT KẾ UX/UI, USER FLOW VÀ KIẾN TRÚC HỆ THỐNG</h1>
+      <div class="doc-sub">Dự án: Nền Tảng Di Chuyển Xanh &amp; Tích Lũy Điểm Thưởng "Lướt Khói Chạm Xanh"</div>
     </div>
 
-    <!-- Tab Navigation Rail -->
-    <nav class="nav-tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-usecase', this)">🗺️ 1. Use Case &amp; Luồng Người Dùng</button>
-      <button class="tab-btn" onclick="switchTab('tab-wireframes', this)">📐 2. Wireframe &amp; Bố Cục UI</button>
-      <button class="tab-btn" onclick="switchTab('tab-architecture', this)">⚙️ 3. Kiến Trúc 3 Tầng &amp; Thuật Toán</button>
-      <button class="tab-btn" onclick="switchTab('tab-design-system', this)">🎨 4. Design Tokens &amp; WCAG AA</button>
-    </nav>
+    <!-- 1. TỔNG QUAN -->
+    <h2 class="section-heading">1. TỔNG QUAN DỰ ÁN VÀ ĐỐI TƯỢNG SỬ DỤNG</h2>
+    <p>
+      Dự án <strong>"Lướt Khói Chạm Xanh"</strong> là nền tảng số hỗ trợ người dân và du khách tại TP. Hồ Chí Minh tiếp cận, tra cứu và sử dụng các phương tiện giao thông công cộng bền vững (bao gồm Tuyến Metro Số 1 Bến Thành - Suối Tiên và mạng lưới xe buýt điện VinBus). Hệ thống tích hợp cơ chế đổi điểm thưởng từ ảnh chụp vé thật, các cẩm nang trải nghiệm văn hóa và minigame tổng kết hành trình xanh.
+    </p>
 
-    <!-- TAB 1: USE CASE & USER FLOWS -->
-    <section id="tab-usecase" class="tab-pane active">
-      
-      <!-- 1.1 UML Use Case -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">1.1. Sơ Đồ Tổng Quan Use Case (UML Use Case Diagram)</h2>
-          <span class="tag tag-green">Chuẩn ISO/IEC UML 2.5</span>
-        </div>
-        <p>Đặc tả mối quan hệ tương tác giữa <strong>Hành Khách (Khách / Thành Viên Gen Z)</strong> và <strong>Quản Trị Viên (Admin)</strong> với 7 Use Case nghiệp vụ chính:</p>
-        
-        <div class="diagram-container">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;">
-  <defs>
-    <linearGradient id="gradHeader" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0F3E31" />
-      <stop offset="100%" stop-color="#10B981" />
-    </linearGradient>
-    <linearGradient id="gradUseCase" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#E6F7F0" />
-      <stop offset="100%" stop-color="#C5EFE0" />
-    </linearGradient>
-    <linearGradient id="gradAdmin" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#FAF5FF" />
-      <stop offset="100%" stop-color="#E9D5FF" />
-    </linearGradient>
-    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
-      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.12"/>
-    </filter>
-  </defs>
+    <!-- 2. USE CASE -->
+    <h2 class="section-heading">2. SƠ ĐỒ USE CASE VÀ BẢN ĐỒ HÀNH TRÌNH NGƯỜI DÙNG</h2>
+    <p>
+      Hệ thống phân định 2 tác nhân chính (Actors) gồm: <strong>Hành Khách (Khách tham quan / Thành viên Gen Z)</strong> và <strong>Quản Trị Viên (Admin)</strong>.
+    </p>
 
-  <!-- Title & Banner -->
-  <rect x="20" y="15" width="960" height="50" rx="12" fill="url(#gradHeader)" filter="url(#shadow)"/>
-  <text x="500" y="46" fill="#ffffff" font-size="18" font-weight="900" text-anchor="middle" letter-spacing="1">
-    SƠ ĐỒ USE CASE TỔNG THỂ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH (UML USE CASE DIAGRAM)
+    <div class="figure-frame">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <!-- Title -->
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="0.5">
+    HÌNH 1. SƠ ĐỒ USE CASE TỔNG THỂ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH (UML USE CASE)
   </text>
 
-  <!-- System Boundary Boundary Box -->
-  <rect x="240" y="80" width="520" height="570" rx="18" fill="#F8FAF9" stroke="#10B981" stroke-width="2" stroke-dasharray="6,4"/>
-  <text x="500" y="105" fill="#0F3E31" font-size="14" font-weight="800" text-anchor="middle">
-    HỆ THỐNG ỨNG DỤNG LƯỚT KHÓI CHẠM XANH (SYSTEM BOUNDARY)
+  <!-- Boundary -->
+  <rect x="230" y="75" width="500" height="525" rx="4" fill="#FAFCFB" stroke="#0F3E31" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="480" y="98" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">
+    PHẠM VI HỆ THỐNG LƯỚT KHÓI CHẠM XANH (SYSTEM BOUNDARY)
   </text>
 
-  <!-- ACTOR 1: NGƯỜI DÙNG / HÀNH KHÁCH (Left) -->
-  <g transform="translate(100, 240)">
-    <!-- Stick Figure -->
-    <circle cx="20" cy="15" r="14" fill="#0F3E31" stroke="#10B981" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="3"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="3"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="3"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="3"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="3"/>
-    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="800" text-anchor="middle">Hành Khách / Gen Z</text>
-    <text x="20" y="150" fill="#6B7280" font-size="11" font-weight="600" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <!-- ACTOR 1 -->
+  <g transform="translate(90, 220)">
+    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
+    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
+    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Hành Khách (Gen Z)</text>
+    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
   </g>
 
-  <!-- ACTOR 2: QUẢN TRỊ VIÊN / ADMIN (Right) -->
-  <g transform="translate(860, 240)">
-    <!-- Stick Figure -->
-    <circle cx="20" cy="15" r="14" fill="#7C3AED" stroke="#5B21B6" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#7C3AED" stroke-width="3"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#7C3AED" stroke-width="3"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#7C3AED" stroke-width="3"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#7C3AED" stroke-width="3"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#7C3AED" stroke-width="3"/>
-    <text x="20" y="135" fill="#7C3AED" font-size="13" font-weight="800" text-anchor="middle">Quản Trị Viên (Admin)</text>
-    <text x="20" y="150" fill="#6B7280" font-size="11" font-weight="600" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <!-- ACTOR 2 -->
+  <g transform="translate(830, 220)">
+    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
+    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
+    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Quản Trị Viên (Admin)</text>
+    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
   </g>
 
-  <!-- USE CASES (Ellipses) -->
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="150" rx="160" ry="26" fill="url(#gradUseCase)" stroke="#059669" stroke-width="1.5"/>
-    <text x="500" y="155" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">UC01: Tra cứu &amp; Tối ưu Lộ trình Xanh</text>
+  <!-- USE CASES -->
+  <g transform="translate(300, 120)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC01: Tra cứu &amp; Tối ưu Lộ trình Xanh</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="220" rx="160" ry="26" fill="url(#gradUseCase)" stroke="#059669" stroke-width="1.5"/>
-    <text x="500" y="225" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">UC02: Khám phá 21 Ga &amp; Mở khóa Cấp độ</text>
+  <g transform="translate(300, 185)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC02: Khám phá 21 Ga &amp; Mở khóa Cấp độ</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="290" rx="160" ry="26" fill="url(#gradUseCase)" stroke="#059669" stroke-width="1.5"/>
-    <text x="500" y="295" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">UC03: Tải ảnh vé &amp; Nhận dạng OCR Tích điểm</text>
+  <g transform="translate(300, 250)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC03: Quét Vé OCR &amp; Tích Điểm Xanh</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="360" rx="160" ry="26" fill="url(#gradUseCase)" stroke="#059669" stroke-width="1.5"/>
-    <text x="500" y="365" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">UC04: Đổi Voucher Xanh SM &amp; Đối tác</text>
+  <g transform="translate(300, 315)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC04: Đổi Voucher Xanh SM &amp; Quà Tặng</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="430" rx="160" ry="26" fill="url(#gradUseCase)" stroke="#059669" stroke-width="1.5"/>
-    <text x="500" y="435" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">UC05: Tạo Hóa đơn XanhWrap &amp; Quay số</text>
+  <g transform="translate(300, 380)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC05: Tạo Hóa Đơn XanhWrap &amp; Quay Số</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="510" rx="160" ry="26" fill="url(#gradAdmin)" stroke="#7C3AED" stroke-width="1.5"/>
-    <text x="500" y="515" fill="#5B21B6" font-size="12" font-weight="700" text-anchor="middle">UC06: Kiểm duyệt Vé Xanh &amp; Đối soát</text>
+  <g transform="translate(300, 450)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC06: Kiểm Duyệt Vé Xanh &amp; Đối Soát</text>
   </g>
 
-  <g filter="url(#shadow)">
-    <ellipse cx="500" cy="580" rx="160" ry="26" fill="url(#gradAdmin)" stroke="#7C3AED" stroke-width="1.5"/>
-    <text x="500" y="585" fill="#5B21B6" font-size="12" font-weight="700" text-anchor="middle">UC07: Giám sát Chỉ số Vận hành &amp; Audit Logs</text>
+  <g transform="translate(300, 515)">
+    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
+    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC07: Giám Sát Chỉ Số 937 Lượt &amp; Audit Logs</text>
   </g>
 
   <!-- Connectors -->
-  <line x1="140" y1="280" x2="340" y2="150" stroke="#059669" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="340" y2="220" stroke="#059669" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="340" y2="290" stroke="#059669" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="340" y2="360" stroke="#059669" stroke-width="1.5"/>
-  <line x1="140" y1="280" x2="340" y2="430" stroke="#059669" stroke-width="1.5"/>
+  <line x1="130" y1="260" x2="320" y2="140" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="130" y1="260" x2="320" y2="205" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="130" y1="260" x2="320" y2="270" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="130" y1="260" x2="320" y2="335" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="130" y1="260" x2="320" y2="400" stroke="#0F3E31" stroke-width="1.2"/>
 
-  <line x1="860" y1="280" x2="660" y2="360" stroke="#7C3AED" stroke-width="1.5"/>
-  <line x1="860" y1="280" x2="660" y2="510" stroke="#7C3AED" stroke-width="1.5"/>
-  <line x1="860" y1="280" x2="660" y2="580" stroke="#7C3AED" stroke-width="1.5"/>
+  <line x1="830" y1="260" x2="640" y2="335" stroke="#4C1D95" stroke-width="1.2"/>
+  <line x1="830" y1="260" x2="640" y2="470" stroke="#4C1D95" stroke-width="1.2"/>
+  <line x1="830" y1="260" x2="640" y2="535" stroke="#4C1D95" stroke-width="1.2"/>
 </svg>
-        </div>
-        <p style="font-size: 0.85rem; color: var(--muted); text-align: center;">
-          💡 <em>Biểu đồ được xây dựng bằng tiêu chuẩn Drawings Vector SVG. Có thể mở và kéo thả trực tiếp trên <a href="https://app.diagrams.net" target="_blank">app.diagrams.net</a>.</em>
-        </p>
-      </div>
+      <div class="figure-caption">Hình 1. Sơ đồ Use Case tổng thể nền tảng Lướt Khói Chạm Xanh</div>
+    </div>
 
-      <!-- 1.2 User Journey Maps -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">1.2. Bản Đồ Hành Trình Trải Nghiệm Khách Hàng (User Journey Map)</h2>
-          <span class="tag tag-purple">Agile Journey Scoring</span>
-        </div>
-        <p>Minh họa mức độ hài lòng theo từng bước tương tác của <strong>Gen Z Minh Anh (20 tuổi)</strong> từ bước lập lộ trình đến săn vé đổi quà:</p>
-        
-        <div class="diagram-container">
-          <div class="mermaid">
-journey
-    title Hành trình Sinh viên khám phá Metro Số 1 &amp; Đổi Voucher Xanh SM
-    section Tiếp cận &amp; Tìm đường
-      Mở web Lướt Khói Chạm Xanh trên điện thoại: 5: Sinh viên
-      Nhập điểm xuất phát KTX ĐHQG đến Ga Bến Thành: 5: Sinh viên
-      Xem lộ trình tối ưu kết hợp Tuyến Bus 19 &amp; Metro 1: 5: Hệ thống
-      Nhận gợi ý tránh mưa và biểu giá chuẩn 12.000 VNĐ: 5: Hệ thống
-    section Trải nghiệm thực tế
-      Đi Metro Số 1 ngắm cảnh qua cầu Sài Gòn: 5: Sinh viên
-      Chụp ảnh check-in &amp; lưu lại vé Metro: 4: Sinh viên
-    section Tích điểm &amp; Đổi thưởng
-      Tải ảnh vé lên hệ thống Lướt Khói Chạm Xanh: 5: Sinh viên
-      Hệ thống quét OCR xác thực hợp lệ +10 Điểm Xanh: 5: Hệ thống
-      Tích đủ 50 điểm đổi ngay Voucher Xanh SM 30.000đ: 5: Sinh viên
-      Nhận mã ưu đãi tức thì &amp; lưu vào ví cá nhân: 5: Hệ thống
-    section Lan tỏa &amp; Minigame
-      Tạo thẻ tổng kết XanhWrap danh hiệu 'Thần Xe Bus Điện': 5: Sinh viên
-      Chia sẻ lên story Facebook kèm hashtag #LuotKhoiChamXanh: 5: Sinh viên
-          </div>
-        </div>
-      </div>
+    <h3 class="sub-heading">2.1. Bản Đồ Hành Trình Trải Nghiệm (User Journey Map)</h3>
+    <p>
+      Quy trình trải nghiệm 4 giai đoạn của sinh viên/Gen Z từ bước tra cứu lộ trình, trải nghiệm thực tế trên tuyến Metro 1, tích lũy điểm thưởng OCR đến bước lan tỏa thông điệp trên mạng xã hội:
+    </p>
 
-      <!-- 1.3 State Transitions -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">1.3. Máy Chuyển Trạng Thái Duyệt Vé &amp; Vòng Đời Voucher</h2>
-          <span class="tag tag-amber">State Machine</span>
-        </div>
-        
-        <div class="diagram-container">
-          <div class="mermaid">
-stateDiagram-v2
-    [*] --> Uploaded: Người dùng tải ảnh chụp vé lên
-    state Uploaded {
-        [*] --> OCRProcessing: Khởi chạy nhận diện ký tự quang học
-        OCRProcessing --> PreVerified: Đọc được số vé, ngày đi &amp; tuyến
-        OCRProcessing --> ManualReviewRequired: Ảnh mờ / góc chụp nghiêng
-    }
-    PreVerified --> PendingModeration: Tạo bản ghi Ticket (Status: 'pending')
-    ManualReviewRequired --> PendingModeration: Đưa vào hàng đợi Admin
-    state PendingModeration {
-        [*] --> InReviewQueue: Hiển thị trên Admin Console
-    }
-    PendingModeration --> Verified: Admin phê duyệt / Tự động đối soát
-    PendingModeration --> Rejected: Ảnh trùng lặp / Không hợp lệ
-    state Verified {
-        [*] --> CreditPoints: +10 Điểm Xanh vào PointsLedger
-        CreditPoints --> UpdatePassbook: Cập nhật thẻ VIP &amp; Thẻ vé số hóa
-    }
-    Verified --> [*]
-    Rejected --> [*]
-          </div>
-        </div>
-      </div>
-    </section>
+    <div class="figure-frame">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
+    HÌNH 2. BẢN ĐỒ HÀNH TRÌNH TRẢI NGHIỆM NGƯỜI DÙNG (USER JOURNEY MAP — GEN Z)
+  </text>
 
-    <!-- TAB 2: WIREFRAMES & UI BLUEPRINTS -->
-    <section id="tab-wireframes" class="tab-pane">
-      
-      <!-- 2.1 Station Experience 2-Column Portal Modal -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">2.1. Cấu Trúc Khung Nhìn Modal 2 Cột Độc Quyền (React Portal Scheme)</h2>
-          <span class="tag tag-green">Zero-Clipping UX Architecture</span>
-        </div>
-        <p>Giải quyết triệt để vấn đề bị tràn/cắt xén nội dung khi xem 21 địa điểm khám phá ga Metro Tuyến 1 bằng cơ chế <strong>React Portal gắn trực tiếp vào <code>document.body</code></strong>:</p>
+  <!-- 4 PHASES -->
+  <g transform="translate(30, 75)">
+    <!-- Phase 1 -->
+    <rect x="0" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="0" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="105" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
+    
+    <text x="15" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="25" y="85" fill="#333" font-size="11.5">- Mở web trên điện thoại</text>
+    <text x="25" y="105" fill="#333" font-size="11.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
+    <text x="25" y="125" fill="#333" font-size="11.5">- Xem gợi ý tránh mưa</text>
 
-        <div class="browser-mockup">
-          <div class="browser-header">
-            <span class="dot dot-red"></span>
-            <span class="dot dot-yellow"></span>
-            <span class="dot dot-green"></span>
-            <span class="browser-url">https://luotkhoichamxanh.vercel.app/#stations ➔ [Modal Portal Overlay]</span>
-          </div>
-          <div class="browser-body">
-            <pre class="wireframe-code">
+    <text x="15" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="25" y="180" fill="#0F3E31" font-size="11.5">- Biểu giá chuẩn: 12.000đ</text>
+    <text x="25" y="200" fill="#0F3E31" font-size="11.5">- Tiết kiệm 450g CO₂</text>
+
+    <text x="105" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 2 -->
+    <rect x="230" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="230" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="335" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. Trải Nghiệm Đi Tàu</text>
+    
+    <text x="245" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="255" y="85" fill="#333" font-size="11.5">- Lên tàu Metro Tuyến 1</text>
+    <text x="255" y="105" fill="#333" font-size="11.5">- Check-in ga Tân Cảng, Ba Son</text>
+    <text x="255" y="125" fill="#333" font-size="11.5">- Chụp ảnh lưu cuống vé</text>
+
+    <text x="245" y="160" fill="#111" font-size="12" font-weight="bold">• Cảm nhận:</text>
+    <text x="255" y="180" fill="#0F3E31" font-size="11.5">- Tàu êm, máy lạnh mát</text>
+    <text x="255" y="200" fill="#0F3E31" font-size="11.5">- Ga sạch đẹp văn minh</text>
+
+    <text x="335" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 3 -->
+    <rect x="460" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="460" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="565" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
+    
+    <text x="475" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="485" y="85" fill="#333" font-size="11.5">- Tải ảnh chụp vé lên web</text>
+    <text x="485" y="105" fill="#333" font-size="11.5">- OCR duyệt tự động</text>
+    <text x="485" y="125" fill="#333" font-size="11.5">- Đổi Voucher Xanh SM 30k</text>
+
+    <text x="475" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="485" y="180" fill="#0F3E31" font-size="11.5">- Cộng 10 Điểm Xanh</text>
+    <text x="485" y="200" fill="#0F3E31" font-size="11.5">- Nhận mã barcode ngay</text>
+
+    <text x="565" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+
+    <!-- Phase 4 -->
+    <rect x="690" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
+    <rect x="690" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
+    <text x="795" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">4. XanhWrap &amp; Lan Tỏa</text>
+    
+    <text x="705" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
+    <text x="715" y="85" fill="#333" font-size="11.5">- Tạo thẻ tổng kết XanhWrap</text>
+    <text x="715" y="105" fill="#333" font-size="11.5">- Xuất ảnh poster cá nhân hóa</text>
+    <text x="715" y="125" fill="#333" font-size="11.5">- Chia sẻ Story Facebook</text>
+
+    <text x="705" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
+    <text x="715" y="180" fill="#0F3E31" font-size="11.5">- Hashtag #LuotKhoiChamXanh</text>
+    <text x="715" y="200" fill="#0F3E31" font-size="11.5">- Lan tỏa thông điệp xanh</text>
+
+    <text x="795" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+  </g>
+</svg>
+      <div class="figure-caption">Hình 2. Bản đồ hành trình trải nghiệm 4 giai đoạn của người dùng</div>
+    </div>
+
+    <h3 class="sub-heading">2.2. Vòng Đời Kiểm Duyệt Vé &amp; Tích Điểm (State Machine)</h3>
+    <p>
+      Máy chuyển trạng thái xử lý ảnh chụp vé thông qua nhận dạng ký tự quang học (OCR), đối soát tính hợp lệ và ghi nhận vào sổ cái điểm thưởng bất biến (PointsLedger):
+    </p>
+
+    <div class="figure-frame">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
+    HÌNH 3. SƠ ĐỒ MÁY CHUYỂN TRẠNG THÁI KIỂM DUYỆT VÉ &amp; TÍCH ĐIỂM (STATE MACHINE)
+  </text>
+
+  <!-- Start -->
+  <circle cx="60" cy="150" r="14" fill="#0F3E31"/>
+  <line x1="74" y1="150" x2="140" y2="150" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="140,150 132,145 132,155" fill="#0F3E31"/>
+
+  <!-- State 1: Uploaded -->
+  <rect x="140" y="120" width="160" height="60" rx="6" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="220" y="145" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">1. Đã Tải Lên</text>
+  <text x="220" y="165" fill="#555555" font-size="11" text-anchor="middle">(Tesseract OCR Quét)</text>
+
+  <line x1="300" y1="150" x2="380" y2="150" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="380,150 372,145 372,155" fill="#0F3E31"/>
+
+  <!-- State 2: Pending Moderation -->
+  <rect x="380" y="120" width="190" height="60" rx="6" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="475" y="145" fill="#92400E" font-size="13" font-weight="bold" text-anchor="middle">2. Chờ Kiểm Duyệt</text>
+  <text x="475" y="165" fill="#555555" font-size="11" text-anchor="middle">(Đối soát số vé &amp; ngày đi)</text>
+
+  <!-- Transition Valid -->
+  <line x1="570" y1="135" x2="660" y2="105" stroke="#059669" stroke-width="2"/>
+  <polygon points="660,105 650,104 654,113" fill="#059669"/>
+  <text x="615" y="112" fill="#059669" font-size="11" font-weight="bold">Hợp lệ</text>
+
+  <!-- State 3: Verified -->
+  <rect x="660" y="75" width="190" height="60" rx="6" fill="#D1E7DD" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="755" y="100" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">3. Đã Phê Duyệt (Verified)</text>
+  <text x="755" y="120" fill="#047857" font-size="11" font-weight="bold">+10 Điểm Sổ Cái PointsLedger</text>
+
+  <!-- Transition Invalid -->
+  <line x1="570" y1="165" x2="660" y2="195" stroke="#DC2626" stroke-width="2"/>
+  <polygon points="660,195 654,187 650,196" fill="#DC2626"/>
+  <text x="615" y="195" fill="#DC2626" font-size="11" font-weight="bold">Trùng/Sai</text>
+
+  <!-- State 4: Rejected -->
+  <rect x="660" y="165" width="190" height="60" rx="6" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+  <text x="755" y="190" fill="#991B1B" font-size="13" font-weight="bold" text-anchor="middle">4. Từ Chối (Rejected)</text>
+  <text x="755" y="210" fill="#7F1D1D" font-size="11" text-anchor="middle">Thông báo lý do từ chối</text>
+
+  <!-- End Circles -->
+  <circle cx="895" cy="105" r="14" fill="#0F3E31"/>
+  <circle cx="895" cy="105" r="10" fill="#ffffff"/>
+  <line x1="850" y1="105" x2="881" y2="105" stroke="#0F3E31" stroke-width="2"/>
+
+  <circle cx="895" cy="195" r="14" fill="#DC2626"/>
+  <circle cx="895" cy="195" r="10" fill="#ffffff"/>
+  <line x1="850" y1="195" x2="881" y2="195" stroke="#DC2626" stroke-width="2"/>
+</svg>
+      <div class="figure-caption">Hình 3. Sơ đồ máy chuyển trạng thái duyệt vé và tích điểm xanh</div>
+    </div>
+
+    <!-- 3. KIẾN TRÚC -->
+    <h2 class="section-heading">3. KIẾN TRÚC HỆ THỐNG VÀ THUẬT TOÁN ĐIỀU HƯỚNG</h2>
+    
+    <h3 class="sub-heading">3.1. Sơ Đồ Kiến Trúc 3 Tầng (3-Tier Cloud Architecture)</h3>
+    <p>
+      Hệ thống được thiết kế theo mô hình phân tầng chặt chẽ nhằm đảm bảo tính toàn vẹn dữ liệu và hiệu năng phản hồi cao:
+    </p>
+
+    <div class="figure-frame">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
+    HÌNH 4. SƠ ĐỒ KIẾN TRÚC HỆ THỐNG 3 TẦNG (3-TIER ARCHITECTURE)
+  </text>
+
+  <!-- TIER 1 -->
+  <g transform="translate(35, 75)">
+    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+    <rect width="270" height="35" rx="4" fill="#1E293B"/>
+    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. TẦNG TRÌNH DIỄN (CLIENT)</text>
+
+    <rect x="15" y="50" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="75" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Next.js 14 App Router</text>
+    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">React 18 SSR &amp; SEO Metadata</text>
+
+    <rect x="15" y="125" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="150" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">React Portal Modal Engine</text>
+    <text x="135" y="170" fill="#64748B" font-size="11" text-anchor="middle">Gắn document.body chống cắt xén</text>
+
+    <rect x="15" y="205" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="230" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Framer Motion &amp; Canvas</text>
+    <text x="135" y="250" fill="#64748B" font-size="11" text-anchor="middle">Xuất poster XanhWrap HD</text>
+
+    <rect x="15" y="280" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="305" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Design Tokens &amp; WCAG AA</text>
+    <text x="135" y="325" fill="#64748B" font-size="11" text-anchor="middle">Bảng màu tiêu chuẩn xanh TP.HCM</text>
+
+    <rect x="15" y="355" width="240" height="105" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="135" y="380" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Triển Khai: VERCEL EDGE</text>
+    <text x="135" y="405" fill="#047857" font-size="11.5" font-weight="bold" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
+    <text x="135" y="430" fill="#555555" font-size="10.5" text-anchor="middle">Tự động CI/CD từ GitHub main</text>
+  </g>
+
+  <!-- TIER 2 -->
+  <g transform="translate(345, 75)">
+    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+    <rect width="270" height="35" rx="4" fill="#0F3E31"/>
+    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. TẦNG DỊCH VỤ (API SERVER)</text>
+
+    <rect x="15" y="50" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="75" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Express.js &amp; TypeScript API</text>
+    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">RESTful Endpoints &amp; Rate Limiting</text>
+
+    <rect x="15" y="125" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="150" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Thuật toán Dijkstra &amp; Tariff</text>
+    <text x="135" y="170" fill="#64748B" font-size="11" text-anchor="middle">Gộp chặng &amp; Biểu giá 7k-12k-16k-20k</text>
+
+    <rect x="15" y="205" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="230" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Tesseract OCR &amp; Vision</text>
+    <text x="135" y="250" fill="#64748B" font-size="11" text-anchor="middle">Đối soát vé Metro &amp; Bus tự động</text>
+
+    <rect x="15" y="280" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="305" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Argon2 Password &amp; JWT</text>
+    <text x="135" y="325" fill="#64748B" font-size="11" text-anchor="middle">Bảo mật đa tầng &amp; Phân quyền</text>
+
+    <rect x="15" y="355" width="240" height="105" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+    <text x="135" y="380" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Triển Khai: RENDER CLOUD</text>
+    <text x="135" y="405" fill="#047857" font-size="11.5" font-weight="bold" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
+    <text x="135" y="430" fill="#555555" font-size="10.5" text-anchor="middle">Container Node.js 20 LTS</text>
+  </g>
+
+  <!-- TIER 3 -->
+  <g transform="translate(655, 75)">
+    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
+    <rect width="270" height="35" rx="4" fill="#92400E"/>
+    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. TẦNG DỮ LIỆU (DATABASE)</text>
+
+    <rect x="15" y="50" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="75" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">PostgreSQL Database</text>
+    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">14 Ga Metro • 21 Địa Điểm • 132 Wraps</text>
+
+    <rect x="15" y="130" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="155" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">PointsLedger (Sổ Cái)</text>
+    <text x="135" y="175" fill="#64748B" font-size="11" text-anchor="middle">45 Lượt đổi Xanh SM • 45 Vé duyệt</text>
+
+    <rect x="15" y="210" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="235" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">VisitorLog &amp; Analytics</text>
+    <text x="135" y="255" fill="#64748B" font-size="11" text-anchor="middle">937 Lượt truy cập Landing Page</text>
+
+    <rect x="15" y="290" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="315" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">Voucher &amp; Code Vault</text>
+    <text x="135" y="335" fill="#64748B" font-size="11" text-anchor="middle">Kho mã quà tặng Xanh SM, Highlands</text>
+
+    <rect x="15" y="370" width="240" height="90" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="135" y="395" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">AuditLog (Kiểm Toán)</text>
+    <text x="135" y="415" fill="#64748B" font-size="11" text-anchor="middle">Nhật ký truy vết bảo mật Admin/Mod</text>
+  </g>
+
+  <!-- Connectors -->
+  <line x1="305" y1="315" x2="345" y2="315" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="345,315 337,310 337,320" fill="#0F3E31"/>
+
+  <line x1="615" y1="315" x2="655" y2="315" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="655,315 647,310 647,320" fill="#0F3E31"/>
+</svg>
+      <div class="figure-caption">Hình 4. Kiến trúc hệ thống 3 tầng phân tách độc lập</div>
+    </div>
+
+    <h3 class="sub-heading">3.2. Thuật Toán Lập Lộ Trình &amp; Tính Giá Vé Gộp</h3>
+    <p>
+      Hệ thống sử dụng thuật toán Dijkstra trên đồ thị đa phương thức kết hợp trọng số thời tiết. Quy trình tính biểu giá gộp chính thức đảm bảo không tính trùng vé ga lẻ:
+    </p>
+
+    <div class="figure-frame">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
+    HÌNH 5. LƯU ĐỒ THUẬT TOÁN DIJKSTRA &amp; TÍNH GIÁ VÉ GỘP CHUẨN (DIJKSTRA FLOWCHART)
+  </text>
+
+  <!-- START -->
+  <rect x="380" y="80" width="200" height="40" rx="20" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="480" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi / Đến</text>
+
+  <line x1="480" y1="120" x2="480" y2="145" stroke="#0F3E31" stroke-width="1.5"/>
+  <polygon points="480,145 475,138 485,138" fill="#0F3E31"/>
+
+  <!-- STEP 1 -->
+  <rect x="340" y="145" width="280" height="50" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+  <text x="480" y="167" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Nạp Đồ Thị 14 Ga Metro 1 &amp; Tuyến Bus</text>
+  <text x="480" y="185" fill="#555555" font-size="11" text-anchor="middle">Trọng số: Khoảng cách, Thời gian, Phương thức</text>
+
+  <line x1="480" y1="195" x2="480" y2="220" stroke="#0F3E31" stroke-width="1.5"/>
+  <polygon points="480,220 475,213 485,213" fill="#0F3E31"/>
+
+  <!-- DECISION WEATHER -->
+  <polygon points="480,220 600,260 480,300 360,260" fill="#FEF9E7" stroke="#B45309" stroke-width="1.2"/>
+  <text x="480" y="255" fill="#92400E" font-size="11.5" font-weight="bold" text-anchor="middle">Context Thời Tiết?</text>
+  <text x="480" y="272" fill="#92400E" font-size="10.5" text-anchor="middle">(Mưa / Nắng nóng / Ban đêm)</text>
+
+  <line x1="600" y1="260" x2="710" y2="260" stroke="#B45309" stroke-width="1.2"/>
+  <polygon points="710,260 703,256 703,264" fill="#B45309"/>
+  <rect x="710" y="235" width="220" height="50" rx="4" fill="#FFFDF5" stroke="#B45309" stroke-width="1"/>
+  <text x="820" y="255" fill="#92400E" font-size="11" font-weight="bold" text-anchor="middle">Tăng trọng số Đi bộ (+50%)</text>
+  <text x="820" y="273" fill="#92400E" font-size="10" text-anchor="middle">Ưu tiên đi ngầm Metro 1 mát mẻ</text>
+
+  <line x1="820" y1="285" x2="820" y2="330" stroke="#B45309" stroke-width="1.2"/>
+  <line x1="820" y1="330" x2="480" y2="330" stroke="#B45309" stroke-width="1.2"/>
+
+  <line x1="480" y1="300" x2="480" y2="345" stroke="#0F3E31" stroke-width="1.5"/>
+  <polygon points="480,345 475,338 485,338" fill="#0F3E31"/>
+
+  <!-- STEP 2 -->
+  <rect x="340" y="345" width="280" height="45" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
+  <text x="480" y="365" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Dijkstra: Tìm 3 Đường Đi Ngắn Nhất</text>
+  <text x="480" y="380" fill="#555555" font-size="10.5" text-anchor="middle">Tối ưu thời gian &amp; số lần chuyển tuyến</text>
+
+  <line x1="480" y1="390" x2="480" y2="415" stroke="#0F3E31" stroke-width="1.5"/>
+  <polygon points="480,415 475,408 485,408" fill="#0F3E31"/>
+
+  <!-- STEP 3 -->
+  <rect x="270" y="415" width="420" height="65" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="480" y="437" fill="#A7F3D0" font-size="12.5" font-weight="bold" text-anchor="middle">consolidateLegs() &amp; calculateMetroFare()</text>
+  <text x="480" y="455" fill="#ffffff" font-size="11" text-anchor="middle">Gộp chặng liên tục ➔ Áp biểu giá chính thức TP.HCM:</text>
+  <text x="480" y="470" fill="#A7F3D0" font-size="10" font-weight="bold" text-anchor="middle">≤5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | &gt;15km: 20.000đ | Bus: 7.000đ</text>
+
+  <line x1="480" y1="480" x2="480" y2="505" stroke="#0F3E31" stroke-width="1.5"/>
+  <polygon points="480,505 475,498 485,498" fill="#0F3E31"/>
+
+  <!-- END -->
+  <rect x="360" y="505" width="240" height="35" rx="17.5" fill="#0F3E31" stroke="#082820" stroke-width="1.2"/>
+  <text x="480" y="527" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">XUẤT KẾT QUẢ: 3 Thẻ Lộ Trình Tối Ưu</text>
+</svg>
+      <div class="figure-caption">Hình 5. Lưu đồ thuật toán Dijkstra và tính giá vé chuẩn TP.HCM</div>
+    </div>
+
+    <!-- 4. WIREFRAME -->
+    <h2 class="section-heading">4. BẢN VẼ WIREFRAME VÀ BỐ CỤC GIAO DIỆN (UI WIREFRAMES)</h2>
+    <p>
+      Để khắc phục triệt để lỗi tràn nội dung khi xem chi tiết 21 địa điểm khám phá ga Metro Tuyến 1, giao diện được cấu trúc theo dạng <strong>Modal 2 Cột chuẩn công nghệ React Portal</strong>:
+    </p>
+
+    <pre class="code-box">
 +=============================================================================================================+
-|  🏛️ CẨM NANG ĐỊA ĐIỂM: CHỢ BẾN THÀNH (MODAL 2 CỘT RENDER QUA REACT PORTAL TRỰC TIẾP VÀO document.body)     |
+|  CẨM NANG ĐỊA ĐIỂM: CHỢ BẾN THÀNH (MODAL 2 CỘT RENDER QUA REACT PORTAL TRỰC TIẾP VÀO document.body)        |
 +-------------------------------------------------+-----------------------------------------------------------+
 |  CỘT TRÁI (THÔNG TIN TỔNG QUAN &amp; LIÊN HỆ)        |  CỘT PHẢI (BÀI VIẾT HƯỚNG DẪN &amp; LỘ TRÌNH ĐI LẠI)          |
 |  ┌───────────────────────────────────────────┐  |  GIỚI THIỆU CHUNG:                                        |
@@ -644,398 +689,68 @@ stateDiagram-v2
 |                                                 |  Đi Metro Tuyến 1 xuống Ga Bến Thành, theo lối ra         |
 |                                                 |  Cổng 1 để bước ngay vào sảnh trước của chợ.              |
 +-------------------------------------------------+-----------------------------------------------------------+
-            </pre>
-          </div>
-        </div>
-      </div>
+    </pre>
 
-      <!-- 2.2 Admin Console Wireframe -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">2.2. Khung Bố Cục Bảng Điều Khiển Quản Trị (Admin Console)</h2>
-          <span class="tag tag-purple">Operational Realtime Specs</span>
-        </div>
+    <!-- 5. DESIGN SYSTEM -->
+    <h2 class="section-heading">5. HỆ THỐNG MÃ MÀU TOKENS VÀ CHUẨN TRỢ NĂNG WCAG 2.1 AA</h2>
+    <p>
+      Các mã màu chủ đạo được thiết lập dựa trên bản sắc thiên nhiên và hệ thống giao thông công cộng TP.HCM, đảm bảo độ tương phản cao cho người dùng:
+    </p>
 
-        <div class="browser-mockup">
-          <div class="browser-header">
-            <span class="dot dot-red"></span>
-            <span class="dot dot-yellow"></span>
-            <span class="dot dot-green"></span>
-            <span class="browser-url">https://luotkhoichamxanh.vercel.app/admin (Admin Role Protected)</span>
-          </div>
-          <div class="browser-body">
-            <pre class="wireframe-code">
-+-------------------------------------------------------------------------------------------------------------+
-|  🛡️ BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN — LƯỚT KHÓI CHẠM XANH                                                     |
-|  [ 📊 Tổng quan ] [ 🎫 Kiểm duyệt vé ] [ 🎁 Quản lý Voucher ] [ 📝 Quản lý Địa điểm ] [ 📈 Thống kê Truy cập ]|
-+-------------------------------------------------------------------------------------------------------------+
-|  4 THẺ CHỈ SỐ HOẠT ĐỘNG CHÍNH (THEO DÕI THỜI GIAN THỰC):                                                    |
-|  ┌─────────────────────────┐ ┌─────────────────────────┐ ┌─────────────────────────┐ ┌────────────────────┐|
-|  | 🌐 TRUY CẬP LANDING     | | ✨ XANHWRAP ĐÃ TẠO      | | 🚗 VOUCHER XANH SM ĐÃ ĐỔI| | 🎫 VÉ XANH (DUYỆT/TỔNG|
-|  |                         | |                         | |                         | |                      |
-|  |         937 lượt        | |         132 bài         | |          45 mã          | |        45 / 48       |
-|  | (Tự động tăng khi có IP)| | (Tích hợp quay số trúng)| | (Đồng hành taxi điện)   | | (45 vé đã đổi quà)   |
-|  └─────────────────────────┘ └─────────────────────────┘ └─────────────────────────┘ └────────────────────┘|
-+-------------------------------------------------------------------------------------------------------------+
-            </pre>
-          </div>
-        </div>
-      </div>
-    </section>
+    <table class="formal-table">
+      <thead>
+        <tr>
+          <th>Tên Biến Token</th>
+          <th>Mã Màu (HEX)</th>
+          <th>Mẫu Màu</th>
+          <th>Tỷ Lệ Tương Phản</th>
+          <th>Chuẩn WCAG</th>
+          <th>Mục Đích Sử Dụng</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--eco-primary</code></td>
+          <td>#0F3E31</td>
+          <td style="background:#0F3E31;width:35px;"></td>
+          <td style="text-align:center;"><strong>11.4 : 1</strong></td>
+          <td style="text-align:center;">AAA</td>
+          <td>Màu tiêu đề chính, Thanh điều hướng, Thẻ nhận diện</td>
+        </tr>
+        <tr>
+          <td><code>--eco-accentGreen</code></td>
+          <td>#10B981</td>
+          <td style="background:#10B981;width:35px;"></td>
+          <td style="text-align:center;"><strong>4.8 : 1</strong></td>
+          <td style="text-align:center;">AA</td>
+          <td>Nút bấm tương tác chính (Call to Action), Icon nổi bật</td>
+        </tr>
+        <tr>
+          <td><code>--eco-mint</code></td>
+          <td>#E6F7F0</td>
+          <td style="background:#E6F7F0;border:1px solid #10B981;width:35px;"></td>
+          <td style="text-align:center;"><strong>12.8 : 1</strong></td>
+          <td style="text-align:center;">AAA</td>
+          <td>Nền khung thông tin, Viền thẻ Card</td>
+        </tr>
+        <tr>
+          <td><code>--badge-upcoming</code></td>
+          <td>#7C3AED</td>
+          <td style="background:#7C3AED;width:35px;"></td>
+          <td style="text-align:center;"><strong>6.2 : 1</strong></td>
+          <td style="text-align:center;">AA</td>
+          <td>Huy hiệu mở khóa cấp độ Gamification</td>
+        </tr>
+      </tbody>
+    </table>
 
-    <!-- TAB 3: ARCHITECTURE & ALGORITHMS -->
-    <section id="tab-architecture" class="tab-pane">
-      
-      <!-- 3.1 3-Tier Architecture -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">3.1. Sơ Đồ Kiến Trúc Hệ Thống 3 Tầng (3-Tier Architecture)</h2>
-          <span class="tag tag-green">Cloud Native Architecture</span>
-        </div>
-        <p>Phân tách 3 tầng độc lập, bảo mật cao giữa Frontend (Next.js 14 / Vercel), Backend (Node.js API / Render) và Cơ sở dữ liệu (PostgreSQL / PointsLedger):</p>
-        
-        <div class="diagram-container">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;">
-  <defs>
-    <linearGradient id="gradHeaderArch" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0F3E31" />
-      <stop offset="100%" stop-color="#059669" />
-    </linearGradient>
-    <linearGradient id="gradClient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#EFF6FF" />
-      <stop offset="100%" stop-color="#DBEAFE" />
-    </linearGradient>
-    <linearGradient id="gradAPI" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#ECFDF5" />
-      <stop offset="100%" stop-color="#D1FAE5" />
-    </linearGradient>
-    <linearGradient id="gradDB" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#FEF3C7" />
-      <stop offset="100%" stop-color="#FDE68A" />
-    </linearGradient>
-    <filter id="shadowArch" x="-5%" y="-5%" width="110%" height="110%">
-      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-opacity="0.1"/>
-    </filter>
-  </defs>
-
-  <rect x="20" y="15" width="960" height="50" rx="12" fill="url(#gradHeaderArch)" filter="url(#shadowArch)"/>
-  <text x="500" y="46" fill="#ffffff" font-size="18" font-weight="900" text-anchor="middle" letter-spacing="1">
-    SƠ ĐỒ KIẾN TRÚC HỆ THỐNG 3 TẦNG (3-TIER ARCHITECTURE DIAGRAM) — LƯỚT KHÓI CHẠM XANH
-  </text>
-
-  <!-- TIER 1 -->
-  <g transform="translate(40, 85)" filter="url(#shadowArch)">
-    <rect width="280" height="560" rx="16" fill="url(#gradClient)" stroke="#3B82F6" stroke-width="2"/>
-    <rect width="280" height="40" rx="16" fill="#3B82F6"/>
-    <text x="140" y="26" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle">1. TẦNG TRÌNH DIỄN (FRONTEND)</text>
-    
-    <rect x="15" y="55" width="250" height="60" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="80" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">Next.js 14 App Router (React 18)</text>
-    <text x="140" y="100" fill="#6B7280" font-size="10" text-anchor="middle">Server Components &amp; SEO SSR</text>
-
-    <rect x="15" y="130" width="250" height="65" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="155" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">React Portal Windowing Engine</text>
-    <text x="140" y="175" fill="#6B7280" font-size="10" text-anchor="middle">document.body Modal Anti-clipping</text>
-
-    <rect x="15" y="210" width="250" height="65" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="235" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">Framer Motion &amp; Canvas Renderer</text>
-    <text x="140" y="255" fill="#6B7280" font-size="10" text-anchor="middle">Xuất ảnh Poster XanhWrap HD</text>
-
-    <rect x="15" y="290" width="250" height="65" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="315" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">Tailwind CSS &amp; Design Tokens</text>
-    <text x="140" y="335" fill="#6B7280" font-size="10" text-anchor="middle">WCAG 2.1 AA Palette Tokens</text>
-
-    <rect x="15" y="370" width="250" height="65" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="395" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">Audio Web API Sound FX</text>
-    <text x="140" y="415" fill="#6B7280" font-size="10" text-anchor="middle">Âm thanh chuông Metro Line 1</text>
-
-    <rect x="15" y="450" width="250" height="85" rx="10" fill="#ffffff" stroke="#93C5FD" stroke-width="1.5"/>
-    <text x="140" y="475" fill="#1E3A8A" font-size="12" font-weight="700" text-anchor="middle">Deployment: VERCEL EDGE</text>
-    <text x="140" y="495" fill="#10B981" font-size="11" font-weight="700" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
-    <text x="140" y="515" fill="#6B7280" font-size="10" text-anchor="middle">Tự động CI/CD từ GitHub main</text>
-  </g>
-
-  <!-- TIER 2 -->
-  <g transform="translate(360, 85)" filter="url(#shadowArch)">
-    <rect width="280" height="560" rx="16" fill="url(#gradAPI)" stroke="#10B981" stroke-width="2"/>
-    <rect width="280" height="40" rx="16" fill="#10B981"/>
-    <text x="140" y="26" fill="#ffffff" font-size="14" font-weight="800" text-anchor="middle">2. TẦNG DỊCH VỤ (API SERVER)</text>
-
-    <rect x="15" y="55" width="250" height="65" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="80" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Express.js &amp; TypeScript API</text>
-    <text x="140" y="100" fill="#6B7280" font-size="10" text-anchor="middle">RESTful Endpoints + Rate Limiting</text>
-
-    <rect x="15" y="135" width="250" height="65" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="160" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Thuật toán Dijkstra &amp; Tariff Engine</text>
-    <text x="140" y="180" fill="#6B7280" font-size="10" text-anchor="middle">Gộp chặng &amp; Biểu giá 7k-12k-16k-20k</text>
-
-    <rect x="15" y="215" width="250" height="65" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="240" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Tesseract OCR &amp; Vision Parsing</text>
-    <text x="140" y="260" fill="#6B7280" font-size="10" text-anchor="middle">Đối soát vé Metro &amp; Buýt tự động</text>
-
-    <rect x="15" y="295" width="250" height="65" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="320" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Argon2 Password &amp; JWT Auth</text>
-    <text x="140" y="340" fill="#6B7280" font-size="10" text-anchor="middle">Bảo mật đa tầng &amp; Phân quyền Role</text>
-
-    <rect x="15" y="375" width="250" height="65" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="400" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Idempotency &amp; Points Ledger</text>
-    <text x="140" y="420" fill="#6B7280" font-size="10" text-anchor="middle">Chống trừ trùng lặp điểm đổi voucher</text>
-
-    <rect x="15" y="455" width="250" height="80" rx="10" fill="#ffffff" stroke="#A7F3D0" stroke-width="1.5"/>
-    <text x="140" y="480" fill="#065F46" font-size="12" font-weight="700" text-anchor="middle">Deployment: RENDER CLOUD</text>
-    <text x="140" y="500" fill="#10B981" font-size="11" font-weight="700" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
-    <text x="140" y="520" fill="#6B7280" font-size="10" text-anchor="middle">Container Node.js 20 LTS</text>
-  </g>
-
-  <!-- TIER 3 -->
-  <g transform="translate(680, 85)" filter="url(#shadowArch)">
-    <rect width="280" height="560" rx="16" fill="url(#gradDB)" stroke="#F59E0B" stroke-width="2"/>
-    <rect width="280" height="40" rx="16" fill="#F59E0B"/>
-    <text x="140" y="26" fill="#78350F" font-size="14" font-weight="800" text-anchor="middle">3. TẦNG DỮ LIỆU (DATABASE)</text>
-
-    <rect x="15" y="55" width="250" height="90" rx="10" fill="#ffffff" stroke="#FDE68A" stroke-width="1.5"/>
-    <text x="140" y="80" fill="#92400E" font-size="12" font-weight="700" text-anchor="middle">PostgreSQL Database</text>
-    <text x="140" y="100" fill="#6B7280" font-size="10" text-anchor="middle">Prisma ORM Client Models</text>
-    <text x="140" y="120" fill="#10B981" font-size="10" font-weight="600" text-anchor="middle">14 Ga Metro • 21 Địa Điểm • 132 Wraps</text>
-
-    <rect x="15" y="160" width="250" height="85" rx="10" fill="#ffffff" stroke="#FDE68A" stroke-width="1.5"/>
-    <text x="140" y="185" fill="#92400E" font-size="12" font-weight="700" text-anchor="middle">PointsLedger (Sổ Cái Bất Biến)</text>
-    <text x="140" y="205" fill="#6B7280" font-size="10" text-anchor="middle">Ghi nhận delta cộng/trừ điểm minh bạch</text>
-    <text x="140" y="225" fill="#6B7280" font-size="10" text-anchor="middle">45 Lượt đổi Xanh SM • 45 Vé duyệt</text>
-
-    <rect x="15" y="260" width="250" height="80" rx="10" fill="#ffffff" stroke="#FDE68A" stroke-width="1.5"/>
-    <text x="140" y="285" fill="#92400E" font-size="12" font-weight="700" text-anchor="middle">VisitorLog &amp; Analytics Store</text>
-    <text x="140" y="305" fill="#6B7280" font-size="10" text-anchor="middle">937 Lượt truy cập Landing Page</text>
-    <text x="140" y="325" fill="#6B7280" font-size="10" text-anchor="middle">Giám sát IP Hash &amp; User Agent</text>
-
-    <rect x="15" y="355" width="250" height="75" rx="10" fill="#ffffff" stroke="#FDE68A" stroke-width="1.5"/>
-    <text x="140" y="380" fill="#92400E" font-size="12" font-weight="700" text-anchor="middle">Voucher &amp; Code Vault</text>
-    <text x="140" y="400" fill="#6B7280" font-size="10" text-anchor="middle">Kho mã quà tặng Xanh SM, Highlands...</text>
-    <text x="140" y="420" fill="#6B7280" font-size="10" text-anchor="middle">Mã hóa đối soát thời gian thực</text>
-
-    <rect x="15" y="445" width="250" height="90" rx="10" fill="#ffffff" stroke="#FDE68A" stroke-width="1.5"/>
-    <text x="140" y="470" fill="#92400E" font-size="12" font-weight="700" text-anchor="middle">AuditLog (Nhật Ký Kiểm Toán)</text>
-    <text x="140" y="490" fill="#6B7280" font-size="10" text-anchor="middle">Vết thao tác bảo mật Admin/Mod</text>
-    <text x="140" y="510" fill="#6B7280" font-size="10" text-anchor="middle">Truy vết IP, thời gian &amp; payload</text>
-  </g>
-
-  <!-- Connectors -->
-  <line x1="320" y1="365" x2="360" y2="365" stroke="#0F3E31" stroke-width="3" stroke-dasharray="4,2"/>
-  <polygon points="360,365 352,360 352,370" fill="#0F3E31"/>
-
-  <line x1="640" y1="365" x2="680" y2="365" stroke="#0F3E31" stroke-width="3" stroke-dasharray="4,2"/>
-  <polygon points="680,365 672,360 672,370" fill="#0F3E31"/>
-</svg>
-        </div>
-      </div>
-
-      <!-- 3.2 Dijkstra Tariff Flow -->
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">3.2. Lưu Đồ Thuật Toán Dijkstra &amp; Biểu Giá Gộp Chuẩn Metro Tuyến 1</h2>
-          <span class="tag tag-amber">Graph Optimization Algorithm</span>
-        </div>
-        <p>Quy trình gộp chặng liên tục và tính đúng biểu giá Metro Tuyến 1 (7k - 12k - 16k - 20k) và xe buýt điện (7k cố định):</p>
-        
-        <div class="diagram-container">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Segoe UI', Arial, sans-serif;">
-  <defs>
-    <linearGradient id="gradFlow" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0F3E31" />
-      <stop offset="100%" stop-color="#10B981" />
-    </linearGradient>
-    <filter id="shadowFlow" x="-5%" y="-5%" width="110%" height="110%">
-      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-opacity="0.1"/>
-    </filter>
-  </defs>
-
-  <rect x="20" y="15" width="960" height="50" rx="12" fill="url(#gradFlow)" filter="url(#shadowFlow)"/>
-  <text x="500" y="46" fill="#ffffff" font-size="18" font-weight="900" text-anchor="middle" letter-spacing="1">
-    LƯU ĐỒ THUẬT TOÁN LẬP LỘ TRÌNH &amp; TÍNH GIÁ VÉ GỘP CHUẨN (DIJKSTRA TARIFF FLOWCHART)
-  </text>
-
-  <!-- START -->
-  <rect x="400" y="85" width="200" height="45" rx="22.5" fill="#10B981" stroke="#047857" stroke-width="2" filter="url(#shadowFlow)"/>
-  <text x="500" y="113" fill="#ffffff" font-size="13" font-weight="800" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi / Đến</text>
-
-  <line x1="500" y1="130" x2="500" y2="155" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,155 495,147 505,147" fill="#0F3E31"/>
-
-  <!-- STEP 1: LOAD GRAPH -->
-  <rect x="360" y="155" width="280" height="50" rx="10" fill="#E6F7F0" stroke="#10B981" stroke-width="1.5" filter="url(#shadowFlow)"/>
-  <text x="500" y="177" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">Nạp Đồ Thị: 14 Ga Metro 1 &amp; Tuyến Bus</text>
-  <text x="500" y="193" fill="#6B7280" font-size="10" text-anchor="middle">RouteEdges: Khoảng cách, Thời gian, Phương thức</text>
-
-  <line x1="500" y1="205" x2="500" y2="230" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,230 495,222 505,222" fill="#0F3E31"/>
-
-  <!-- DECISION 1: WEATHER CONTEXT -->
-  <polygon points="500,230 630,275 500,320 370,275" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1.5" filter="url(#shadowFlow)"/>
-  <text x="500" y="270" fill="#92400E" font-size="11" font-weight="700" text-anchor="middle">Context Thời Tiết?</text>
-  <text x="500" y="286" fill="#92400E" font-size="10" text-anchor="middle">(Mưa / Nắng nóng / Ban đêm)</text>
-
-  <!-- WEATHER BRANCH -->
-  <line x1="630" y1="275" x2="740" y2="275" stroke="#F59E0B" stroke-width="1.5"/>
-  <polygon points="740,275 732,270 732,280" fill="#F59E0B"/>
-  <rect x="740" y="250" width="220" height="50" rx="8" fill="#FFFBEB" stroke="#F59E0B" stroke-width="1"/>
-  <text x="850" y="270" fill="#92400E" font-size="11" font-weight="700" text-anchor="middle">Tăng trọng số Đi bộ (+50%)</text>
-  <text x="850" y="288" fill="#92400E" font-size="10" text-anchor="middle">Ưu tiên hầm ngầm Metro 1 mát mẻ</text>
-
-  <line x1="850" y1="300" x2="850" y2="350" stroke="#F59E0B" stroke-width="1.5"/>
-  <line x1="850" y1="350" x2="500" y2="350" stroke="#F59E0B" stroke-width="1.5"/>
-
-  <line x1="500" y1="320" x2="500" y2="365" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,365 495,357 505,357" fill="#0F3E31"/>
-
-  <!-- STEP 2: DIJKSTRA SEARCH -->
-  <rect x="360" y="365" width="280" height="50" rx="10" fill="#E6F7F0" stroke="#10B981" stroke-width="1.5" filter="url(#shadowFlow)"/>
-  <text x="500" y="387" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">Dijkstra: Tìm 3 Đường Đi Ngắn Nhất</text>
-  <text x="500" y="403" fill="#6B7280" font-size="10" text-anchor="middle">Tính tổng thời gian &amp; số lần chuyển tuyến</text>
-
-  <line x1="500" y1="415" x2="500" y2="440" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,440 495,432 505,432" fill="#0F3E31"/>
-
-  <!-- STEP 3: CONSOLIDATE LEGS & TARIFF CALC -->
-  <rect x="300" y="440" width="400" height="75" rx="12" fill="#0F3E31" stroke="#10B981" stroke-width="2" filter="url(#shadowFlow)"/>
-  <text x="500" y="465" fill="#10B981" font-size="13" font-weight="800" text-anchor="middle">consolidateLegs() &amp; calculateMetroFare()</text>
-  <text x="500" y="485" fill="#ffffff" font-size="11" text-anchor="middle">Gộp chặng liên tục ➔ Áp biểu giá chính thức TP.HCM:</text>
-  <text x="500" y="502" fill="#A7F3D0" font-size="10" font-weight="700" text-anchor="middle">≤5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | &gt;15km: 20.000đ</text>
-
-  <line x1="500" y1="515" x2="500" y2="545" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,545 495,537 505,537" fill="#0F3E31"/>
-
-  <!-- OUTPUT: RETURN TOP 3 ROUTES -->
-  <rect x="340" y="545" width="320" height="50" rx="10" fill="#E6F7F0" stroke="#059669" stroke-width="1.5" filter="url(#shadowFlow)"/>
-  <text x="500" y="567" fill="#0F3E31" font-size="12" font-weight="700" text-anchor="middle">XUẤT KẾT QUẢ: 3 Thẻ Lộ Trình Hoàn Chỉnh</text>
-  <text x="500" y="583" fill="#6B7280" font-size="10" text-anchor="middle">Kèm lượng CO₂ giảm &amp; Hóa đơn thời gian xanh</text>
-
-  <line x1="500" y1="595" x2="500" y2="620" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="500,620 495,612 505,612" fill="#0F3E31"/>
-
-  <!-- END -->
-  <rect x="420" y="620" width="160" height="35" rx="17.5" fill="#10B981" stroke="#047857" stroke-width="1.5"/>
-  <text x="500" y="642" fill="#ffffff" font-size="12" font-weight="800" text-anchor="middle">KẾT THÚC</text>
-</svg>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 4: DESIGN SYSTEM & TOKENS -->
-    <section id="tab-design-system" class="tab-pane">
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">4.1. Bảng Mã Màu Design Tokens &amp; Kiểm Định Độ Tương Phản WCAG 2.1 AA</h2>
-          <span class="tag tag-green">WCAG 2.1 AA Certified</span>
-        </div>
-        
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Biến Token</th>
-              <th>Mã Màu Hex</th>
-              <th>Mẫu Màu</th>
-              <th>Tương Phản</th>
-              <th>Chuẩn Đạt</th>
-              <th>Ứng Dụng Thực Tế</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><code>--eco-primary</code></td>
-              <td><code>#0F3E31</code></td>
-              <td><span style="display:inline-block;width:24px;height:24px;border-radius:6px;background:#0F3E31;"></span></td>
-              <td><strong>11.4 : 1</strong></td>
-              <td><span class="tag tag-green">AAA</span></td>
-              <td>Tiêu đề chính, Header, Nút điều hướng</td>
-            </tr>
-            <tr>
-              <td><code>--eco-accentGreen</code></td>
-              <td><code>#10B981</code></td>
-              <td><span style="display:inline-block;width:24px;height:24px;border-radius:6px;background:#10B981;"></span></td>
-              <td><strong>4.8 : 1</strong></td>
-              <td><span class="tag tag-green">AA</span></td>
-              <td>Nút bấm chính CTA, Huy hiệu thành công</td>
-            </tr>
-            <tr>
-              <td><code>--eco-mint</code></td>
-              <td><code>#E6F7F0</code></td>
-              <td><span style="display:inline-block;width:24px;height:24px;border-radius:6px;background:#E6F7F0;border:1px solid #10B981;"></span></td>
-              <td><strong>12.8 : 1</strong></td>
-              <td><span class="tag tag-green">AAA</span></td>
-              <td>Nền thẻ thông tin, Viền thẻ Card</td>
-            </tr>
-            <tr>
-              <td><code>--badge-upcoming</code></td>
-              <td><code>#7C3AED</code></td>
-              <td><span style="display:inline-block;width:24px;height:24px;border-radius:6px;background:#7C3AED;"></span></td>
-              <td><strong>6.2 : 1</strong></td>
-              <td><span class="tag tag-purple">AA</span></td>
-              <td>Huy hiệu 🔒 SẮP MỞ KHÓA (CẤP SAU)</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div class="spec-card">
-        <div class="spec-card-header">
-          <h2 class="spec-card-title">4.2. Hệ Thống Kiểu Chữ (Typography Matrix)</h2>
-          <span class="tag tag-purple">Google Fonts Hierarchy</span>
-        </div>
-        <p>Sự kết hợp giữa <strong>Outfit (Đậm nét hiện đại, nhận diện thương hiệu)</strong> và <strong>Inter (Tối ưu khả năng đọc trên màn hình điện thoại)</strong>:</p>
-        
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Cấp Bậc (Hierarchy)</th>
-              <th>Font Family</th>
-              <th>Weight</th>
-              <th>Size / Line-height</th>
-              <th>Ví Dụ Minh Họa</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Hero Title</td>
-              <td><code>Outfit</code></td>
-              <td>900 Black</td>
-              <td>2.5rem / 1.15</td>
-              <td style="font-family:'Outfit';font-weight:900;font-size:1.4rem;color:#0F3E31;">LƯỚT KHÓI CHẠM XANH</td>
-            </tr>
-            <tr>
-              <td>Section Header</td>
-              <td><code>Outfit</code></td>
-              <td>800 Bold</td>
-              <td>1.5rem / 1.25</td>
-              <td style="font-family:'Outfit';font-weight:800;font-size:1.15rem;color:#0F3E31;">KHÁM PHÁ GA METRO SỐ 1</td>
-            </tr>
-            <tr>
-              <td>Body Text</td>
-              <td><code>Inter</code></td>
-              <td>400 Regular</td>
-              <td>0.875rem / 1.6</td>
-              <td style="font-family:'Inter';font-size:0.875rem;">Trải nghiệm di chuyển văn minh không phát thải...</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="page-footer">
-      <p><strong>© 2026 LƯỚT KHÓI CHẠM XANH.</strong> Chiến dịch di chuyển giao thông đô thị xanh TP. Hồ Chí Minh.</p>
-      <p style="margin-top: 0.5rem; font-size: 0.8rem;">Bộ tài liệu đặc tả thiết kế UX/UI &amp; Kiến trúc hệ thống phiên bản Enterprise 2.0.</p>
-    </footer>
+    <!-- Doc Footer -->
+    <div class="doc-footer">
+      <span>Dự án: Lướt Khói Chạm Xanh TP.HCM</span>
+      <span>Hồ sơ Tiêu chuẩn Kỹ thuật &amp; Thiết kế UX/UI (Bản quyền 2026)</span>
+    </div>
 
   </div>
 
-  <script>
-    function switchTab(tabId, btn) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-      
-      document.getElementById(tabId).classList.add('active');
-      btn.classList.add('active');
-    }
-  </script>
 </body>
 </html>
