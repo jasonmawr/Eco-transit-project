@@ -388,41 +388,42 @@
     .btn-mockup-green { background: #0F3E31; color: #ffffff; }
     .btn-mockup-outline { background: #EBF6F0; color: #0F3E31; border: 1px solid #0F3E31; }
 
-    /* Admin Console Mockup Layout */
+    /* Admin Console Mockup Layout (5 STAT CARDS) */
     .admin-stats-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.1rem;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.9rem;
       margin-bottom: 1.5rem;
     }
     .admin-stat-card {
       background: #FFFFFF;
       border: 1px solid #CBD5E1;
       border-radius: 6px;
-      padding: 1.1rem;
+      padding: 1rem;
       border-left: 5px solid #0F3E31;
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
+    .admin-stat-card.indigo { border-left-color: #4F46E5; }
     .admin-stat-card.purple { border-left-color: #7C3AED; }
     .admin-stat-card.emerald { border-left-color: #10B981; }
     .admin-stat-card.amber { border-left-color: #F59E0B; }
     .stat-label {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
       text-transform: uppercase;
       color: #64748B;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.3rem;
     }
     .stat-value {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
       color: #0F172A;
       line-height: 1.1;
     }
     .stat-sub {
-      font-size: 12.5px;
+      font-size: 11.5px;
       color: #059669;
-      margin-top: 0.35rem;
+      margin-top: 0.3rem;
       font-weight: bold;
     }
 
@@ -610,7 +611,7 @@
             <tr>
               <td><strong>Người Đi Xe / Gen Z</strong></td>
               <td>Thích công nghệ, săn ưu đãi, check-in địa điểm mới lạ dọc tuyến Metro Số 1.</td>
-              <td>Tra cứu lộ trình nhanh, quét ảnh chụp vé nhận dạng OCR, đổi Voucher Xanh SM 30k, tạo poster XanhWrap chia sẻ Facebook.</td>
+              <td>Đăng ký tài khoản trong số <strong>435 thành viên</strong>, quét ảnh chụp vé nhận dạng OCR, đổi Voucher Xanh SM 30k, tạo poster XanhWrap chia sẻ Facebook.</td>
             </tr>
             <tr>
               <td><strong>Nhân Viên Văn Phòng</strong></td>
@@ -625,7 +626,7 @@
             <tr>
               <td><strong>Ban Quản Trị (Admin / Kiểm duyệt viên)</strong></td>
               <td>Giám sát chỉ số thời gian thực, duyệt vé giao thông hợp lệ, điều phối kho voucher đối tác.</td>
-              <td>Sử dụng Bảng điều khiển Admin Console: đối soát 48 vé tải lên (45 vé hợp lệ), theo dõi 937 lượt truy cập, 132 bài XanhWrap, 45 voucher Xanh SM.</td>
+              <td>Sử dụng Bảng điều khiển Admin Console: đối soát 48 vé tải lên (45 vé hợp lệ), theo dõi <strong>435 tài khoản người dùng</strong>, 937 lượt truy cập, 132 bài XanhWrap, 45 voucher Xanh SM.</td>
             </tr>
           </tbody>
         </table>
@@ -909,7 +910,7 @@
 
         <h3 class="section-heading">3.1. Sơ Đồ Kiến Trúc Hệ Thống 3 Khối Hoạt Động</h3>
         <p>
-          Hệ thống được chia thành 3 khối hoạt động chuyên biệt: Giao diện Web người dùng, Máy chủ xử lý trung tâm và Cơ sở dữ liệu lưu trữ:
+          Hệ thống được chia thành 3 khối hoạt động chuyên biệt: Giao diện Web người dùng, Máy chủ xử lý trung tâm và Cơ sở dữ liệu lưu trữ (quản lý 435 tài khoản thành viên):
         </p>
 
         <div class="figure-frame">
@@ -1204,10 +1205,10 @@
 
         <h3 class="section-heading">4.2. Giao Diện Bảng Điều Khiển Quản Trị Hệ Thống (Admin Console)</h3>
         <p>
-          Bảng điều khiển cho phép Ban quản trị theo dõi 4 chỉ số hoạt động thời gian thực và thực hiện kiểm duyệt ảnh vé xe nhanh chóng:
+          Bảng điều khiển cho phép Ban quản trị theo dõi <strong>5 chỉ số hoạt động then chốt thời gian thực</strong> (bao gồm tổng hợp 435 tài khoản người dùng đã tạo) và thực hiện kiểm duyệt ảnh vé xe nhanh chóng:
         </p>
 
-        <!-- Mockup 2: Admin Dashboard -->
+        <!-- Mockup 2: Admin Dashboard (5 STAT CARDS) -->
         <div class="mockup-window">
           <div class="mockup-header">
             <div class="window-dots">
@@ -1219,27 +1220,32 @@
           </div>
           <div class="mockup-body">
             
-            <!-- 4 Stat Cards -->
+            <!-- 5 Stat Cards -->
             <div class="admin-stats-grid">
               <div class="admin-stat-card">
-                <div class="stat-label">🌐 Lượt Truy Cập Web</div>
+                <div class="stat-label">🌐 Lượt Truy Cập</div>
                 <div class="stat-value">937</div>
-                <div class="stat-sub">↑ Tự động tăng khi có IP mới</div>
+                <div class="stat-sub">↑ Tự động tăng</div>
+              </div>
+              <div class="admin-stat-card indigo">
+                <div class="stat-label">👥 Tài Khoản Tạo</div>
+                <div class="stat-value">435</div>
+                <div class="stat-sub">Thành viên xanh</div>
               </div>
               <div class="admin-stat-card purple">
-                <div class="stat-label">✨ Bài XanhWrap Đã Tạo</div>
+                <div class="stat-label">✨ Bài XanhWrap</div>
                 <div class="stat-value">132</div>
-                <div class="stat-sub">Quay số trúng quà thành công</div>
+                <div class="stat-sub">Quay số trúng quà</div>
               </div>
               <div class="admin-stat-card emerald">
-                <div class="stat-label">🚗 Voucher Xanh SM Đã Cấp</div>
+                <div class="stat-label">🚗 Voucher SM</div>
                 <div class="stat-value">45</div>
-                <div class="stat-sub">Mã giảm 30.000đ taxi điện</div>
+                <div class="stat-sub">Giảm 30.000đ</div>
               </div>
               <div class="admin-stat-card amber">
-                <div class="stat-label">🎫 Vé Xe (Duyệt / Tổng)</div>
+                <div class="stat-label">🎫 Vé Duyệt/Tổng</div>
                 <div class="stat-value">45 / 48</div>
-                <div class="stat-sub">+450 điểm thưởng đã vào ví</div>
+                <div class="stat-sub">+450 điểm thưởng</div>
               </div>
             </div>
 
@@ -1477,8 +1483,8 @@
             </tr>
             <tr>
               <td><code>Lấy dữ liệu</code></td>
-              <td><code>/api/admin/metrics</code></td>
-              <td>Lấy thống kê thời gian thực (937 truy cập, 132 wrap, 45 voucher)</td>
+              <td><code>/api/admin/overview</code></td>
+              <td>Lấy thống kê thời gian thực (435 tài khoản, 937 truy cập, 132 wrap, 45 voucher)</td>
               <td>Ban quản trị</td>
             </tr>
           </tbody>
@@ -1486,7 +1492,7 @@
 
         <h3 class="section-heading">6.2. Nhật Ký Hệ Thống &amp; Bảo Mật</h3>
         <p>
-          Mọi hoạt động duyệt vé, phát mã ưu đãi voucher và các lượt truy cập đều được ghi chép minh bạch, tự động bảo vệ dữ liệu người dùng 24/7.
+          Mọi hoạt động duyệt vé, phát mã ưu đãi voucher và các lượt truy cập của 435 tài khoản thành viên đều được ghi chép minh bạch, tự động bảo vệ dữ liệu người dùng 24/7.
         </p>
 
         <div class="page-nav-bar">

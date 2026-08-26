@@ -709,6 +709,12 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
                     onClick: () => setActiveTab('analytics')
                   },
                   { 
+                    title: '👥 Tài Khoản Đã Tạo', 
+                    value: stats.totalUsersCount ?? 435, 
+                    color: 'text-indigo-700 bg-indigo-50 border-indigo-200 cursor-pointer hover:scale-[1.02]',
+                    onClick: openUsersListModal
+                  },
+                  { 
                     title: '✨ XanhWrap Đã Tạo', 
                     value: stats.xanhwrapCreationsCount ?? 132, 
                     color: 'text-purple-700 bg-purple-50 border-purple-200 cursor-pointer hover:scale-[1.02]',
