@@ -70,6 +70,9 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: '4qTpHgUcHb62lzq7bQgHyRrBb0IEmJrRY',
+  },
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
