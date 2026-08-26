@@ -1,58 +1,59 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 580" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="970" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="500" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
     HÌNH 5. LƯU ĐỒ TÌM ĐƯỜNG ĐI THÔNG MINH &amp; TÍNH ĐÚNG GIÁ VÉ METRO
   </text>
 
   <!-- START -->
-  <rect x="360" y="75" width="240" height="45" rx="22.5" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
-  <text x="480" y="103" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi &amp; Đến</text>
+  <rect x="380" y="75" width="240" height="45" rx="22.5" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="500" y="103" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi &amp; Đến</text>
 
-  <line x1="480" y1="120" x2="480" y2="148" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="480,148 474,140 486,140" fill="#0F3E31"/>
+  <line x1="500" y1="120" x2="500" y2="148" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="500,148 494,140 506,140" fill="#0F3E31"/>
 
   <!-- STEP 1 -->
-  <rect x="310" y="148" width="340" height="55" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
-  <text x="480" y="172" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">1. Nạp Bản Đồ 14 Ga Metro Số 1 &amp; Tuyến Xe Buýt</text>
-  <text x="480" y="193" fill="#555555" font-size="13" text-anchor="middle">(Thông tin khoảng cách, thời gian và trạm trung chuyển)</text>
+  <rect x="320" y="148" width="360" height="55" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="500" y="172" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">1. Nạp Bản Đồ 14 Ga Metro Số 1 &amp; Tuyến Xe Buýt</text>
+  <text x="500" y="193" fill="#555555" font-size="13" text-anchor="middle">(Thông tin khoảng cách, thời gian và trạm trung chuyển)</text>
 
-  <line x1="480" y1="203" x2="480" y2="232" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="480,232 474,224 486,224" fill="#0F3E31"/>
+  <line x1="500" y1="203" x2="500" y2="232" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="500,232 494,224 506,224" fill="#0F3E31"/>
 
   <!-- DECISION WEATHER -->
-  <polygon points="480,232 620,277 480,322 340,277" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
-  <text x="480" y="271" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Điều Kiện Thời Tiết?</text>
-  <text x="480" y="291" fill="#92400E" font-size="13" text-anchor="middle">(Mưa to / Nắng gắt / Ban đêm)</text>
+  <polygon points="500,232 640,277 500,322 360,277" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="500" y="271" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Điều Kiện Thời Tiết?</text>
+  <text x="500" y="291" fill="#92400E" font-size="13" text-anchor="middle">(Mưa to / Nắng gắt / Ban đêm)</text>
 
-  <line x1="620" y1="277" x2="715" y2="277" stroke="#B45309" stroke-width="1.5"/>
-  <polygon points="715,277 706,272 706,282" fill="#B45309"/>
-  <rect x="715" y="248" width="225" height="58" rx="4" fill="#FFFDF5" stroke="#B45309" stroke-width="1.2"/>
-  <text x="827" y="272" fill="#92400E" font-size="13.5" font-weight="bold" text-anchor="middle">Ưu Tiên Tuyến Đi Ngầm</text>
-  <text x="827" y="292" fill="#92400E" font-size="12.5" text-anchor="middle">Tránh nắng mưa, mát mẻ, an toàn</text>
+  <!-- Side branch -->
+  <line x1="640" y1="277" x2="735" y2="277" stroke="#B45309" stroke-width="1.5"/>
+  <polygon points="735,277 726,272 726,282" fill="#B45309"/>
+  <rect x="735" y="248" width="235" height="58" rx="4" fill="#FFFDF5" stroke="#B45309" stroke-width="1.2"/>
+  <text x="852" y="272" fill="#92400E" font-size="13.5" font-weight="bold" text-anchor="middle">Ưu Tiên Tuyến Đi Ngầm</text>
+  <text x="852" y="292" fill="#92400E" font-size="12.5" text-anchor="middle">Tránh nắng mưa, mát mẻ, an toàn</text>
 
-  <line x1="827" y1="306" x2="827" y2="355" stroke="#B45309" stroke-width="1.5"/>
-  <line x1="827" y1="355" x2="480" y2="355" stroke="#B45309" stroke-width="1.5"/>
+  <line x1="852" y1="306" x2="852" y2="355" stroke="#B45309" stroke-width="1.5"/>
+  <line x1="852" y1="355" x2="500" y2="355" stroke="#B45309" stroke-width="1.5"/>
 
-  <line x1="480" y1="322" x2="480" y2="370" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="480,370 474,362 486,362" fill="#0F3E31"/>
+  <line x1="500" y1="322" x2="500" y2="370" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="500,370 494,362 506,362" fill="#0F3E31"/>
 
   <!-- STEP 2 -->
-  <rect x="310" y="370" width="340" height="50" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
-  <text x="480" y="393" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">2. Tìm 3 Phương Án Đi Lại Tốt Nhất</text>
-  <text x="480" y="411" fill="#555555" font-size="12.5" text-anchor="middle">Nhanh nhất • Ít đổi tuyến nhất • Tiết kiệm nhất</text>
+  <rect x="320" y="370" width="360" height="50" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="500" y="393" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">2. Tìm 3 Phương Án Đi Lại Tốt Nhất</text>
+  <text x="500" y="411" fill="#555555" font-size="12.5" text-anchor="middle">Nhanh nhất • Ít đổi tuyến nhất • Tiết kiệm nhất</text>
 
-  <line x1="480" y1="420" x2="480" y2="446" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="480,446 474,438 486,438" fill="#0F3E31"/>
+  <line x1="500" y1="420" x2="500" y2="446" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="500,446 494,438 506,438" fill="#0F3E31"/>
 
   <!-- STEP 3 -->
-  <rect x="230" y="446" width="500" height="68" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
-  <text x="480" y="471" fill="#A7F3D0" font-size="15" font-weight="bold" text-anchor="middle">3. Tự Động Gộp Chặng &amp; Áp Biểu Giá Chuẩn TP.HCM</text>
-  <text x="480" y="497" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Dưới 5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | Trên 15km: 20.000đ</text>
+  <rect x="240" y="446" width="520" height="68" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="500" y="471" fill="#A7F3D0" font-size="15" font-weight="bold" text-anchor="middle">3. Tự Động Gộp Chặng &amp; Áp Biểu Giá Chuẩn TP.HCM</text>
+  <text x="500" y="497" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Dưới 5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | Trên 15km: 20.000đ</text>
 
-  <line x1="480" y1="514" x2="480" y2="538" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="480,538 474,530 486,530" fill="#0F3E31"/>
+  <line x1="500" y1="514" x2="500" y2="538" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="500,538 494,530 506,530" fill="#0F3E31"/>
 
   <!-- END -->
-  <rect x="330" y="538" width="300" height="38" rx="19" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
-  <text x="480" y="562" fill="#ffffff" font-size="14.5" font-weight="bold" text-anchor="middle">XUẤT KẾT QUẢ CHO NGƯỜI DÙNG XEM</text>
+  <rect x="350" y="538" width="300" height="38" rx="19" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="500" y="562" fill="#ffffff" font-size="14.5" font-weight="bold" text-anchor="middle">XUẤT KẾT QUẢ CHO NGƯỜI DÙNG XEM</text>
 </svg>

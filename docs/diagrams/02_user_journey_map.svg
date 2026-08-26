@@ -1,73 +1,73 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 390" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="970" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="500" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
     HÌNH 2. BẢN ĐỒ TRẢI NGHIỆM CỦA NGƯỜI DÙNG (USER JOURNEY MAP — GEN Z)
   </text>
 
   <!-- 4 PHASES -->
-  <g transform="translate(25, 70)">
+  <g transform="translate(20, 70)">
     <!-- Phase 1 -->
-    <rect x="0" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
-    <rect x="0" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
-    <text x="107" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
+    <rect x="0" y="0" width="225" height="305" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="0" y="0" width="225" height="42" rx="6" fill="#0F3E31"/>
+    <text x="112" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
     
     <text x="15" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
-    <text x="25" y="95" fill="#333" font-size="13.5">- Mở web trên điện thoại</text>
-    <text x="25" y="118" fill="#333" font-size="13.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
-    <text x="25" y="141" fill="#333" font-size="13.5">- Xem gợi ý đường đi tránh mưa</text>
+    <text x="22" y="95" fill="#333" font-size="13.5">- Mở web trên điện thoại</text>
+    <text x="22" y="118" fill="#333" font-size="13.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
+    <text x="22" y="141" fill="#333" font-size="13.5">- Xem gợi ý đường đi tránh mưa</text>
 
     <text x="15" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
-    <text x="25" y="205" fill="#0F3E31" font-size="13.5">- Giá vé chính xác: 12.000đ</text>
-    <text x="25" y="228" fill="#0F3E31" font-size="13.5">- Giảm 450g khói bụi CO₂</text>
+    <text x="22" y="205" fill="#0F3E31" font-size="13.5">- Giá vé chính xác: 12.000đ</text>
+    <text x="22" y="228" fill="#0F3E31" font-size="13.5">- Giảm 450g khói bụi CO₂</text>
 
-    <text x="107" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
+    <text x="112" y="278" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 2 -->
-    <rect x="230" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
-    <rect x="230" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
-    <text x="337" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. Đi Tàu Thực Tế</text>
+    <rect x="245" y="0" width="225" height="305" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="245" y="0" width="225" height="42" rx="6" fill="#0F3E31"/>
+    <text x="357" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. Đi Tàu Thực Tế</text>
     
-    <text x="245" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
-    <text x="255" y="95" fill="#333" font-size="13.5">- Lên tàu Metro Tuyến 1</text>
-    <text x="255" y="118" fill="#333" font-size="13.5">- Ngắm cảnh qua cầu Sài Gòn</text>
-    <text x="255" y="141" fill="#333" font-size="13.5">- Chụp lại vé xe làm kỷ niệm</text>
+    <text x="260" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="267" y="95" fill="#333" font-size="13.5">- Lên tàu Metro Tuyến 1</text>
+    <text x="267" y="118" fill="#333" font-size="13.5">- Ngắm cảnh qua cầu Sài Gòn</text>
+    <text x="267" y="141" fill="#333" font-size="13.5">- Chụp lại vé xe làm kỷ niệm</text>
 
-    <text x="245" y="180" fill="#111" font-size="14" font-weight="bold">• Cảm nhận:</text>
-    <text x="255" y="205" fill="#0F3E31" font-size="13.5">- Tàu chạy êm, mát mẻ</text>
-    <text x="255" y="228" fill="#0F3E31" font-size="13.5">- Ga hiện đại, sạch sẽ</text>
+    <text x="260" y="180" fill="#111" font-size="14" font-weight="bold">• Cảm nhận:</text>
+    <text x="267" y="205" fill="#0F3E31" font-size="13.5">- Tàu chạy êm, mát mẻ</text>
+    <text x="267" y="228" fill="#0F3E31" font-size="13.5">- Ga hiện đại, sạch sẽ</text>
 
-    <text x="337" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
+    <text x="357" y="278" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 3 -->
-    <rect x="460" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
-    <rect x="460" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
-    <text x="567" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
+    <rect x="490" y="0" width="225" height="305" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="490" y="0" width="225" height="42" rx="6" fill="#0F3E31"/>
+    <text x="602" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
     
-    <text x="475" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
-    <text x="485" y="95" fill="#333" font-size="13.5">- Tải ảnh vé lên hệ thống</text>
-    <text x="485" y="118" fill="#333" font-size="13.5">- Hệ thống tự quét đọc vé</text>
-    <text x="485" y="141" fill="#333" font-size="13.5">- Đổi Voucher Xanh SM 30k</text>
+    <text x="505" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="512" y="95" fill="#333" font-size="13.5">- Tải ảnh vé lên hệ thống</text>
+    <text x="512" y="118" fill="#333" font-size="13.5">- Hệ thống tự quét đọc vé</text>
+    <text x="512" y="141" fill="#333" font-size="13.5">- Đổi Voucher Xanh SM 30k</text>
 
-    <text x="475" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
-    <text x="485" y="205" fill="#0F3E31" font-size="13.5">- Được cộng 10 điểm xanh</text>
-    <text x="485" y="228" fill="#0F3E31" font-size="13.5">- Nhận mã barcode ngay</text>
+    <text x="505" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
+    <text x="512" y="205" fill="#0F3E31" font-size="13.5">- Được cộng 10 điểm xanh</text>
+    <text x="512" y="228" fill="#0F3E31" font-size="13.5">- Nhận mã barcode ngay</text>
 
-    <text x="567" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
+    <text x="602" y="278" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 4 -->
-    <rect x="690" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
-    <rect x="690" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
-    <text x="797" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">4. Lan Tỏa Mạng Xã Hội</text>
+    <rect x="735" y="0" width="225" height="305" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="735" y="0" width="225" height="42" rx="6" fill="#0F3E31"/>
+    <text x="847" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">4. Lan Tỏa Mạng Xã Hội</text>
     
-    <text x="705" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
-    <text x="715" y="95" fill="#333" font-size="13.5">- Tạo thẻ tổng kết XanhWrap</text>
-    <text x="715" y="118" fill="#333" font-size="13.5">- Tải ảnh poster đẹp về máy</text>
-    <text x="715" y="141" fill="#333" font-size="13.5">- Đăng lên Story Facebook</text>
+    <text x="750" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="757" y="95" fill="#333" font-size="13.5">- Tạo thẻ tổng kết XanhWrap</text>
+    <text x="757" y="118" fill="#333" font-size="13.5">- Tải ảnh poster đẹp về máy</text>
+    <text x="757" y="141" fill="#333" font-size="13.5">- Đăng lên Story Facebook</text>
 
-    <text x="705" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
-    <text x="715" y="205" fill="#0F3E31" font-size="13.5">- Kèm #LuotKhoiChamXanh</text>
-    <text x="715" y="228" fill="#0F3E31" font-size="13.5">- Rủ bạn bè cùng đi tàu</text>
+    <text x="750" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
+    <text x="757" y="205" fill="#0F3E31" font-size="13.5">- Kèm #LuotKhoiChamXanh</text>
+    <text x="757" y="228" fill="#0F3E31" font-size="13.5">- Rủ bạn bè cùng đi tàu</text>
 
-    <text x="797" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
+    <text x="847" y="278" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
   </g>
 </svg>

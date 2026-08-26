@@ -1,97 +1,97 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="970" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="500" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
     HÌNH 4. SƠ ĐỒ KIẾN TRÚC HỆ THỐNG 3 KHỐI HOẠT ĐỘNG
   </text>
 
   <!-- BLOCK 1: GIAO DIỆN NGƯỜI DÙNG -->
   <g transform="translate(25, 70)">
-    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
-    <rect width="280" height="42" rx="6" fill="#1E293B"/>
-    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. GIAO DIỆN WEB NGƯỜI DÙNG</text>
+    <rect width="295" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="295" height="42" rx="6" fill="#1E293B"/>
+    <text x="147" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. GIAO DIỆN WEB NGƯỜI DÙNG</text>
 
-    <rect x="15" y="55" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="82" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Trang Web Next.js 14</text>
-    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">Hiển thị nhanh, chuẩn tìm kiếm Google</text>
+    <rect x="15" y="55" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="82" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Trang Web Next.js 14</text>
+    <text x="147" y="104" fill="#475569" font-size="13" text-anchor="middle">Hiển thị nhanh, chuẩn tìm kiếm Google</text>
 
-    <rect x="15" y="135" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="162" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Cửa Sổ Xem Ga 2 Cột</text>
-    <text x="140" y="184" fill="#475569" font-size="13" text-anchor="middle">Xem chi tiết 21 ga không bị cắt chữ</text>
+    <rect x="15" y="135" width="265" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="162" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Cửa Sổ Xem Ga 2 Cột</text>
+    <text x="147" y="184" fill="#475569" font-size="13" text-anchor="middle">Xem chi tiết 21 ga không bị cắt chữ</text>
 
-    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="247" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xuất Poster XanhWrap</text>
-    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">Tạo ảnh tổng kết hành trình sắc nét</text>
+    <rect x="15" y="220" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="247" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xuất Poster XanhWrap</text>
+    <text x="147" y="269" fill="#475569" font-size="13" text-anchor="middle">Tạo ảnh tổng kết hành trình sắc nét</text>
 
-    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="327" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bảng Màu Xanh Chuẩn Đẹp</text>
-    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Tương phản cao, dịu mắt, dễ nhìn</text>
+    <rect x="15" y="300" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="327" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bảng Màu Xanh Chuẩn Đẹp</text>
+    <text x="147" y="349" fill="#475569" font-size="13" text-anchor="middle">Tương phản cao, dịu mắt, dễ nhìn</text>
 
-    <rect x="15" y="380" width="250" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
-    <text x="140" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Máy Chủ Vercel</text>
-    <text x="140" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
-    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Tốc độ mở trang cực nhanh</text>
+    <rect x="15" y="380" width="265" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="147" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Máy Chủ Vercel</text>
+    <text x="147" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
+    <text x="147" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Tốc độ mở trang cực nhanh</text>
   </g>
 
-  <!-- BLOCK 2: MÁY CHỦ XỬ LÝ & TÍNH TOÁN -->
-  <g transform="translate(340, 70)">
-    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
-    <rect width="280" height="42" rx="6" fill="#0F3E31"/>
-    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. MÁY CHỦ XỬ LÝ (BACKEND)</text>
+  <!-- BLOCK 2: MÁY CHỦ XỬ LÝ -->
+  <g transform="translate(352, 70)">
+    <rect width="295" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="295" height="42" rx="6" fill="#0F3E31"/>
+    <text x="147" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. MÁY CHỦ XỬ LÝ (BACKEND)</text>
 
-    <rect x="15" y="55" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="82" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xử Lý API Express.js</text>
-    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">Tiếp nhận và phản hồi tức thì</text>
+    <rect x="15" y="55" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="82" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xử Lý API Express.js</text>
+    <text x="147" y="104" fill="#475569" font-size="13" text-anchor="middle">Tiếp nhận và phản hồi tức thì</text>
 
-    <rect x="15" y="135" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="162" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Thuật Toán Tìm Đường Tối Ưu</text>
-    <text x="140" y="184" fill="#475569" font-size="13" text-anchor="middle">Tính đúng giá vé Metro: 7k-12k-16k-20k</text>
+    <rect x="15" y="135" width="265" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="162" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Thuật Toán Tìm Đường Tối Ưu</text>
+    <text x="147" y="184" fill="#475569" font-size="13" text-anchor="middle">Tính đúng giá vé Metro: 7k-12k-16k-20k</text>
 
-    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="247" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Trí Tuệ Nhân Tạo Đọc Vé OCR</text>
-    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">Tự động nhận diện chữ số trên vé xe</text>
+    <rect x="15" y="220" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="247" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Trí Tuệ Nhân Tạo Đọc Vé OCR</text>
+    <text x="147" y="269" fill="#475569" font-size="13" text-anchor="middle">Tự động nhận diện chữ số trên vé xe</text>
 
-    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="327" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bảo Mật Tài Khoản Đa Lớp</text>
-    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Mã hóa mật khẩu an toàn tuyệt đối</text>
+    <rect x="15" y="300" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="327" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bảo Mật Tài Khoản Đa Lớp</text>
+    <text x="147" y="349" fill="#475569" font-size="13" text-anchor="middle">Mã hóa mật khẩu an toàn tuyệt đối</text>
 
-    <rect x="15" y="380" width="250" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
-    <text x="140" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Điện Toán Render</text>
-    <text x="140" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
-    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Chạy 24/7 ổn định liên tục</text>
+    <rect x="15" y="380" width="265" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="147" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Điện Toán Render</text>
+    <text x="147" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
+    <text x="147" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Chạy 24/7 ổn định liên tục</text>
   </g>
 
-  <!-- BLOCK 3: CƠ SỞ DỮ LIỆU & LƯU TRỮ -->
-  <g transform="translate(655, 70)">
-    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
-    <rect width="280" height="42" rx="6" fill="#92400E"/>
-    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. CƠ SỞ DỮ LIỆU (DATABASE)</text>
+  <!-- BLOCK 3: CƠ SỞ DỮ LIỆU -->
+  <g transform="translate(680, 70)">
+    <rect width="295" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="295" height="42" rx="6" fill="#92400E"/>
+    <text x="147" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. CƠ SỞ DỮ LIỆU (DATABASE)</text>
 
-    <rect x="15" y="55" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="82" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Dữ Liệu Tuyến &amp; 21 Địa Điểm</text>
-    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">14 Ga Metro • 21 Điểm Đến • 132 Wraps</text>
+    <rect x="15" y="55" width="265" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="82" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Dữ Liệu Tuyến &amp; 21 Địa Điểm</text>
+    <text x="147" y="104" fill="#475569" font-size="13" text-anchor="middle">14 Ga Metro • 21 Điểm Đến • 132 Wraps</text>
 
-    <rect x="15" y="137" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="164" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Sổ Cái Điểm Thưởng Bất Biến</text>
-    <text x="140" y="186" fill="#475569" font-size="13" text-anchor="middle">45 Vé Hợp Lệ • 45 Voucher Xanh SM</text>
+    <rect x="15" y="137" width="265" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="164" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Sổ Cái Điểm Thưởng Bất Biến</text>
+    <text x="147" y="186" fill="#475569" font-size="13" text-anchor="middle">45 Vé Hợp Lệ • 45 Voucher Xanh SM</text>
 
-    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="247" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Ghi Nhận Lượt Truy Cập</text>
-    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">937 Lượt truy cập Landing Page</text>
+    <rect x="15" y="220" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="247" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Ghi Nhận Lượt Truy Cập</text>
+    <text x="147" y="269" fill="#475569" font-size="13" text-anchor="middle">937 Lượt truy cập Landing Page</text>
 
-    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="140" y="327" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Kho Mã Quà Tặng Voucher</text>
-    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Kho mã ưu đãi taxi điện Xanh SM</text>
+    <rect x="15" y="300" width="265" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="147" y="327" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Kho Mã Quà Tặng Voucher</text>
+    <text x="147" y="349" fill="#475569" font-size="13" text-anchor="middle">Kho mã ưu đãi taxi điện Xanh SM</text>
 
-    <rect x="15" y="380" width="250" height="110" rx="4" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
-    <text x="140" y="408" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Nhật Ký Kiểm Toán (Audit Log)</text>
-    <text x="140" y="435" fill="#B45309" font-size="13.5" font-weight="bold" text-anchor="middle">Bảo Mật &amp; Minh Bạch 100%</text>
-    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Lưu vết thao tác duyệt vé của Admin</text>
+    <rect x="15" y="380" width="265" height="110" rx="4" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
+    <text x="147" y="408" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Nhật Ký Kiểm Toán (Audit Log)</text>
+    <text x="147" y="435" fill="#B45309" font-size="13.5" font-weight="bold" text-anchor="middle">Bảo Mật &amp; Minh Bạch 100%</text>
+    <text x="147" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Lưu vết thao tác duyệt vé của Admin</text>
   </g>
 
   <!-- Connectors -->
-  <line x1="305" y1="322" x2="340" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
-  <polygon points="340,322 330,316 330,328" fill="#0F3E31"/>
+  <line x1="320" y1="322" x2="352" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="352,322 342,316 342,328" fill="#0F3E31"/>
 
-  <line x1="620" y1="322" x2="655" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
-  <polygon points="655,322 645,316 645,328" fill="#0F3E31"/>
+  <line x1="647" y1="322" x2="680" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="680,322 670,316 670,328" fill="#0F3E31"/>
 </svg>
