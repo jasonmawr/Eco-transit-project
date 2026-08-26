@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/admin/'],
     },
-    sitemap: 'https://luotkhoichamxanh.vercel.app/sitemap.xml',
+    sitemap: 'https://eco-transit-project-web.vercel.app/sitemap.xml',
   };
 }

@@ -33,14 +33,14 @@ export const metadata = {
   authors: [{ name: 'Chiến dịch Lướt Khói Chạm Xanh' }],
   creator: 'Lướt Khói Chạm Xanh',
   publisher: 'Chiến dịch Lướt Khói Chạm Xanh TP.HCM',
-  metadataBase: new URL('https://luotkhoichamxanh.vercel.app'),
+  metadataBase: new URL('https://eco-transit-project-web.vercel.app'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Lướt Khói Chạm Xanh — Hành Trình Xanh Cùng Metro Số 1 TP.HCM',
     description: 'Khám phá các ga Metro Số 1, tối ưu lộ trình xe buýt - metro, quét vé tích điểm và đổi voucher quà tặng hấp dẫn cùng chiến dịch Lướt Khói Chạm Xanh!',
-    url: 'https://luotkhoichamxanh.vercel.app',
+    url: 'https://eco-transit-project-web.vercel.app',
     siteName: 'Lướt Khói Chạm Xanh',
     locale: 'vi_VN',
     type: 'website',
