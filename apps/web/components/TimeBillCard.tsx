@@ -92,8 +92,8 @@ export default function TimeBillCard({
         <div className="flex items-center space-x-1.5">
           <span className="text-xl">🌿</span>
           <div className="flex flex-col">
-            <span className="text-xs font-black tracking-widest text-emerald-400 uppercase">EcoTransit</span>
-            <span className="text-[8px] text-white/50 tracking-wider font-extrabold uppercase">Hóa Đơn Lướt Khói</span>
+            <span className="text-[10px] font-black tracking-widest text-emerald-400 uppercase font-display-campaign">LƯỚT KHÓI CHẠM XANH</span>
+            <span className="text-[8px] text-white/50 tracking-wider font-extrabold uppercase">Hóa Đơn Thời Gian Xanh</span>
           </div>
         </div>
         <div className="text-right shrink-0">

@@ -94,7 +94,7 @@ router.post('/register', async (req: Request, res: Response) => {
     try {
       await mailProvider.sendMail({
         to: email,
-        subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
+        subject: 'Xác thực tài khoản - Lướt Khói Chạm Xanh',
         text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
         html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
       });
@@ -438,7 +438,7 @@ router.post('/resend-verification', async (req: Request, res: Response) => {
       try {
         await mailProvider.sendMail({
           to: normalizedEmail,
-          subject: 'Xác thực tài khoản di chuyển xanh - EcoTransit',
+          subject: 'Xác thực tài khoản - Lướt Khói Chạm Xanh',
           text: `Chào bạn, vui lòng xác thực tài khoản của bạn bằng cách nhấp vào đường dẫn sau: ${verifyUrl}. Đường dẫn có hiệu lực trong 15 phút.`,
           html: `<p>Chào bạn,</p><p>Vui lòng xác thực tài khoản di chuyển xanh của bạn bằng cách nhấp vào đường dẫn dưới đây:</p><p><a href="${verifyUrl}" style="padding: 10px 20px; background-color: #10B981; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Xác thực tài khoản</a></p><p>Đường dẫn có hiệu lực trong 15 phút.</p>`,
         });

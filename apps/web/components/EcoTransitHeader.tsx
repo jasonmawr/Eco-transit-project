@@ -80,9 +80,6 @@ export default function EcoTransitHeader({ activeSection, onSectionSelect }: Eco
                 <span className="text-xs sm:text-base md:text-lg font-black tracking-tight text-eco-accentGreen uppercase font-display-campaign whitespace-nowrap">
                   Chạm Xanh
                 </span>
-                <span className="hidden lg:inline-block text-[8px] text-eco-muted font-bold tracking-wider bg-eco-mint px-1.5 py-0.5 rounded border border-eco-primary/10">
-                  EcoTransit
-                </span>
               </div>
               <span className="hidden lg:inline-block text-[7px] sm:text-[8px] text-eco-muted/50 tracking-wider font-semibold">
                 Chiến dịch giao thông xanh TP.HCM

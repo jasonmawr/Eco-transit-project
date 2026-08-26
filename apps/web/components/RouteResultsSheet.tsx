@@ -273,7 +273,7 @@ export default function RouteResultsSheet({
                     ) : (
                       <div className="bg-eco-soft/50 rounded-2xl p-4 border border-eco-mint/60 flex flex-col space-y-3">
                         <p className="text-[11px] text-eco-muted leading-relaxed font-medium">
-                          Tạo hóa đơn thời gian di chuyển để lưu giữ và chia sẻ thành tích giảm thiểu CO₂ cùng các điểm xanh chiến dịch EcoTransit!
+                          Tạo hóa đơn thời gian di chuyển để lưu giữ và chia sẻ thành tích giảm thiểu CO₂ cùng các điểm xanh chiến dịch Lướt Khói Chạm Xanh!
                         </p>
                         <button
                           type="button"

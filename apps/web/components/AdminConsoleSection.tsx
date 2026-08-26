@@ -2161,7 +2161,7 @@ export default function AdminConsoleSection({ user, onLoginClick }: AdminConsole
               <div className="flex items-center space-x-2">
                 <span className="text-xl">👥</span>
                 <div>
-                  <h3 className="text-md font-black uppercase text-eco-ink">Thành viên EcoTransit ({usersList.length})</h3>
+                  <h3 className="text-md font-black uppercase text-eco-ink">Thành viên Lướt Khói Chạm Xanh ({usersList.length})</h3>
                   <p className="text-[10px] text-eco-muted">Danh sách tài khoản đăng ký trên hệ thống</p>
                 </div>
               </div>

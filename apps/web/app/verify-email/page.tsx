@@ -87,7 +87,7 @@ function VerifyEmailContent() {
               {message}
             </p>
             <p className="text-[10px] text-white/40 pt-2 leading-normal">
-              Chào mừng bạn đến với chiến dịch EcoTransit. Bây giờ bạn có thể mở trang cá nhân và bắt đầu thiết lập Avatar nhân vật di chuyển xanh của mình.
+              Chào mừng bạn đến với chiến dịch Lướt Khói Chạm Xanh. Bây giờ bạn có thể mở trang cá nhân và bắt đầu thiết lập Avatar nhân vật di chuyển xanh của mình.
             </p>
           </div>
           <button
@@ -156,8 +156,8 @@ export default function VerifyEmailPage() {
 
       {/* Header */}
       <header className="w-full max-w-md mx-auto flex items-center justify-center py-6 relative z-10">
-        <div className="flex items-center space-x-2 text-white font-black text-lg tracking-tight uppercase">
-          <span>🌿 EcoTransit</span>
+        <div className="flex items-center space-x-2 text-white font-black text-lg tracking-tight uppercase font-display-campaign">
+          <span>🌿 Lướt Khói Chạm Xanh</span>
         </div>
       </header>
 

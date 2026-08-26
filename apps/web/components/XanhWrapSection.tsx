@@ -271,7 +271,7 @@ export default function XanhWrapSection() {
 🌱 CO₂e giảm ước tính: ${co2Trip} kg/hành trình (≈ ${co2Year} kg CO₂e/năm)
 💬 Dòng suy nghĩ: "${resultReceipt.reflection}"
 🎲 Số dự thi may mắn: #${resultReceipt.luckyNumber}
-#XanhWrap #LuotKhoiChamXanh #EcoTransit`;
+#XanhWrap #LuotKhoiChamXanh`;
 
     try {
       await navigator.clipboard.writeText(caption);
@@ -1139,7 +1139,7 @@ export default function XanhWrapSection() {
 Một ngày mình có ${resultReceipt.handsFreeMin || resultReceipt.transitMin} phút không phải cầm lái. Đổi sang buýt/metro thì lấy lại được ${resultReceipt.daysPerYear} ngày tự do mỗi năm!
 💬 Dòng suy nghĩ: "${resultReceipt.reflection}"
 🎲 Số dự thi may mắn: #${resultReceipt.luckyNumber}
-#XanhWrap #LuotKhoiChamXanh #EcoTransit`}
+#XanhWrap #LuotKhoiChamXanh`}
                 className="w-full bg-eco-soft/40 border border-eco-primary/20 rounded-2xl p-3 text-xs font-mono text-eco-ink select-all focus:outline-none"
               />
             </div>

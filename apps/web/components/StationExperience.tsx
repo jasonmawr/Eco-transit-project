@@ -679,7 +679,7 @@ export default function StationExperience({
                             <span className="text-xs font-black uppercase tracking-wider">Hành trình khám phá – Cấp độ tiếp theo</span>
                           </div>
                           <p className="text-xs text-purple-950 font-medium leading-relaxed">
-                            Địa điểm này đang trong quá trình biên soạn bài viết & chụp ảnh thực tế bởi Ban biên tập EcoTransit. Hãy tích cực tích lũy lượt đi xanh để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo!
+                            Địa điểm này đang trong quá trình biên soạn bài viết & chụp ảnh thực tế bởi Ban biên tập Lướt Khói Chạm Xanh. Hãy tích cực tích lũy lượt đi xanh để sẵn sàng mở khóa các cẩm nang trải nghiệm độc quyền tiếp theo!
                           </p>
                           <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-[11px] font-bold rounded-xl shadow-xs">
                             <span>🔒 Sắp cập nhật bài viết chính thức (Cấp độ tiếp theo)</span>

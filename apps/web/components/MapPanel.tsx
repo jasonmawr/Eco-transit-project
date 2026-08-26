@@ -353,7 +353,7 @@ export default function MapPanel({
         <span className="text-3xl">📴</span>
         <h4 className="text-xs font-black uppercase tracking-wider text-amber-800">Chế độ Bản đồ Ngoại tuyến</h4>
         <p className="text-[11px] leading-relaxed max-w-xs text-amber-700">
-          Không thể tải bản đồ địa lý trực tuyến. EcoTransit đã chuyển đổi sang chế độ danh sách hành trình chi tiết.
+          Không thể tải bản đồ địa lý trực tuyến. Hệ thống đã chuyển đổi sang chế độ danh sách hành trình chi tiết.
         </p>
         <span className="text-[9px] text-eco-muted select-none">© OpenStreetMap contributors</span>
       </div>

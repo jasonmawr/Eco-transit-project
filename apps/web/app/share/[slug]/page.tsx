@@ -48,7 +48,7 @@ export default function SharePage() {
           className="flex items-center space-x-2 text-white/80 hover:text-white transition-colors"
         >
           <span className="text-xl">🌿</span>
-          <span className="text-sm font-bold tracking-tight">EcoTransit</span>
+          <span className="text-sm font-black tracking-tight uppercase font-display-campaign">Lướt Khói Chạm Xanh</span>
         </button>
         <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-extrabold px-2.5 py-0.5 rounded-full border border-emerald-400/25">
           Chiến Dịch Lướt Khói
@@ -94,7 +94,7 @@ export default function SharePage() {
           </button>
         )}
         <p className="text-[10px] text-white/30 font-medium">
-          © {new Date().getFullYear()} EcoTransit. Đồng hành bảo vệ môi trường Thành phố Hồ Chí Minh.
+          © {new Date().getFullYear()} Lướt Khói Chạm Xanh. Đồng hành bảo vệ môi trường Thành phố Hồ Chí Minh.
         </p>
       </footer>
     </main>

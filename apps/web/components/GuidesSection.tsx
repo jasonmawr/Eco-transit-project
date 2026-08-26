@@ -49,7 +49,7 @@ export default function GuidesSection() {
           CẨM NANG LƯỚT XANH & HÀNH TRÌNH ĐÔ THỊ
         </h3>
         <p className="text-xs text-eco-muted mt-1 leading-normal">
-          Khám phá các cẩm nang du lịch xanh, mẹo di chuyển metro và bản tin cộng đồng EcoTransit.
+          Khám phá các cẩm nang du lịch xanh, mẹo di chuyển metro và bản tin cộng đồng Lướt Khói Chạm Xanh.
         </p>
       </div>
 

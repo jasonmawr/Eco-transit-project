@@ -74,7 +74,7 @@ export class LocalRouteProvider implements TransitRouteProvider {
               fareEstimate: 0,
             },
           ],
-          explanation: 'Điểm đi và điểm đến rất gần nhau, EcoTransit đề xuất bạn đi bộ để bảo vệ sức khỏe.',
+          explanation: 'Điểm đi và điểm đến rất gần nhau, hệ thống đề xuất bạn đi bộ để bảo vệ sức khỏe và môi trường.',
         },
       ];
     }
@@ -391,7 +391,7 @@ export class LocalRouteProvider implements TransitRouteProvider {
           strategy = 'ưu tiên lộ trình an toàn, đơn giản, ít chuyển tuyến và hạn chế đi bộ xa ban đêm';
         }
 
-        explanation = `${conditionStr}, EcoTransit ${strategy}.`;
+        explanation = `${conditionStr}, lộ trình tối ưu ${strategy}.`;
       }
 
       score = score - weatherPenalty - raw.transferCount * 8 - Math.floor(raw.totalMinutes / 5);

@@ -380,7 +380,7 @@ export default function Home() {
 
       {/* Mini status bar footer */}
       <footer className="bg-eco-ink text-white py-1 border-t border-eco-primary/10 relative z-10 shrink-0 text-center text-[10px] text-eco-muted">
-        &copy; 2026 Lướt Khói Chạm Xanh. Vận hành bởi EcoTransit.
+        &copy; 2026 Lướt Khói Chạm Xanh. Chiến dịch di chuyển xanh TP. Hồ Chí Minh.
       </footer>
 
       {/* Auth Modal Overlay */}

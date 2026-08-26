@@ -40,7 +40,7 @@ function checkHtmlRecursive(obj: any): boolean {
 }
 
 const headlines = [
-  'Lướt Khói Chạm Xanh cùng EcoTransit 🌿',
+  'Lướt Khói Chạm Xanh TP.HCM 🌿',
   'Hành trình xanh cứu rỗi hành tinh 🌍',
   'Hóa đơn xanh - Lướt khỏi khói bụi 🚀',
   'Tôi đi xanh, bạn cũng thế chứ? 💚'

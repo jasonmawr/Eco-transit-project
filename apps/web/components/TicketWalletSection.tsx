@@ -351,7 +351,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                 <p className="text-[10px] text-eco-accentGreen font-black uppercase tracking-widest font-mono">
                   GREEN POINTS WALLET
                 </p>
-                <h3 className="text-[11px] text-white/60 font-semibold mt-0.5">EcoTransit Campaign Card</h3>
+                <h3 className="text-[11px] text-white/60 font-semibold mt-0.5">Thẻ Chiến Dịch Lướt Khói Chạm Xanh</h3>
               </div>
               <Wallet className="w-5 h-5 text-eco-accentGreen" />
             </div>
@@ -597,7 +597,7 @@ export default function TicketWalletSection({ user, onLoginClick }: TicketWallet
                     className="p-3 bg-eco-accentGreen/10 border border-eco-accentGreen/20 rounded-xl flex items-start space-x-2 text-eco-accentGreenDeep text-[10px] font-bold"
                   >
                     <CheckCircle className="w-4 h-4 shrink-0 text-eco-accentGreen" />
-                    <span>Vé xanh đã được gửi và đang chờ đội vận hành EcoTransit kiểm duyệt. Khi được duyệt, bạn sẽ nhận +10 điểm xanh.</span>
+                    <span>Vé xanh đã được gửi và đang chờ đội ngũ kiểm duyệt Lướt Khói Chạm Xanh xác nhận. Khi được duyệt, bạn sẽ nhận +10 điểm xanh.</span>
                   </motion.div>
                 )}
               </AnimatePresence>
