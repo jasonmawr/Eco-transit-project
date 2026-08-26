@@ -248,7 +248,7 @@
       margin-bottom: 1.2rem;
     }
 
-    /* Diagram Containers - Tối ưu hiển thị to rõ */
+    /* Diagram Containers */
     .figure-frame {
       border: 1px solid var(--border-color);
       border-radius: 4px;
@@ -291,18 +291,138 @@
       text-align: center;
     }
 
-    /* Code & ASCII Wireframe Boxes */
-    pre.code-box {
-      font-family: 'Consolas', 'Courier New', monospace;
-      background: #F9FAFB;
-      border: 1px solid #D1D5DB;
-      border-radius: 4px;
-      padding: 1.1rem;
+    /* UI MOCKUP BROWSER WINDOW COMPONENT */
+    .mockup-window {
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      background: #FFFFFF;
+      margin: 1.5rem 0 2rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+    .mockup-header {
+      background: #1E293B;
+      color: #ffffff;
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .window-dots {
+      display: flex;
+      gap: 5px;
+    }
+    .window-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .dot-red { background: #EF4444; }
+    .dot-yellow { background: #F59E0B; }
+    .dot-green { background: #10B981; }
+    .mockup-title {
       font-size: 13.5px;
-      line-height: 1.4;
-      overflow-x: auto;
-      margin: 1.2rem 0;
-      color: #111827;
+      font-weight: bold;
+      color: #E2E8F0;
+      letter-spacing: 0.3px;
+    }
+    .mockup-body {
+      padding: 1.25rem;
+      background: #F8FAFC;
+    }
+
+    /* Modal 2-Column Mockup Layout */
+    .modal-2col-container {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.5rem;
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .modal-col-left {
+      border-right: 1px solid #E2E8F0;
+      padding-right: 1.25rem;
+    }
+    .modal-col-right {
+      padding-left: 0.5rem;
+    }
+    .place-img-card {
+      width: 100%;
+      height: 220px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid #E2E8F0;
+      margin-bottom: 1rem;
+      display: block;
+    }
+    .info-badge-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .info-badge-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 14.5px;
+      margin-bottom: 0.6rem;
+      color: #334155;
+    }
+    .btn-mockup {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 0.45rem 0.85rem;
+      border-radius: 4px;
+      cursor: pointer;
+      border: none;
+      margin-right: 0.4rem;
+      margin-top: 0.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .btn-mockup-green { background: #0F3E31; color: #ffffff; }
+    .btn-mockup-outline { background: #EBF6F0; color: #0F3E31; border: 1px solid #0F3E31; }
+
+    /* Admin Console Mockup Layout */
+    .admin-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+    .admin-stat-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 6px;
+      padding: 1rem;
+      border-left: 4px solid #0F3E31;
+    }
+    .admin-stat-card.purple { border-left-color: #7C3AED; }
+    .admin-stat-card.emerald { border-left-color: #10B981; }
+    .admin-stat-card.amber { border-left-color: #F59E0B; }
+    .stat-label {
+      font-size: 12.5px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #64748B;
+      margin-bottom: 0.3rem;
+    }
+    .stat-value {
+      font-size: 26px;
+      font-weight: bold;
+      color: #0F172A;
+      line-height: 1.1;
+    }
+    .stat-sub {
+      font-size: 12px;
+      color: #059669;
+      margin-top: 0.3rem;
     }
 
     /* Page Navigation Footer */
@@ -341,7 +461,7 @@
       .app-layout { max-width: 100%; margin: 0; padding: 0; display: block; }
       .doc-main { border: none; box-shadow: none; padding: 0; }
       .page-section { display: block !important; margin-bottom: 4rem; break-after: page; }
-      .figure-frame { break-inside: avoid; border: 1px solid #888; }
+      .figure-frame, .mockup-window { break-inside: avoid; border: 1px solid #888; }
       table.formal-table { break-inside: avoid; }
     }
   </style>
@@ -352,7 +472,7 @@
   <header class="top-bar">
     <div class="title-group">
       <h1>LƯỚT KHÓI CHẠM XANH — TÀI LIỆU ĐẶC TẢ THIẾT KẾ HỆ THỐNG</h1>
-      <p>Báo Cáo Toàn Diện: Chức Năng, Hành Trình Người Dùng, Kiến Trúc 3 Khối, Wireframe &amp; Bảng Màu</p>
+      <p>Báo Cáo Toàn Diện: Chức Năng, Hành Trình Người Dùng, Kiến Trúc 3 Khối, Bản Vẽ UI &amp; Bảng Màu</p>
     </div>
     <div class="btn-group">
       <button class="btn btn-print" onclick="window.print()">🖨️ In / Xuất PDF Báo Cáo</button>
@@ -384,7 +504,7 @@
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(3, this)">
-            <span>4.</span> Bản Vẽ Khung Giao Diện
+            <span>4.</span> Bản Vẽ Giao Diện Thực Tế
           </a>
         </li>
         <li class="nav-item">
@@ -939,69 +1059,174 @@
             ⬅️ Xem Chuyên Đề 2: Hành Trình Trải Nghiệm
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(3, document.querySelectorAll('.nav-link')[3])">
-            Xem Chuyên Đề 4: Bản Vẽ Khung Giao Diện ➔
+            Xem Chuyên Đề 4: Bản Vẽ Giao Diện Thực Tế ➔
           </button>
         </div>
       </section>
 
-      <!-- CHAPTER 4: WIREFRAMES & LAYOUTS -->
+      <!-- CHAPTER 4: WIREFRAMES & HIGH-FIDELITY VISUAL UI -->
       <section id="page-3" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 4: BẢN VẼ KHUNG GIAO DIỆN VÀ BỐ CỤC MÀN HÌNH</span>
+          <span>CHUYÊN ĐỀ 4: BẢN VẼ GIAO DIỆN THỰC TẾ &amp; CẤU TRÚC HIỂN THỊ</span>
           <span class="chapter-badge">Phần 4 / 6</span>
         </h2>
 
-        <h3 class="section-heading">4.1. Khung Giao Diện Xem Chi Tiết 21 Ga Metro (Cửa Sổ 2 Cột)</h3>
+        <h3 class="section-heading">4.1. Giao Diện Cửa Sổ 2 Cột Khám Phá 21 Ga Metro (Chống Tràn Nội Dung)</h3>
         <p>
-          Cấu trúc khung nhìn 2 cột tách biệt hoàn toàn giữa Cột thông tin ảnh/liên hệ cố định bên trái và Cột bài viết cẩm nang cuộn độc lập bên phải, giải quyết 100% hiện tượng cắt xén nội dung:
+          Để đảm bảo người dùng có thể đọc toàn bộ cẩm nang lịch sử và xem trọn vẹn hình ảnh địa điểm mà không bao giờ bị cắt chữ hay tràn màn hình, hệ thống áp dụng cấu trúc <strong>Cửa Sổ 2 Cột Độc Lập</strong> được xuất trực tiếp vào khung nhìn chính (React Portal):
         </p>
 
-        <pre class="code-box">
-+=============================================================================================================+
-|  CẨM NANG ĐỊA ĐIỂM: CHỢ BẾN THÀNH (MODAL 2 CỘT RENDER QUA REACT PORTAL TRỰC TIẾP VÀO document.body)        |
-+-------------------------------------------------+-----------------------------------------------------------+
-|  CỘT TRÁI (THÔNG TIN TỔNG QUAN &amp; LIÊN HỆ)        |  CỘT PHẢI (BÀI VIẾT HƯỚNG DẪN &amp; LỘ TRÌNH ĐI LẠI)          |
-|  ┌───────────────────────────────────────────┐  |  GIỚI THIỆU CHUNG:                                        |
-|  │ [ Ảnh Chợ Bến Thành sắc nét - Bo góc 2xl ] │  |  Chợ Bến Thành là biểu tượng văn hóa lịch sử hơn         |
-|  └───────────────────────────────────────────┘  |  100 năm tuổi của Sài Gòn, kết nối ngầm trực tiếp         |
-|  📍 ĐỊA CHỈ: Đường Lê Lợi, P. Bến Thành, Quận 1 |  với Nhà Ga Trung Tâm Bến Thành hiện đại...               |
-|  ⏰ GIỜ MỞ CỬA: 07:00 – 22:00 (Hàng ngày)      |                                                           |
-|  🎟️ VÉ THAM QUAN: Miễn phí vào cửa tự do       |  🌟 ĐIỂM NHẤN TRẢI NGHIỆM ĐỘC ĐÁO:                        |
-|  🚆 GA GẦN NHẤT: Ga Trung Tâm Bến Thành        |  • Tháp đồng hồ 4 mặt biểu tượng check-in kinh điển       |
-|  🚶 KHOẢNG CÁCH: 150m (Khoảng 2 phút đi bộ)    |  • Thiên đường ẩm thực chè &amp; món ngon 3 miền              |
-|                                                 |                                                           |
-|  [ 🌐 Mở bản đồ Google ] [ 🚩 Lưu địa điểm ]   |  🚆 HƯỚNG DẪN DI CHUYỂN BẰNG METRO &amp; BUS:                 |
-|                                                 |  Đi Metro Tuyến 1 xuống Ga Bến Thành, theo lối ra         |
-|                                                 |  Cổng 1 để bước ngay vào sảnh trước của chợ.              |
-+-------------------------------------------------+-----------------------------------------------------------+
-        </pre>
+        <!-- Mockup 1: Station 2-Column Modal -->
+        <div class="mockup-window">
+          <div class="mockup-header">
+            <div class="window-dots">
+              <span class="window-dot dot-red"></span>
+              <span class="window-dot dot-yellow"></span>
+              <span class="window-dot dot-green"></span>
+            </div>
+            <div class="mockup-title">🌐 CẨM NANG KHÁM PHÁ GA METRO SỐ 1 — CHỢ BẾN THÀNH (MODAL 2 CỘT)</div>
+          </div>
+          <div class="mockup-body">
+            <div class="modal-2col-container">
+              
+              <!-- Cột Trái -->
+              <div class="modal-col-left">
+                <img src="/images/places/cho_ben_thanh_main.png" alt="Chợ Bến Thành" class="place-img-card" onerror="this.src='images/places/cho_ben_thanh_main.png'" />
+                <ul class="info-badge-list">
+                  <li class="info-badge-item">📍 <strong>Địa chỉ:</strong> Đường Lê Lợi, P. Bến Thành, Quận 1</li>
+                  <li class="info-badge-item">⏰ <strong>Giờ mở cửa:</strong> 07:00 – 22:00 (Hàng ngày)</li>
+                  <li class="info-badge-item">🎟️ <strong>Vé tham quan:</strong> Miễn phí vào cửa tự do</li>
+                  <li class="info-badge-item">🚆 <strong>Ga Metro gần nhất:</strong> Ga Trung Tâm Bến Thành</li>
+                  <li class="info-badge-item">🚶 <strong>Khoảng cách:</strong> 150m (Khoảng 2 phút đi bộ)</li>
+                </ul>
+                <div style="margin-top: 1rem;">
+                  <button class="btn-mockup btn-mockup-green">🌐 Mở Bản Đồ Google</button>
+                  <button class="btn-mockup btn-mockup-outline">🚩 Lưu Địa Điểm</button>
+                </div>
+              </div>
 
-        <h3 class="section-heading">4.2. Khung Bố Cục Bảng Quản Trị Hệ Thống (Admin Console)</h3>
+              <!-- Cột Phải -->
+              <div class="modal-col-right">
+                <span style="font-size: 12px; font-weight: bold; background: #EBF6F0; color: #0F3E31; padding: 0.2rem 0.6rem; border-radius: 4px;">
+                  ✨ ĐỊA ĐIỂM VĂN HÓA LỊCH SỬ TIÊU BIỂU
+                </span>
+                <h4 style="font-size: 18px; font-weight: bold; color: #0F3E31; margin: 0.5rem 0 0.75rem;">
+                  Chợ Bến Thành — Trái Tim Thương Mại &amp; Biểu Tượng 100 Năm Của Sài Gòn
+                </h4>
+                <p style="font-size: 14.5px; color: #334155; line-height: 1.55; margin-bottom: 0.85rem;">
+                  Chợ Bến Thành được khởi công xây dựng từ năm 1912 và khánh thành vào năm 1914. Trải qua hơn một thế kỷ, ngôi chợ không chỉ là trung tâm giao thương sầm uất mà còn là chứng nhân lịch sử, biểu tượng kiến trúc không thể tách rời của TP. Hồ Chí Minh. Đặc biệt, chợ nằm ngay trên Nhà ga ngầm Trung tâm Bến Thành của Tuyến Metro Số 1.
+                </p>
+                
+                <h5 style="font-size: 15px; font-weight: bold; color: #0F172A; margin: 0.8rem 0 0.3rem;">
+                  🌟 Điểm Nhấn Trải Nghiệm Độc Đáo:
+                </h5>
+                <ul style="font-size: 14px; color: #334155; margin-left: 1.5rem; margin-bottom: 0.8rem;">
+                  <li>Tháp đồng hồ 4 mặt huyền thoại — góc check-in kinh điển của mọi du khách.</li>
+                  <li>Khu ẩm thực chợ truyền thống quy tụ hàng trăm món ngon 3 miền (chè sương sa, bún mắm, bánh xèo).</li>
+                </ul>
+
+                <h5 style="font-size: 15px; font-weight: bold; color: #0F172A; margin: 0.8rem 0 0.3rem;">
+                  🚆 Hướng Dẫn Di Chuyển Bằng Metro &amp; Bus:
+                </h5>
+                <p style="font-size: 14px; color: #0F3E31; background: #F0FDF4; padding: 0.6rem 0.8rem; border-radius: 4px; border-left: 3px solid #10B981; margin: 0;">
+                  Hành khách đi Tuyến Metro Số 1 xuống tại <strong>Ga Trung Tâm Bến Thành</strong>, đi theo biển chỉ dẫn lên <strong>Lối Ra Cổng 1</strong> sẽ bước ngay ra quảng trường trước cửa Nam của Chợ.
+                </p>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <h3 class="section-heading">4.2. Giao Diện Bảng Điều Khiển Quản Trị Hệ Thống (Admin Console)</h3>
         <p>
-          Bố cục 4 thẻ chỉ số thời gian thực và danh sách kiểm duyệt vé, cấp phát voucher và nhật ký hệ thống:
+          Bảng điều khiển cho phép Ban quản trị theo dõi 4 chỉ số hoạt động thời gian thực và thực hiện kiểm duyệt ảnh vé xe nhanh chóng:
         </p>
 
-        <pre class="code-box">
-+-------------------------------------------------------------------------------------------------------------+
-|  🛡️ BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN — LƯỚT KHÓI CHẠM XANH                                                     |
-|  [ 📊 Tổng quan ] [ 🎫 Kiểm duyệt vé ] [ 🎁 Quản lý Voucher ] [ 📝 Quản lý Địa điểm ] [ 📈 Thống kê Truy cập ]|
-+-------------------------------------------------------------------------------------------------------------+
-|  4 THẺ CHỈ SỐ HOẠT ĐỘNG CHÍNH (THEO DÕI THỜI GIAN THỰC):                                                    |
-|  ┌─────────────────────────┐ ┌─────────────────────────┐ ┌─────────────────────────┐ ┌────────────────────┐|
-|  | 🌐 TRUY CẬP LANDING     | | ✨ XANHWRAP ĐÃ TẠO      | | 🚗 VOUCHER XANH SM ĐÃ ĐỔI| | 🎫 VÉ XANH (DUYỆT/TỔNG|
-|  |                         | |                         | |                         | |                      |
-|  |         937 lượt        | |         132 bài         | |          45 mã          | |        45 / 48       |
-|  | (Tự động tăng khi có IP)| | (Tích hợp quay số trúng)| | (Đồng hành taxi điện)   | | (45 vé đã đổi quà)   |
-|  └─────────────────────────┘ └─────────────────────────┘ └─────────────────────────┘ └────────────────────┘|
-+-------------------------------------------------------------------------------------------------------------+
-        </pre>
+        <!-- Mockup 2: Admin Dashboard -->
+        <div class="mockup-window">
+          <div class="mockup-header">
+            <div class="window-dots">
+              <span class="window-dot dot-red"></span>
+              <span class="window-dot dot-yellow"></span>
+              <span class="window-dot dot-green"></span>
+            </div>
+            <div class="mockup-title">🛡️ TRUNG TÂM QUẢN TRỊ &amp; KIỂM DUYỆT HỆ THỐNG — LƯỚT KHÓI CHẠM XANH</div>
+          </div>
+          <div class="mockup-body">
+            
+            <!-- 4 Stat Cards -->
+            <div class="admin-stats-grid">
+              <div class="admin-stat-card">
+                <div class="stat-label">🌐 Lượt Truy Cập Web</div>
+                <div class="stat-value">937</div>
+                <div class="stat-sub">↑ Tự động tăng khi có IP mới</div>
+              </div>
+              <div class="admin-stat-card purple">
+                <div class="stat-label">✨ Bài XanhWrap Đã Tạo</div>
+                <div class="stat-value">132</div>
+                <div class="stat-sub">Quay số trúng quà thành công</div>
+              </div>
+              <div class="admin-stat-card emerald">
+                <div class="stat-label">🚗 Voucher Xanh SM Đã Cấp</div>
+                <div class="stat-value">45</div>
+                <div class="stat-sub">Mã giảm 30.000đ taxi điện</div>
+              </div>
+              <div class="admin-stat-card amber">
+                <div class="stat-label">🎫 Vé Xe (Duyệt / Tổng)</div>
+                <div class="stat-value">45 / 48</div>
+                <div class="stat-sub">+450 điểm thưởng đã vào ví</div>
+              </div>
+            </div>
+
+            <!-- Table of Tickets -->
+            <table class="formal-table" style="background:#ffffff; margin: 0;">
+              <thead>
+                <tr>
+                  <th>Mã Vé</th>
+                  <th>Người Đi Xe</th>
+                  <th>Tuyến / Phương Tiện</th>
+                  <th>Thời Gian Chụp</th>
+                  <th>Điểm Thưởng</th>
+                  <th>Trạng Thái</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>#TK-2026-089</code></td>
+                  <td>Nguyễn Minh Anh</td>
+                  <td>Metro 1 (Bến Thành ➔ Ba Son)</td>
+                  <td>Hôm nay, 08:30</td>
+                  <td style="color:#059669; font-weight:bold;">+10 Điểm</td>
+                  <td><span style="background:#D1E7DD; color:#0F3E31; font-weight:bold; padding:0.2rem 0.5rem; border-radius:4px; font-size:12.5px;">🟢 ĐÃ PHÊ DUYỆT</span></td>
+                </tr>
+                <tr>
+                  <td><code>#TK-2026-088</code></td>
+                  <td>Trần Hoàng Long</td>
+                  <td>VinBus D4 (Vinhomes ➔ Bến Thành)</td>
+                  <td>Hôm nay, 07:45</td>
+                  <td style="color:#059669; font-weight:bold;">+10 Điểm</td>
+                  <td><span style="background:#D1E7DD; color:#0F3E31; font-weight:bold; padding:0.2rem 0.5rem; border-radius:4px; font-size:12.5px;">🟢 ĐÃ PHÊ DUYỆT</span></td>
+                </tr>
+                <tr>
+                  <td><code>#TK-2026-087</code></td>
+                  <td>Lê Thu Hà</td>
+                  <td>Metro 1 (Thảo Điền ➔ Suối Tiên)</td>
+                  <td>Hôm qua, 18:20</td>
+                  <td style="color:#92400E; font-weight:bold;">Đang chờ</td>
+                  <td><span style="background:#FEF9E7; color:#92400E; font-weight:bold; padding:0.2rem 0.5rem; border-radius:4px; font-size:12.5px;">🟡 ĐANG XÁC THỰC</span></td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+        </div>
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(2, document.querySelectorAll('.nav-link')[2])">
             ⬅️ Xem Chuyên Đề 3: Kiến Trúc 3 Khối
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(4, document.querySelectorAll('.nav-link')[4])">
-            Xem Chuyên Đề 5: Bảng Màu &amp; Độ Tương Phản ➔
+            Xem Chuyên Đề 5: Bảng Màu &amp; Tiêu Chuẩn Đọc ➔
           </button>
         </div>
       </section>
@@ -1068,7 +1293,7 @@
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(3, document.querySelectorAll('.nav-link')[3])">
-            ⬅️ Xem Chuyên Đề 4: Bản Vẽ Khung Giao Diện
+            ⬅️ Xem Chuyên Đề 4: Bản Vẽ Giao Diện Thực Tế
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(5, document.querySelectorAll('.nav-link')[5])">
             Xem Chuyên Đề 6: Quản Trị &amp; Kết Nối Dữ Liệu ➔
@@ -1134,7 +1359,7 @@
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(4, document.querySelectorAll('.nav-link')[4])">
-            ⬅️ Xem Chuyên Đề 5: Bảng Màu &amp; Độ Tương Phản
+            ⬅️ Xem Chuyên Đề 5: Bảng Màu &amp; Tiêu Chuẩn Đọc
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(0, document.querySelectorAll('.nav-link')[0])">
             Quay Về Chuyên Đề 1 (Trang Đầu) 🔄
