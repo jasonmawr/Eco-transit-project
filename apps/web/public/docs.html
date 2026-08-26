@@ -26,7 +26,7 @@
       font-family: 'Times New Roman', Times, serif;
       background-color: var(--bg-page);
       color: var(--text-main);
-      line-height: 1.55;
+      line-height: 1.6;
       font-size: 16px;
       -webkit-font-smoothing: antialiased;
     }
@@ -38,7 +38,7 @@
       z-index: 1000;
       background: var(--primary);
       color: #ffffff;
-      padding: 0.75rem 2rem;
+      padding: 0.75rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -84,51 +84,50 @@
     }
     .btn-live:hover { background: var(--accent-dark); }
 
-    /* Layout: Sidebar + Main Content */
+    /* Layout: Sidebar sát mép trái + Nội dung giữa cực rộng */
     .app-layout {
       display: flex;
-      max-width: 1300px;
-      margin: 1.5rem auto 4rem;
-      gap: 1.5rem;
-      padding: 0 1rem;
+      max-width: 98%;
+      margin: 1rem auto 3rem 1rem;
+      gap: 1.25rem;
     }
 
-    /* Left Sidebar Navigation */
+    /* Left Sidebar Navigation - Gọn gàng, sát góc trái */
     .sidebar {
-      width: 310px;
+      width: 250px;
       flex-shrink: 0;
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 1.5rem 1rem;
+      padding: 1.25rem 0.85rem;
       position: sticky;
       top: 4.5rem;
       height: fit-content;
-      max-height: calc(100vh - 6rem);
+      max-height: calc(100vh - 5.5rem);
       overflow-y: auto;
       box-shadow: 0 2px 6px rgba(0,0,0,0.04);
     }
     .sidebar-title {
-      font-size: 14px;
+      font-size: 14.5px;
       font-weight: bold;
       text-transform: uppercase;
       color: var(--primary);
       border-bottom: 2px solid var(--primary-light);
-      padding-bottom: 0.6rem;
-      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      margin-bottom: 0.85rem;
       letter-spacing: 0.5px;
     }
     .nav-list {
       list-style: none;
     }
     .nav-item {
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.3rem;
     }
     .nav-link {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.6rem 0.8rem;
+      padding: 0.55rem 0.75rem;
       border-radius: 4px;
       color: var(--text-main);
       text-decoration: none;
@@ -149,13 +148,13 @@
       border-left-color: var(--accent);
     }
 
-    /* Main Document Area */
+    /* Main Document Area - Mở rộng tối đa */
     .doc-main {
       flex: 1;
       background: #ffffff;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      padding: 3rem 3.5rem;
+      padding: 2.75rem 3.5rem;
       box-shadow: 0 3px 12px rgba(0,0,0,0.06);
       min-width: 0;
     }
@@ -189,7 +188,7 @@
       margin-bottom: 0.35rem;
     }
     .doc-title {
-      font-size: 24px;
+      font-size: 25px;
       font-weight: bold;
       text-transform: uppercase;
       color: var(--primary);
@@ -197,13 +196,13 @@
       line-height: 1.3;
     }
     .doc-sub {
-      font-size: 14px;
+      font-size: 14.5px;
       font-style: italic;
       color: var(--text-muted);
     }
 
     h2.chapter-title {
-      font-size: 19px;
+      font-size: 20px;
       font-weight: bold;
       text-transform: uppercase;
       color: var(--primary);
@@ -224,7 +223,7 @@
     }
 
     h3.section-heading {
-      font-size: 16.5px;
+      font-size: 17px;
       font-weight: bold;
       color: var(--primary-dark);
       margin: 1.6rem 0 0.6rem;
@@ -241,7 +240,7 @@
     p, li {
       text-align: left;
       margin-bottom: 0.85rem;
-      font-size: 15.5px;
+      font-size: 16px;
       line-height: 1.6;
     }
     ul, ol {
@@ -249,13 +248,13 @@
       margin-bottom: 1.2rem;
     }
 
-    /* Diagram Containers */
+    /* Diagram Containers - Tối ưu hiển thị to rõ */
     .figure-frame {
       border: 1px solid var(--border-color);
       border-radius: 4px;
       background: #FFFFFF;
-      padding: 1rem;
-      margin: 1.4rem 0;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
       text-align: center;
     }
     .figure-frame svg {
@@ -265,7 +264,7 @@
       margin: 0 auto;
     }
     .figure-caption {
-      font-size: 13.5px;
+      font-size: 14px;
       font-style: italic;
       color: var(--text-muted);
       margin-top: 0.65rem;
@@ -277,11 +276,11 @@
       width: 100%;
       border-collapse: collapse;
       margin: 1.2rem 0 1.6rem;
-      font-size: 14.5px;
+      font-size: 15px;
     }
     table.formal-table th, table.formal-table td {
       border: 1px solid #9CA3AF;
-      padding: 0.65rem 0.85rem;
+      padding: 0.7rem 0.9rem;
       text-align: left;
       line-height: 1.45;
     }
@@ -299,7 +298,7 @@
       border: 1px solid #D1D5DB;
       border-radius: 4px;
       padding: 1.1rem;
-      font-size: 13px;
+      font-size: 13.5px;
       line-height: 1.4;
       overflow-x: auto;
       margin: 1.2rem 0;
@@ -317,7 +316,7 @@
     }
     .page-nav-btn {
       font-family: 'Times New Roman', Times, serif;
-      font-size: 14.5px;
+      font-size: 15px;
       font-weight: bold;
       padding: 0.55rem 1.2rem;
       border: 1px solid var(--primary);
@@ -353,7 +352,7 @@
   <header class="top-bar">
     <div class="title-group">
       <h1>LƯỚT KHÓI CHẠM XANH — TÀI LIỆU ĐẶC TẢ THIẾT KẾ HỆ THỐNG</h1>
-      <p>Báo Cáo Toàn Diện: Use Cases, User Flows, Kiến Trúc 3 Tầng, Wireframe &amp; Design System</p>
+      <p>Báo Cáo Toàn Diện: Chức Năng, Hành Trình Người Dùng, Kiến Trúc 3 Khối, Wireframe &amp; Bảng Màu</p>
     </div>
     <div class="btn-group">
       <button class="btn btn-print" onclick="window.print()">🖨️ In / Xuất PDF Báo Cáo</button>
@@ -366,36 +365,36 @@
     
     <!-- Left Navigation Sidebar -->
     <aside class="sidebar">
-      <div class="sidebar-title">📑 MỤC LỤC CHUYÊN ĐỀ</div>
+      <div class="sidebar-title">📑 MỤC LỤC</div>
       <ul class="nav-list">
         <li class="nav-item">
           <a class="nav-link active" onclick="navigateToPage(0, this)">
-            <span>1.</span> Tổng Quan &amp; Ma Trận Use Case
+            <span>1.</span> Tổng Quan &amp; Chức Năng
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(1, this)">
-            <span>2.</span> Bản Đồ Hành Trình (Journey Maps)
+            <span>2.</span> Hành Trình Trải Nghiệm
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(2, this)">
-            <span>3.</span> Kiến Trúc 3 Tầng &amp; Thuật Toán
+            <span>3.</span> Kiến Trúc 3 Khối &amp; Tìm Đường
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(3, this)">
-            <span>4.</span> Bản Vẽ Wireframe &amp; Bố Cục UI
+            <span>4.</span> Bản Vẽ Khung Giao Diện
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(4, this)">
-            <span>5.</span> Design System &amp; Chuẩn WCAG AA
+            <span>5.</span> Bảng Màu &amp; Tiêu Chuẩn Đọc
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" onclick="navigateToPage(5, this)">
-            <span>6.</span> Quản Trị Hệ Thống &amp; API Specs
+            <span>6.</span> Quản Trị &amp; Kết Nối Dữ Liệu
           </a>
         </li>
       </ul>
@@ -408,12 +407,12 @@
       <section id="page-0" class="page-section active">
         <div class="doc-cover-header">
           <div class="doc-org">CHIẾN DỊCH GIAO THÔNG ĐÔ THỊ BỀN VỮNG TP. HỒ CHÍ MINH</div>
-          <h1 class="doc-title">HỒ SƠ ĐẶC TẢ THIẾT KẾ UX/UI VÀ KIẾN TRÚC HỆ THỐNG</h1>
+          <h1 class="doc-title">HỒ SƠ ĐẶC TẢ THIẾT KẾ VÀ KIẾN TRÚC HỆ THỐNG</h1>
           <div class="doc-sub">Dự án: Nền Tảng Di Chuyển Xanh &amp; Tích Lũy Điểm Thưởng "LƯỚT KHÓI CHẠM XANH"</div>
         </div>
 
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 1: TỔNG QUAN DỰ ÁN VÀ MA TRẬN USE CASE</span>
+          <span>CHUYÊN ĐỀ 1: TỔNG QUAN DỰ ÁN VÀ CÁC TÍNH NĂNG CHÍNH</span>
           <span class="chapter-badge">Phần 1 / 6</span>
         </h2>
 
@@ -422,18 +421,18 @@
           Dự án <strong>"Lướt Khói Chạm Xanh"</strong> là sáng kiến chuyển đổi số giao thông công cộng tại TP. Hồ Chí Minh nhằm khuyến khích thế hệ trẻ (Gen Z, học sinh, sinh viên), nhân viên văn phòng và du khách thay đổi thói quen di chuyển từ xe máy cá nhân sang phương tiện công cộng xanh (Tuyến Metro Số 1 Bến Thành - Suối Tiên và xe buýt điện VinBus).
         </p>
 
-        <h3 class="section-heading">1.2. Phân Tích Chân Dung Tác Nhân (Personas &amp; Actors)</h3>
+        <h3 class="section-heading">1.2. Phân Tích Chân Dung Người Dùng (Personas &amp; Actors)</h3>
         <table class="formal-table">
           <thead>
             <tr>
-              <th>Nhóm Tác Nhân</th>
+              <th>Nhóm Người Dùng</th>
               <th>Đặc Điểm &amp; Nhu Cầu Cốt Lõi</th>
-              <th>Kịch Bản Sử Dụng Chính (Use Cases)</th>
+              <th>Nhu Cầu Sử Dụng Thực Tế</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Hành Khách Gen Z / Sinh Viên</strong></td>
+              <td><strong>Người Đi Xe / Gen Z</strong></td>
               <td>Thích công nghệ, săn ưu đãi, check-in địa điểm mới lạ dọc tuyến Metro Số 1.</td>
               <td>Tra cứu lộ trình nhanh, quét ảnh chụp vé nhận dạng OCR, đổi Voucher Xanh SM 30k, tạo poster XanhWrap chia sẻ Facebook.</td>
             </tr>
@@ -448,110 +447,110 @@
               <td>Sử dụng tính năng "Khám phá ga", mở bài viết chi tiết 2 cột để xem giờ mở cửa, giá vé và hướng dẫn đi bộ từ sảnh ga.</td>
             </tr>
             <tr>
-              <td><strong>Quản Trị Viên (Admin / Moderator)</strong></td>
+              <td><strong>Ban Quản Trị (Admin / Kiểm duyệt viên)</strong></td>
               <td>Giám sát chỉ số thời gian thực, duyệt vé giao thông hợp lệ, điều phối kho voucher đối tác.</td>
               <td>Sử dụng Bảng điều khiển Admin Console: đối soát 48 vé tải lên (45 vé hợp lệ), theo dõi 937 lượt truy cập, 132 bài XanhWrap, 45 voucher Xanh SM.</td>
             </tr>
           </tbody>
         </table>
 
-        <h3 class="section-heading">1.3. Sơ Đồ Use Case Tổng Thể Hệ Thống (UML Use Case Diagram)</h3>
+        <h3 class="section-heading">1.3. Sơ Đồ Các Chức Năng Chính Trên Hệ Thống</h3>
         <p>
-          Sơ đồ đặc tả toàn bộ 7 Use Case nghiệp vụ chính kết nối giữa Hành khách và Quản trị viên:
+          Sơ đồ đặc tả toàn bộ 7 tính năng tương tác chính giữa Người dùng và Ban quản trị hệ thống:
         </p>
 
         <div class="figure-frame">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
   <!-- Title -->
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="0.5">
-    HÌNH 1. SƠ ĐỒ USE CASE TỔNG THỂ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH (UML USE CASE)
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle" letter-spacing="0.5">
+    HÌNH 1. SƠ ĐỒ CHỨC NĂNG NGHIỆP VỤ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH
   </text>
 
   <!-- Boundary -->
-  <rect x="230" y="75" width="500" height="525" rx="4" fill="#FAFCFB" stroke="#0F3E31" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="480" y="98" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">
-    PHẠM VI HỆ THỐNG LƯỚT KHÓI CHẠM XANH (SYSTEM BOUNDARY)
+  <rect x="220" y="70" width="520" height="555" rx="6" fill="#FAFCFB" stroke="#0F3E31" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="480" y="96" fill="#0F3E31" font-size="15" font-weight="bold" text-anchor="middle">
+    CÁC TÍNH NĂNG TRÊN ỨNG DỤNG LƯỚT KHÓI CHẠM XANH
   </text>
 
   <!-- ACTOR 1 -->
-  <g transform="translate(90, 220)">
-    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Hành Khách (Gen Z)</text>
-    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <g transform="translate(80, 230)">
+    <circle cx="25" cy="18" r="16" fill="#ffffff" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="25" y1="34" x2="25" y2="85" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="50" x2="-5" y2="40" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="50" x2="55" y2="40" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="85" x2="-2" y2="130" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="85" x2="52" y2="130" stroke="#0F3E31" stroke-width="3"/>
+    <text x="25" y="155" fill="#0F3E31" font-size="16" font-weight="bold" text-anchor="middle">Người Đi Xe / Gen Z</text>
+    <text x="25" y="175" fill="#555555" font-size="13" font-style="italic" text-anchor="middle">(Hành khách)</text>
   </g>
 
   <!-- ACTOR 2 -->
-  <g transform="translate(830, 220)">
-    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Quản Trị Viên (Admin)</text>
-    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <g transform="translate(830, 230)">
+    <circle cx="25" cy="18" r="16" fill="#ffffff" stroke="#4C1D95" stroke-width="2.5"/>
+    <line x1="25" y1="34" x2="25" y2="85" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="50" x2="-5" y2="40" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="50" x2="55" y2="40" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="85" x2="-2" y2="130" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="85" x2="52" y2="130" stroke="#4C1D95" stroke-width="3"/>
+    <text x="25" y="155" fill="#4C1D95" font-size="16" font-weight="bold" text-anchor="middle">Ban Quản Trị (Admin)</text>
+    <text x="25" y="175" fill="#555555" font-size="13" font-style="italic" text-anchor="middle">(Kiểm duyệt viên)</text>
   </g>
 
   <!-- USE CASES -->
-  <g transform="translate(300, 120)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC01: Tra cứu &amp; Tối ưu Lộ trình Xanh</text>
+  <g transform="translate(290, 115)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">1. Tìm &amp; Tối Ưu Lộ Trình Đi Lại</text>
   </g>
 
-  <g transform="translate(300, 185)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC02: Khám phá 21 Ga &amp; Mở khóa Cấp độ</text>
+  <g transform="translate(290, 185)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">2. Khám Phá 21 Ga &amp; Mở Khóa Địa Điểm</text>
   </g>
 
-  <g transform="translate(300, 250)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC03: Quét Vé OCR &amp; Tích Điểm Xanh</text>
+  <g transform="translate(290, 255)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">3. Chụp Vé Xe Tích Điểm Thưởng</text>
   </g>
 
-  <g transform="translate(300, 315)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC04: Đổi Voucher Xanh SM &amp; Quà Tặng</text>
+  <g transform="translate(290, 325)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">4. Đổi Voucher Xanh SM &amp; Quà Tặng</text>
   </g>
 
-  <g transform="translate(300, 380)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC05: Tạo Hóa Đơn XanhWrap &amp; Quay Số</text>
+  <g transform="translate(290, 395)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">5. Tạo Hóa Đơn XanhWrap &amp; Quay Thưởng</text>
   </g>
 
-  <g transform="translate(300, 450)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC06: Kiểm Duyệt Vé Xanh &amp; Đối Soát</text>
+  <g transform="translate(290, 470)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#4C1D95" font-size="14.5" font-weight="bold" text-anchor="middle">6. Duyệt Vé Xe Thật &amp; Cộng Điểm Ví</text>
   </g>
 
-  <g transform="translate(300, 515)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC07: Giám Sát Chỉ Số 937 Lượt &amp; Audit Logs</text>
+  <g transform="translate(290, 540)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#4C1D95" font-size="14.5" font-weight="bold" text-anchor="middle">7. Xem Thống Kê 937 Lượt &amp; Nhật Ký Hệ Thống</text>
   </g>
 
   <!-- Connectors -->
-  <line x1="130" y1="260" x2="320" y2="140" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="205" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="270" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="335" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="400" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="125" y1="270" x2="310" y2="140" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="210" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="280" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="350" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="420" stroke="#0F3E31" stroke-width="1.5"/>
 
-  <line x1="830" y1="260" x2="640" y2="335" stroke="#4C1D95" stroke-width="1.2"/>
-  <line x1="830" y1="260" x2="640" y2="470" stroke="#4C1D95" stroke-width="1.2"/>
-  <line x1="830" y1="260" x2="640" y2="535" stroke="#4C1D95" stroke-width="1.2"/>
+  <line x1="830" y1="270" x2="650" y2="350" stroke="#4C1D95" stroke-width="1.5"/>
+  <line x1="830" y1="270" x2="650" y2="495" stroke="#4C1D95" stroke-width="1.5"/>
+  <line x1="830" y1="270" x2="650" y2="565" stroke="#4C1D95" stroke-width="1.5"/>
 </svg>
-          <div class="figure-caption">Hình 1. Sơ đồ Use Case tổng thể nền tảng Lướt Khói Chạm Xanh</div>
+          <div class="figure-caption">Hình 1. Sơ đồ các chức năng chính trên nền tảng Lướt Khói Chạm Xanh</div>
         </div>
 
         <div class="page-nav-bar">
           <div></div>
           <button class="page-nav-btn" onclick="navigateToPage(1, document.querySelectorAll('.nav-link')[1])">
-            Xem Chuyên Đề 2: Bản Đồ Hành Trình ➔
+            Xem Chuyên Đề 2: Hành Trình Trải Nghiệm ➔
           </button>
         </div>
       </section>
@@ -559,160 +558,160 @@
       <!-- CHAPTER 2: JOURNEY MAPS -->
       <section id="page-1" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 2: BẢN ĐỒ HÀNH TRÌNH TRẢI NGHIỆM KHÁCH HÀNG</span>
+          <span>CHUYÊN ĐỀ 2: BẢN ĐỒ HÀNH TRÌNH TRẢI NGHIỆM NGƯỜI DÙNG</span>
           <span class="chapter-badge">Phần 2 / 6</span>
         </h2>
 
-        <h3 class="section-heading">2.1. Bản Đồ Hành Trình Trải Nghiệm 4 Giai Đoạn (User Journey Map)</h3>
+        <h3 class="section-heading">2.1. Bản Đồ Hành Trình Trải Nghiệm 4 Giai Đoạn</h3>
         <p>
           Mô hình hóa toàn diện 4 giai đoạn trải nghiệm của sinh viên từ lúc tiếp cận nền tảng trên điện thoại đến bước lan tỏa thông điệp trên mạng xã hội:
         </p>
 
         <div class="figure-frame">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 380" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
-    HÌNH 2. BẢN ĐỒ HÀNH TRÌNH TRẢI NGHIỆM NGƯỜI DÙNG (USER JOURNEY MAP — GEN Z)
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 390" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+    HÌNH 2. BẢN ĐỒ TRẢI NGHIỆM CỦA NGƯỜI DÙNG (USER JOURNEY MAP — GEN Z)
   </text>
 
   <!-- 4 PHASES -->
-  <g transform="translate(30, 75)">
+  <g transform="translate(25, 70)">
     <!-- Phase 1 -->
-    <rect x="0" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
-    <rect x="0" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
-    <text x="105" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
+    <rect x="0" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="0" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
+    <text x="107" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. Tìm Đường &amp; Giá Vé</text>
     
-    <text x="15" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
-    <text x="25" y="85" fill="#333" font-size="11.5">- Mở web trên điện thoại</text>
-    <text x="25" y="105" fill="#333" font-size="11.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
-    <text x="25" y="125" fill="#333" font-size="11.5">- Xem gợi ý tránh mưa</text>
+    <text x="15" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="25" y="95" fill="#333" font-size="13.5">- Mở web trên điện thoại</text>
+    <text x="25" y="118" fill="#333" font-size="13.5">- Nhập KTX ĐHQG ➔ Bến Thành</text>
+    <text x="25" y="141" fill="#333" font-size="13.5">- Xem gợi ý đường đi tránh mưa</text>
 
-    <text x="15" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
-    <text x="25" y="180" fill="#0F3E31" font-size="11.5">- Biểu giá chuẩn: 12.000đ</text>
-    <text x="25" y="200" fill="#0F3E31" font-size="11.5">- Tiết kiệm 450g CO₂</text>
+    <text x="15" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
+    <text x="25" y="205" fill="#0F3E31" font-size="13.5">- Giá vé chính xác: 12.000đ</text>
+    <text x="25" y="228" fill="#0F3E31" font-size="13.5">- Giảm 450g khói bụi CO₂</text>
 
-    <text x="105" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+    <text x="107" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 2 -->
-    <rect x="230" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
-    <rect x="230" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
-    <text x="335" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. Trải Nghiệm Đi Tàu</text>
+    <rect x="230" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="230" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
+    <text x="337" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. Đi Tàu Thực Tế</text>
     
-    <text x="245" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
-    <text x="255" y="85" fill="#333" font-size="11.5">- Lên tàu Metro Tuyến 1</text>
-    <text x="255" y="105" fill="#333" font-size="11.5">- Check-in ga Tân Cảng, Ba Son</text>
-    <text x="255" y="125" fill="#333" font-size="11.5">- Chụp ảnh lưu cuống vé</text>
+    <text x="245" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="255" y="95" fill="#333" font-size="13.5">- Lên tàu Metro Tuyến 1</text>
+    <text x="255" y="118" fill="#333" font-size="13.5">- Ngắm cảnh qua cầu Sài Gòn</text>
+    <text x="255" y="141" fill="#333" font-size="13.5">- Chụp lại vé xe làm kỷ niệm</text>
 
-    <text x="245" y="160" fill="#111" font-size="12" font-weight="bold">• Cảm nhận:</text>
-    <text x="255" y="180" fill="#0F3E31" font-size="11.5">- Tàu êm, máy lạnh mát</text>
-    <text x="255" y="200" fill="#0F3E31" font-size="11.5">- Ga sạch đẹp văn minh</text>
+    <text x="245" y="180" fill="#111" font-size="14" font-weight="bold">• Cảm nhận:</text>
+    <text x="255" y="205" fill="#0F3E31" font-size="13.5">- Tàu chạy êm, mát mẻ</text>
+    <text x="255" y="228" fill="#0F3E31" font-size="13.5">- Ga hiện đại, sạch sẽ</text>
 
-    <text x="335" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+    <text x="337" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 3 -->
-    <rect x="460" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
-    <rect x="460" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
-    <text x="565" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
+    <rect x="460" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="460" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
+    <text x="567" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. Tích Điểm &amp; Đổi Quà</text>
     
-    <text x="475" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
-    <text x="485" y="85" fill="#333" font-size="11.5">- Tải ảnh chụp vé lên web</text>
-    <text x="485" y="105" fill="#333" font-size="11.5">- OCR duyệt tự động</text>
-    <text x="485" y="125" fill="#333" font-size="11.5">- Đổi Voucher Xanh SM 30k</text>
+    <text x="475" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="485" y="95" fill="#333" font-size="13.5">- Tải ảnh vé lên hệ thống</text>
+    <text x="485" y="118" fill="#333" font-size="13.5">- Hệ thống tự quét đọc vé</text>
+    <text x="485" y="141" fill="#333" font-size="13.5">- Đổi Voucher Xanh SM 30k</text>
 
-    <text x="475" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
-    <text x="485" y="180" fill="#0F3E31" font-size="11.5">- Cộng 10 Điểm Xanh</text>
-    <text x="485" y="200" fill="#0F3E31" font-size="11.5">- Nhận mã barcode ngay</text>
+    <text x="475" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
+    <text x="485" y="205" fill="#0F3E31" font-size="13.5">- Được cộng 10 điểm xanh</text>
+    <text x="485" y="228" fill="#0F3E31" font-size="13.5">- Nhận mã barcode ngay</text>
 
-    <text x="565" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+    <text x="567" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
 
     <!-- Phase 4 -->
-    <rect x="690" y="0" width="210" height="270" rx="4" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.2"/>
-    <rect x="690" y="0" width="210" height="35" rx="4" fill="#0F3E31"/>
-    <text x="795" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">4. XanhWrap &amp; Lan Tỏa</text>
+    <rect x="690" y="0" width="215" height="295" rx="6" fill="#F9FBFA" stroke="#D1E7DD" stroke-width="1.5"/>
+    <rect x="690" y="0" width="215" height="40" rx="6" fill="#0F3E31"/>
+    <text x="797" y="26" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">4. Lan Tỏa Mạng Xã Hội</text>
     
-    <text x="705" y="65" fill="#111" font-size="12" font-weight="bold">• Hành động:</text>
-    <text x="715" y="85" fill="#333" font-size="11.5">- Tạo thẻ tổng kết XanhWrap</text>
-    <text x="715" y="105" fill="#333" font-size="11.5">- Xuất ảnh poster cá nhân hóa</text>
-    <text x="715" y="125" fill="#333" font-size="11.5">- Chia sẻ Story Facebook</text>
+    <text x="705" y="70" fill="#111" font-size="14" font-weight="bold">• Người dùng làm gì:</text>
+    <text x="715" y="95" fill="#333" font-size="13.5">- Tạo thẻ tổng kết XanhWrap</text>
+    <text x="715" y="118" fill="#333" font-size="13.5">- Tải ảnh poster đẹp về máy</text>
+    <text x="715" y="141" fill="#333" font-size="13.5">- Đăng lên Story Facebook</text>
 
-    <text x="705" y="160" fill="#111" font-size="12" font-weight="bold">• Kết quả:</text>
-    <text x="715" y="180" fill="#0F3E31" font-size="11.5">- Hashtag #LuotKhoiChamXanh</text>
-    <text x="715" y="200" fill="#0F3E31" font-size="11.5">- Lan tỏa thông điệp xanh</text>
+    <text x="705" y="180" fill="#111" font-size="14" font-weight="bold">• Kết quả nhận được:</text>
+    <text x="715" y="205" fill="#0F3E31" font-size="13.5">- Kèm #LuotKhoiChamXanh</text>
+    <text x="715" y="228" fill="#0F3E31" font-size="13.5">- Rủ bạn bè cùng đi tàu</text>
 
-    <text x="795" y="245" fill="#059669" font-size="12" font-weight="bold" text-anchor="middle">⭐ Điểm hài lòng: 5/5</text>
+    <text x="797" y="270" fill="#059669" font-size="14" font-weight="bold" text-anchor="middle">⭐ Mức hài lòng: 5/5</text>
   </g>
 </svg>
           <div class="figure-caption">Hình 2. Bản đồ hành trình trải nghiệm 4 giai đoạn của người dùng Gen Z</div>
         </div>
 
-        <h3 class="section-heading">2.2. Vòng Đời Kiểm Duyệt Vé &amp; Tích Điểm Thưởng (State Machine)</h3>
+        <h3 class="section-heading">2.2. Quy Trình Kiểm Duyệt Vé Xe &amp; Tích Điểm Thưởng</h3>
         <p>
-          Quy trình xử lý tự động và bán tự động ảnh chụp vé nhằm chống gian lận và cộng điểm chính xác vào Sổ cái PointsLedger:
+          Quy trình tự động quét đọc vé xe, đối soát tính hợp lệ và cộng điểm vào ví của người dùng:
         </p>
 
         <div class="figure-frame">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 300" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
-    HÌNH 3. SƠ ĐỒ MÁY CHUYỂN TRẠNG THÁI KIỂM DUYỆT VÉ &amp; TÍCH ĐIỂM (STATE MACHINE)
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+    HÌNH 3. QUY TRÌNH DUYỆT VÉ XE &amp; CỘNG ĐIỂM THƯỞNG VÀO VÍ
   </text>
 
   <!-- Start -->
-  <circle cx="60" cy="150" r="14" fill="#0F3E31"/>
-  <line x1="74" y1="150" x2="140" y2="150" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="140,150 132,145 132,155" fill="#0F3E31"/>
+  <circle cx="50" cy="160" r="16" fill="#0F3E31"/>
+  <line x1="66" y1="160" x2="120" y2="160" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="120,160 110,154 110,166" fill="#0F3E31"/>
 
   <!-- State 1: Uploaded -->
-  <rect x="140" y="120" width="160" height="60" rx="6" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
-  <text x="220" y="145" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">1. Đã Tải Lên</text>
-  <text x="220" y="165" fill="#555555" font-size="11" text-anchor="middle">(Tesseract OCR Quét)</text>
+  <rect x="120" y="125" width="180" height="70" rx="6" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.8"/>
+  <text x="210" y="153" fill="#0F3E31" font-size="15" font-weight="bold" text-anchor="middle">1. Đã Tải Ảnh Vé</text>
+  <text x="210" y="176" fill="#555555" font-size="13" text-anchor="middle">(Hệ thống quét đọc thông tin)</text>
 
-  <line x1="300" y1="150" x2="380" y2="150" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="380,150 372,145 372,155" fill="#0F3E31"/>
+  <line x1="300" y1="160" x2="360" y2="160" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="360,160 350,154 350,166" fill="#0F3E31"/>
 
   <!-- State 2: Pending Moderation -->
-  <rect x="380" y="120" width="190" height="60" rx="6" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
-  <text x="475" y="145" fill="#92400E" font-size="13" font-weight="bold" text-anchor="middle">2. Chờ Kiểm Duyệt</text>
-  <text x="475" y="165" fill="#555555" font-size="11" text-anchor="middle">(Đối soát số vé &amp; ngày đi)</text>
+  <rect x="360" y="125" width="200" height="70" rx="6" fill="#FEF9E7" stroke="#B45309" stroke-width="1.8"/>
+  <text x="460" y="153" fill="#92400E" font-size="15" font-weight="bold" text-anchor="middle">2. Chờ Xác Thực</text>
+  <text x="460" y="176" fill="#555555" font-size="13" text-anchor="middle">(Kiểm tra số vé &amp; ngày đi)</text>
 
   <!-- Transition Valid -->
-  <line x1="570" y1="135" x2="660" y2="105" stroke="#059669" stroke-width="2"/>
-  <polygon points="660,105 650,104 654,113" fill="#059669"/>
-  <text x="615" y="112" fill="#059669" font-size="11" font-weight="bold">Hợp lệ</text>
+  <line x1="560" y1="145" x2="650" y2="110" stroke="#059669" stroke-width="2.5"/>
+  <polygon points="650,110 638,109 643,119" fill="#059669"/>
+  <text x="605" y="118" fill="#059669" font-size="13" font-weight="bold">Vé Hợp Lệ</text>
 
   <!-- State 3: Verified -->
-  <rect x="660" y="75" width="190" height="60" rx="6" fill="#D1E7DD" stroke="#0F3E31" stroke-width="1.5"/>
-  <text x="755" y="100" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">3. Đã Phê Duyệt (Verified)</text>
-  <text x="755" y="120" fill="#047857" font-size="11" font-weight="bold">+10 Điểm Sổ Cái PointsLedger</text>
+  <rect x="650" y="75" width="210" height="70" rx="6" fill="#D1E7DD" stroke="#0F3E31" stroke-width="1.8"/>
+  <text x="755" y="103" fill="#0F3E31" font-size="15.5" font-weight="bold" text-anchor="middle">3. Đã Phê Duyệt</text>
+  <text x="755" y="126" fill="#047857" font-size="13.5" font-weight="bold" text-anchor="middle">+10 Điểm Vào Ví Thành Viên</text>
 
   <!-- Transition Invalid -->
-  <line x1="570" y1="165" x2="660" y2="195" stroke="#DC2626" stroke-width="2"/>
-  <polygon points="660,195 654,187 650,196" fill="#DC2626"/>
-  <text x="615" y="195" fill="#DC2626" font-size="11" font-weight="bold">Trùng/Sai</text>
+  <line x1="560" y1="175" x2="650" y2="210" stroke="#DC2626" stroke-width="2.5"/>
+  <polygon points="650,210 643,201 638,211" fill="#DC2626"/>
+  <text x="605" y="210" fill="#DC2626" font-size="13" font-weight="bold">Trùng/Sai</text>
 
   <!-- State 4: Rejected -->
-  <rect x="660" y="165" width="190" height="60" rx="6" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
-  <text x="755" y="190" fill="#991B1B" font-size="13" font-weight="bold" text-anchor="middle">4. Từ Chối (Rejected)</text>
-  <text x="755" y="210" fill="#7F1D1D" font-size="11" text-anchor="middle">Thông báo lý do từ chối</text>
+  <rect x="650" y="175" width="210" height="70" rx="6" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.8"/>
+  <text x="755" y="203" fill="#991B1B" font-size="15.5" font-weight="bold" text-anchor="middle">4. Từ Chối Duyệt</text>
+  <text x="755" y="226" fill="#7F1D1D" font-size="13" text-anchor="middle">(Báo lý do cho người dùng)</text>
 
   <!-- End Circles -->
-  <circle cx="895" cy="105" r="14" fill="#0F3E31"/>
-  <circle cx="895" cy="105" r="10" fill="#ffffff"/>
-  <line x1="850" y1="105" x2="881" y2="105" stroke="#0F3E31" stroke-width="2"/>
+  <circle cx="900" cy="110" r="16" fill="#0F3E31"/>
+  <circle cx="900" cy="110" r="11" fill="#ffffff"/>
+  <line x1="860" y1="110" x2="884" y2="110" stroke="#0F3E31" stroke-width="2"/>
 
-  <circle cx="895" cy="195" r="14" fill="#DC2626"/>
-  <circle cx="895" cy="195" r="10" fill="#ffffff"/>
-  <line x1="850" y1="195" x2="881" y2="195" stroke="#DC2626" stroke-width="2"/>
+  <circle cx="900" cy="210" r="16" fill="#DC2626"/>
+  <circle cx="900" cy="210" r="11" fill="#ffffff"/>
+  <line x1="860" y1="210" x2="884" y2="210" stroke="#DC2626" stroke-width="2"/>
 </svg>
-          <div class="figure-caption">Hình 3. Sơ đồ máy chuyển trạng thái duyệt vé và tích điểm xanh</div>
+          <div class="figure-caption">Hình 3. Quy trình duyệt vé xe và cộng điểm xanh vào ví thành viên</div>
         </div>
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(0, document.querySelectorAll('.nav-link')[0])">
-            ⬅️ Xem Chuyên Đề 1: Tổng Quan &amp; Use Case
+            ⬅️ Xem Chuyên Đề 1: Tổng Quan &amp; Chức Năng
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(2, document.querySelectorAll('.nav-link')[2])">
-            Xem Chuyên Đề 3: Kiến Trúc 3 Tầng ➔
+            Xem Chuyên Đề 3: Kiến Trúc 3 Khối ➔
           </button>
         </div>
       </section>
@@ -720,181 +719,181 @@
       <!-- CHAPTER 3: ARCHITECTURE & ALGORITHMS -->
       <section id="page-2" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 3: KIẾN TRÚC HỆ THỐNG &amp; THUẬT TOÁN ĐIỀU HƯỚNG</span>
+          <span>CHUYÊN ĐỀ 3: KIẾN TRÚC HỆ THỐNG &amp; TÌM ĐƯỜNG THÔNG MINH</span>
           <span class="chapter-badge">Phần 3 / 6</span>
         </h2>
 
-        <h3 class="section-heading">3.1. Sơ Đồ Kiến Trúc Hệ Thống 3 Tầng (3-Tier Cloud Architecture)</h3>
+        <h3 class="section-heading">3.1. Sơ Đồ Kiến Trúc Hệ Thống 3 Khối Hoạt Động</h3>
         <p>
-          Hệ thống được thiết kế theo mô hình 3 tầng phân tách độc lập nhằm đảm bảo khả năng mở rộng (Scalability) và bảo mật dữ liệu cấp doanh nghiệp:
+          Hệ thống được chia thành 3 khối hoạt động chuyên biệt: Giao diện Web người dùng, Máy chủ xử lý trung tâm và Cơ sở dữ liệu lưu trữ:
+        </p>
+
+        <div class="figure-frame">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+    HÌNH 4. SƠ ĐỒ KIẾN TRÚC HỆ THỐNG 3 KHỐI HOẠT ĐỘNG
+  </text>
+
+  <!-- BLOCK 1: GIAO DIỆN NGƯỜI DÙNG -->
+  <g transform="translate(25, 70)">
+    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="280" height="42" rx="6" fill="#1E293B"/>
+    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">1. GIAO DIỆN WEB NGƯỜI DÙNG</text>
+
+    <rect x="15" y="55" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="82" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Trang Web Next.js 14</text>
+    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">Hiển thị nhanh, chuẩn tìm kiếm Google</text>
+
+    <rect x="15" y="135" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="162" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Cửa Sổ Xem Ga 2 Cột</text>
+    <text x="140" y="184" fill="#475569" font-size="13" text-anchor="middle">Xem chi tiết 21 ga không bị cắt chữ</text>
+
+    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="247" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xuất Poster XanhWrap</text>
+    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">Tạo ảnh tổng kết hành trình sắc nét</text>
+
+    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="327" fill="#0F172A" font-size="14.5" font-weight="bold" text-anchor="middle">Bảng Màu Xanh Chuẩn Đẹp</text>
+    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Tương phản cao, dịu mắt, dễ nhìn</text>
+
+    <rect x="15" y="380" width="250" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="140" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Máy Chủ Vercel</text>
+    <text x="140" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
+    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Tốc độ mở trang cực nhanh</text>
+  </g>
+
+  <!-- BLOCK 2: MÁY CHỦ XỬ LÝ & TÍNH TOÁN -->
+  <g transform="translate(340, 70)">
+    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="280" height="42" rx="6" fill="#0F3E31"/>
+    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">2. MÁY CHỦ XỬ LÝ (BACKEND)</text>
+
+    <rect x="15" y="55" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="82" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bộ Xử Lý API Express.js</text>
+    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">Tiếp nhận và phản hồi tức thì</text>
+
+    <rect x="15" y="135" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="162" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Thuật Toán Tìm Đường Tối Ưu</text>
+    <text x="140" y="184" fill="#475569" font-size="13" text-anchor="middle">Tính đúng giá vé Metro: 7k-12k-16k-20k</text>
+
+    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="247" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Trí Tuệ Nhân Tạo Đọc Vé OCR</text>
+    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">Tự động nhận diện chữ số trên vé xe</text>
+
+    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="327" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Bảo Mật Tài Khoản Đa Lớp</text>
+    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Mã hóa mật khẩu an toàn tuyệt đối</text>
+
+    <rect x="15" y="380" width="250" height="110" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="140" y="408" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">Nền Tảng Điện Toán Render</text>
+    <text x="140" y="435" fill="#047857" font-size="14" font-weight="bold" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
+    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Chạy 24/7 ổn định liên tục</text>
+  </g>
+
+  <!-- BLOCK 3: CƠ SỞ DỮ LIỆU & LƯU TRỮ -->
+  <g transform="translate(655, 70)">
+    <rect width="280" height="505" rx="6" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.5"/>
+    <rect width="280" height="42" rx="6" fill="#92400E"/>
+    <text x="140" y="27" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">3. CƠ SỞ DỮ LIỆU (DATABASE)</text>
+
+    <rect x="15" y="55" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="82" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Dữ Liệu Tuyến &amp; 21 Địa Điểm</text>
+    <text x="140" y="104" fill="#475569" font-size="13" text-anchor="middle">14 Ga Metro • 21 Điểm Đến • 132 Wraps</text>
+
+    <rect x="15" y="137" width="250" height="72" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="164" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Sổ Cái Điểm Thưởng Bất Biến</text>
+    <text x="140" y="186" fill="#475569" font-size="13" text-anchor="middle">45 Vé Hợp Lệ • 45 Voucher Xanh SM</text>
+
+    <rect x="15" y="220" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="247" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Ghi Nhận Lượt Truy Cập</text>
+    <text x="140" y="269" fill="#475569" font-size="13" text-anchor="middle">937 Lượt truy cập Landing Page</text>
+
+    <rect x="15" y="300" width="250" height="68" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
+    <text x="140" y="327" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Kho Mã Quà Tặng Voucher</text>
+    <text x="140" y="349" fill="#475569" font-size="13" text-anchor="middle">Kho mã ưu đãi taxi điện Xanh SM</text>
+
+    <rect x="15" y="380" width="250" height="110" rx="4" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
+    <text x="140" y="408" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Nhật Ký Kiểm Toán (Audit Log)</text>
+    <text x="140" y="435" fill="#B45309" font-size="13.5" font-weight="bold" text-anchor="middle">Bảo Mật &amp; Minh Bạch 100%</text>
+    <text x="140" y="462" fill="#555555" font-size="12.5" text-anchor="middle">Lưu vết thao tác duyệt vé của Admin</text>
+  </g>
+
+  <!-- Connectors -->
+  <line x1="305" y1="322" x2="340" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="340,322 330,316 330,328" fill="#0F3E31"/>
+
+  <line x1="620" y1="322" x2="655" y2="322" stroke="#0F3E31" stroke-width="2.5"/>
+  <polygon points="655,322 645,316 645,328" fill="#0F3E31"/>
+</svg>
+          <div class="figure-caption">Hình 4. Sơ đồ kiến trúc 3 khối hoạt động của hệ thống Lướt Khói Chạm Xanh</div>
+        </div>
+
+        <h3 class="section-heading">3.2. Thuật Toán Tìm Đường Đi Thông Minh &amp; Tính Đúng Giá Vé Metro</h3>
+        <p>
+          Thuật toán tìm đường Dijkstra được tối ưu hóa theo đồ thị mạng lưới Metro Line 1 và hệ thống Bus kết nối, tự động tích hợp điều kiện thời tiết (nắng nóng, mưa rào, ban đêm) và tự động gộp chặng tính giá vé:
         </p>
 
         <div class="figure-frame">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
-    HÌNH 4. SƠ ĐỒ KIẾN TRÚC HỆ THỐNG 3 TẦNG (3-TIER ARCHITECTURE)
-  </text>
-
-  <!-- TIER 1 -->
-  <g transform="translate(35, 75)">
-    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
-    <rect width="270" height="35" rx="4" fill="#1E293B"/>
-    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. TẦNG TRÌNH DIỄN (CLIENT)</text>
-
-    <rect x="15" y="50" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="75" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Next.js 14 App Router</text>
-    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">React 18 SSR &amp; SEO Metadata</text>
-
-    <rect x="15" y="125" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="150" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">React Portal Modal Engine</text>
-    <text x="135" y="170" fill="#64748B" font-size="11" text-anchor="middle">Gắn document.body chống cắt xén</text>
-
-    <rect x="15" y="205" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="230" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Framer Motion &amp; Canvas</text>
-    <text x="135" y="250" fill="#64748B" font-size="11" text-anchor="middle">Xuất poster XanhWrap HD</text>
-
-    <rect x="15" y="280" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="305" fill="#0F172A" font-size="12" font-weight="bold" text-anchor="middle">Design Tokens &amp; WCAG AA</text>
-    <text x="135" y="325" fill="#64748B" font-size="11" text-anchor="middle">Bảng màu tiêu chuẩn xanh TP.HCM</text>
-
-    <rect x="15" y="355" width="240" height="105" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="135" y="380" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Triển Khai: VERCEL EDGE</text>
-    <text x="135" y="405" fill="#047857" font-size="11.5" font-weight="bold" text-anchor="middle">luotkhoichamxanh.vercel.app</text>
-    <text x="135" y="430" fill="#555555" font-size="10.5" text-anchor="middle">Tự động CI/CD từ GitHub main</text>
-  </g>
-
-  <!-- TIER 2 -->
-  <g transform="translate(345, 75)">
-    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
-    <rect width="270" height="35" rx="4" fill="#0F3E31"/>
-    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. TẦNG DỊCH VỤ (API SERVER)</text>
-
-    <rect x="15" y="50" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="75" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Express.js &amp; TypeScript API</text>
-    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">RESTful Endpoints &amp; Rate Limiting</text>
-
-    <rect x="15" y="125" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="150" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Thuật toán Dijkstra &amp; Tariff</text>
-    <text x="135" y="170" fill="#64748B" font-size="11" text-anchor="middle">Gộp chặng &amp; Biểu giá 7k-12k-16k-20k</text>
-
-    <rect x="15" y="205" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="230" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Tesseract OCR &amp; Vision</text>
-    <text x="135" y="250" fill="#64748B" font-size="11" text-anchor="middle">Đối soát vé Metro &amp; Bus tự động</text>
-
-    <rect x="15" y="280" width="240" height="60" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="305" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Argon2 Password &amp; JWT</text>
-    <text x="135" y="325" fill="#64748B" font-size="11" text-anchor="middle">Bảo mật đa tầng &amp; Phân quyền</text>
-
-    <rect x="15" y="355" width="240" height="105" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="135" y="380" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Triển Khai: RENDER CLOUD</text>
-    <text x="135" y="405" fill="#047857" font-size="11.5" font-weight="bold" text-anchor="middle">api.luotkhoichamxanh.onrender.com</text>
-    <text x="135" y="430" fill="#555555" font-size="10.5" text-anchor="middle">Container Node.js 20 LTS</text>
-  </g>
-
-  <!-- TIER 3 -->
-  <g transform="translate(655, 75)">
-    <rect width="270" height="480" rx="4" fill="#F8FAFC" stroke="#94A3B8" stroke-width="1.2"/>
-    <rect width="270" height="35" rx="4" fill="#92400E"/>
-    <text x="135" y="23" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. TẦNG DỮ LIỆU (DATABASE)</text>
-
-    <rect x="15" y="50" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="75" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">PostgreSQL Database</text>
-    <text x="135" y="95" fill="#64748B" font-size="11" text-anchor="middle">14 Ga Metro • 21 Địa Điểm • 132 Wraps</text>
-
-    <rect x="15" y="130" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="155" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">PointsLedger (Sổ Cái)</text>
-    <text x="135" y="175" fill="#64748B" font-size="11" text-anchor="middle">45 Lượt đổi Xanh SM • 45 Vé duyệt</text>
-
-    <rect x="15" y="210" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="235" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">VisitorLog &amp; Analytics</text>
-    <text x="135" y="255" fill="#64748B" font-size="11" text-anchor="middle">937 Lượt truy cập Landing Page</text>
-
-    <rect x="15" y="290" width="240" height="65" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="315" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">Voucher &amp; Code Vault</text>
-    <text x="135" y="335" fill="#64748B" font-size="11" text-anchor="middle">Kho mã quà tặng Xanh SM, Highlands</text>
-
-    <rect x="15" y="370" width="240" height="90" rx="4" fill="#ffffff" stroke="#CBD5E1" stroke-width="1"/>
-    <text x="135" y="395" fill="#92400E" font-size="12" font-weight="bold" text-anchor="middle">AuditLog (Kiểm Toán)</text>
-    <text x="135" y="415" fill="#64748B" font-size="11" text-anchor="middle">Nhật ký truy vết bảo mật Admin/Mod</text>
-  </g>
-
-  <!-- Connectors -->
-  <line x1="305" y1="315" x2="345" y2="315" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="345,315 337,310 337,320" fill="#0F3E31"/>
-
-  <line x1="615" y1="315" x2="655" y2="315" stroke="#0F3E31" stroke-width="2"/>
-  <polygon points="655,315 647,310 647,320" fill="#0F3E31"/>
-</svg>
-          <div class="figure-caption">Hình 4. Kiến trúc hệ thống 3 tầng phân tách độc lập</div>
-        </div>
-
-        <h3 class="section-heading">3.2. Thuật Toán Lập Lộ Trình Đa Phương Thức Dijkstra &amp; Biểu Giá Gộp</h3>
-        <p>
-          Thuật toán tìm đường Dijkstra được tối ưu hóa theo đồ thị mạng lưới Metro Line 1 và hệ thống Bus kết nối, đồng thời tích hợp ma trận trọng số thời tiết (nắng nóng, mưa rào, ban đêm) và cơ chế tính giá vé gộp:
-        </p>
-
-        <div class="figure-frame">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle">
-    HÌNH 5. LƯU ĐỒ THUẬT TOÁN DIJKSTRA &amp; TÍNH GIÁ VÉ GỘP CHUẨN (DIJKSTRA FLOWCHART)
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle">
+    HÌNH 5. LƯU ĐỒ TÌM ĐƯỜNG ĐI THÔNG MINH &amp; TÍNH ĐÚNG GIÁ VÉ METRO
   </text>
 
   <!-- START -->
-  <rect x="380" y="80" width="200" height="40" rx="20" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
-  <text x="480" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi / Đến</text>
+  <rect x="360" y="75" width="240" height="45" rx="22.5" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="480" y="103" fill="#ffffff" font-size="15" font-weight="bold" text-anchor="middle">BẮT ĐẦU: Nhập Điểm Đi &amp; Đến</text>
 
-  <line x1="480" y1="120" x2="480" y2="145" stroke="#0F3E31" stroke-width="1.5"/>
-  <polygon points="480,145 475,138 485,138" fill="#0F3E31"/>
+  <line x1="480" y1="120" x2="480" y2="148" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="480,148 474,140 486,140" fill="#0F3E31"/>
 
   <!-- STEP 1 -->
-  <rect x="340" y="145" width="280" height="50" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-  <text x="480" y="167" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Nạp Đồ Thị 14 Ga Metro 1 &amp; Tuyến Bus</text>
-  <text x="480" y="185" fill="#555555" font-size="11" text-anchor="middle">Trọng số: Khoảng cách, Thời gian, Phương thức</text>
+  <rect x="310" y="148" width="340" height="55" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="480" y="172" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">1. Nạp Bản Đồ 14 Ga Metro Số 1 &amp; Tuyến Xe Buýt</text>
+  <text x="480" y="193" fill="#555555" font-size="13" text-anchor="middle">(Thông tin khoảng cách, thời gian và trạm trung chuyển)</text>
 
-  <line x1="480" y1="195" x2="480" y2="220" stroke="#0F3E31" stroke-width="1.5"/>
-  <polygon points="480,220 475,213 485,213" fill="#0F3E31"/>
+  <line x1="480" y1="203" x2="480" y2="232" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="480,232 474,224 486,224" fill="#0F3E31"/>
 
   <!-- DECISION WEATHER -->
-  <polygon points="480,220 600,260 480,300 360,260" fill="#FEF9E7" stroke="#B45309" stroke-width="1.2"/>
-  <text x="480" y="255" fill="#92400E" font-size="11.5" font-weight="bold" text-anchor="middle">Context Thời Tiết?</text>
-  <text x="480" y="272" fill="#92400E" font-size="10.5" text-anchor="middle">(Mưa / Nắng nóng / Ban đêm)</text>
+  <polygon points="480,232 620,277 480,322 340,277" fill="#FEF9E7" stroke="#B45309" stroke-width="1.5"/>
+  <text x="480" y="271" fill="#92400E" font-size="14.5" font-weight="bold" text-anchor="middle">Điều Kiện Thời Tiết?</text>
+  <text x="480" y="291" fill="#92400E" font-size="13" text-anchor="middle">(Mưa to / Nắng gắt / Ban đêm)</text>
 
-  <line x1="600" y1="260" x2="710" y2="260" stroke="#B45309" stroke-width="1.2"/>
-  <polygon points="710,260 703,256 703,264" fill="#B45309"/>
-  <rect x="710" y="235" width="220" height="50" rx="4" fill="#FFFDF5" stroke="#B45309" stroke-width="1"/>
-  <text x="820" y="255" fill="#92400E" font-size="11" font-weight="bold" text-anchor="middle">Tăng trọng số Đi bộ (+50%)</text>
-  <text x="820" y="273" fill="#92400E" font-size="10" text-anchor="middle">Ưu tiên đi ngầm Metro 1 mát mẻ</text>
+  <line x1="620" y1="277" x2="715" y2="277" stroke="#B45309" stroke-width="1.5"/>
+  <polygon points="715,277 706,272 706,282" fill="#B45309"/>
+  <rect x="715" y="248" width="225" height="58" rx="4" fill="#FFFDF5" stroke="#B45309" stroke-width="1.2"/>
+  <text x="827" y="272" fill="#92400E" font-size="13.5" font-weight="bold" text-anchor="middle">Ưu Tiên Tuyến Đi Ngầm</text>
+  <text x="827" y="292" fill="#92400E" font-size="12.5" text-anchor="middle">Tránh nắng mưa, mát mẻ, an toàn</text>
 
-  <line x1="820" y1="285" x2="820" y2="330" stroke="#B45309" stroke-width="1.2"/>
-  <line x1="820" y1="330" x2="480" y2="330" stroke="#B45309" stroke-width="1.2"/>
+  <line x1="827" y1="306" x2="827" y2="355" stroke="#B45309" stroke-width="1.5"/>
+  <line x1="827" y1="355" x2="480" y2="355" stroke="#B45309" stroke-width="1.5"/>
 
-  <line x1="480" y1="300" x2="480" y2="345" stroke="#0F3E31" stroke-width="1.5"/>
-  <polygon points="480,345 475,338 485,338" fill="#0F3E31"/>
+  <line x1="480" y1="322" x2="480" y2="370" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="480,370 474,362 486,362" fill="#0F3E31"/>
 
   <!-- STEP 2 -->
-  <rect x="340" y="345" width="280" height="45" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-  <text x="480" y="365" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">Dijkstra: Tìm 3 Đường Đi Ngắn Nhất</text>
-  <text x="480" y="380" fill="#555555" font-size="10.5" text-anchor="middle">Tối ưu thời gian &amp; số lần chuyển tuyến</text>
+  <rect x="310" y="370" width="340" height="50" rx="4" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+  <text x="480" y="393" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">2. Tìm 3 Phương Án Đi Lại Tốt Nhất</text>
+  <text x="480" y="411" fill="#555555" font-size="12.5" text-anchor="middle">Nhanh nhất • Ít đổi tuyến nhất • Tiết kiệm nhất</text>
 
-  <line x1="480" y1="390" x2="480" y2="415" stroke="#0F3E31" stroke-width="1.5"/>
-  <polygon points="480,415 475,408 485,408" fill="#0F3E31"/>
+  <line x1="480" y1="420" x2="480" y2="446" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="480,446 474,438 486,438" fill="#0F3E31"/>
 
   <!-- STEP 3 -->
-  <rect x="270" y="415" width="420" height="65" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
-  <text x="480" y="437" fill="#A7F3D0" font-size="12.5" font-weight="bold" text-anchor="middle">consolidateLegs() &amp; calculateMetroFare()</text>
-  <text x="480" y="455" fill="#ffffff" font-size="11" text-anchor="middle">Gộp chặng liên tục ➔ Áp biểu giá chính thức TP.HCM:</text>
-  <text x="480" y="470" fill="#A7F3D0" font-size="10" font-weight="bold" text-anchor="middle">≤5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | &gt;15km: 20.000đ | Bus: 7.000đ</text>
+  <rect x="230" y="446" width="500" height="68" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="480" y="471" fill="#A7F3D0" font-size="15" font-weight="bold" text-anchor="middle">3. Tự Động Gộp Chặng &amp; Áp Biểu Giá Chuẩn TP.HCM</text>
+  <text x="480" y="497" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">Dưới 5km: 7.000đ | 5-10km: 12.000đ | 10-15km: 16.000đ | Trên 15km: 20.000đ</text>
 
-  <line x1="480" y1="480" x2="480" y2="505" stroke="#0F3E31" stroke-width="1.5"/>
-  <polygon points="480,505 475,498 485,498" fill="#0F3E31"/>
+  <line x1="480" y1="514" x2="480" y2="538" stroke="#0F3E31" stroke-width="2"/>
+  <polygon points="480,538 474,530 486,530" fill="#0F3E31"/>
 
   <!-- END -->
-  <rect x="360" y="505" width="240" height="35" rx="17.5" fill="#0F3E31" stroke="#082820" stroke-width="1.2"/>
-  <text x="480" y="527" fill="#ffffff" font-size="12" font-weight="bold" text-anchor="middle">XUẤT KẾT QUẢ: 3 Thẻ Lộ Trình Tối Ưu</text>
+  <rect x="330" y="538" width="300" height="38" rx="19" fill="#0F3E31" stroke="#082820" stroke-width="1.5"/>
+  <text x="480" y="562" fill="#ffffff" font-size="14.5" font-weight="bold" text-anchor="middle">XUẤT KẾT QUẢ CHO NGƯỜI DÙNG XEM</text>
 </svg>
-          <div class="figure-caption">Hình 5. Lưu đồ thuật toán Dijkstra và tính giá vé chuẩn TP.HCM</div>
+          <div class="figure-caption">Hình 5. Lưu đồ tìm đường thông minh và tính đúng giá vé Metro TP.HCM</div>
         </div>
 
         <h3 class="section-heading">3.3. Biểu Phí Vé Metro Tuyến 1 Chính Thức Áp Dụng Trong Thuật Toán</h3>
@@ -903,7 +902,7 @@
             <tr>
               <th>Cự Ly Di Chuyển</th>
               <th>Mức Giá Vé Chuẩn</th>
-              <th>Cơ Chế Gộp Chặng (Consolidation)</th>
+              <th>Cơ Chế Gộp Chặng Thông Minh</th>
             </tr>
           </thead>
           <tbody>
@@ -930,17 +929,17 @@
             <tr>
               <td>Xe Buýt Điện VinBus</td>
               <td><strong>7.000 VNĐ</strong></td>
-              <td>Cố định theo lượt, hỗ trợ sinh viên chỉ 3.000 VNĐ.</td>
+              <td>Cố định theo lượt, hỗ trợ học sinh / sinh viên chỉ 3.000 VNĐ.</td>
             </tr>
           </tbody>
         </table>
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(1, document.querySelectorAll('.nav-link')[1])">
-            ⬅️ Xem Chuyên Đề 2: Bản Đồ Hành Trình
+            ⬅️ Xem Chuyên Đề 2: Hành Trình Trải Nghiệm
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(3, document.querySelectorAll('.nav-link')[3])">
-            Xem Chuyên Đề 4: Bản Vẽ Wireframe ➔
+            Xem Chuyên Đề 4: Bản Vẽ Khung Giao Diện ➔
           </button>
         </div>
       </section>
@@ -948,11 +947,11 @@
       <!-- CHAPTER 4: WIREFRAMES & LAYOUTS -->
       <section id="page-3" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 4: BẢN VẼ WIREFRAME VÀ BỐ CỤC GIAO DIỆN</span>
+          <span>CHUYÊN ĐỀ 4: BẢN VẼ KHUNG GIAO DIỆN VÀ BỐ CỤC MÀN HÌNH</span>
           <span class="chapter-badge">Phần 4 / 6</span>
         </h2>
 
-        <h3 class="section-heading">4.1. Bản Vẽ Wireframe Modal 2 Cột Khám Phá 21 Ga Metro (React Portal)</h3>
+        <h3 class="section-heading">4.1. Khung Giao Diện Xem Chi Tiết 21 Ga Metro (Cửa Sổ 2 Cột)</h3>
         <p>
           Cấu trúc khung nhìn 2 cột tách biệt hoàn toàn giữa Cột thông tin ảnh/liên hệ cố định bên trái và Cột bài viết cẩm nang cuộn độc lập bên phải, giải quyết 100% hiện tượng cắt xén nội dung:
         </p>
@@ -977,9 +976,9 @@
 +-------------------------------------------------+-----------------------------------------------------------+
         </pre>
 
-        <h3 class="section-heading">4.2. Bản Vẽ Wireframe Bảng Điều Khiển Quản Trị (Admin Console)</h3>
+        <h3 class="section-heading">4.2. Khung Bố Cục Bảng Quản Trị Hệ Thống (Admin Console)</h3>
         <p>
-          Bố cục 4 thẻ chỉ số thời gian thực và danh sách kiểm duyệt vé, cấp phát voucher và audit logs:
+          Bố cục 4 thẻ chỉ số thời gian thực và danh sách kiểm duyệt vé, cấp phát voucher và nhật ký hệ thống:
         </p>
 
         <pre class="code-box">
@@ -999,10 +998,10 @@
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(2, document.querySelectorAll('.nav-link')[2])">
-            ⬅️ Xem Chuyên Đề 3: Kiến Trúc 3 Tầng
+            ⬅️ Xem Chuyên Đề 3: Kiến Trúc 3 Khối
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(4, document.querySelectorAll('.nav-link')[4])">
-            Xem Chuyên Đề 5: Design Tokens &amp; WCAG ➔
+            Xem Chuyên Đề 5: Bảng Màu &amp; Độ Tương Phản ➔
           </button>
         </div>
       </section>
@@ -1010,69 +1009,69 @@
       <!-- CHAPTER 5: DESIGN SYSTEM -->
       <section id="page-4" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 5: HỆ THỐNG THIẾT KẾ DESIGN SYSTEM &amp; CHUẨN WCAG AA</span>
+          <span>CHUYÊN ĐỀ 5: BẢNG MÀU THIẾT KẾ &amp; TIÊU CHUẨN ĐỘ TƯƠNG PHẢN</span>
           <span class="chapter-badge">Phần 5 / 6</span>
         </h2>
 
-        <h3 class="section-heading">5.1. Bảng Mã Màu Design Tokens &amp; Kiểm Định Trợ Năng WCAG 2.1 AA</h3>
+        <h3 class="section-heading">5.1. Bảng Màu Sắc Chủ Đạo Của Dự Án</h3>
         <table class="formal-table">
           <thead>
             <tr>
-              <th>Biến Token</th>
+              <th>Tên Màu</th>
               <th>Mã Màu (HEX)</th>
               <th>Mẫu Màu</th>
               <th>Độ Tương Phản</th>
-              <th>Chuẩn Đạt</th>
-              <th>Mục Đích Sử Dụng</th>
+              <th>Đánh Giá</th>
+              <th>Vị Trí Sử Dụng Trên Web</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><code>--eco-primary</code></td>
+              <td><strong>Xanh Rừng Đậm (Primary)</strong></td>
               <td>#0F3E31</td>
               <td style="background:#0F3E31;width:40px;"></td>
               <td style="text-align:center;"><strong>11.4 : 1</strong></td>
-              <td style="text-align:center;">AAA</td>
-              <td>Màu tiêu đề chính, Thanh Header, Thẻ nhận diện</td>
+              <td style="text-align:center;">Rất Tốt (AAA)</td>
+              <td>Màu tiêu đề chính, Thanh Menu trên cùng, Thẻ nhận diện</td>
             </tr>
             <tr>
-              <td><code>--eco-accentGreen</code></td>
+              <td><strong>Xanh Ngọc Tươi (Accent)</strong></td>
               <td>#10B981</td>
               <td style="background:#10B981;width:40px;"></td>
               <td style="text-align:center;"><strong>4.8 : 1</strong></td>
-              <td style="text-align:center;">AA</td>
-              <td>Nút bấm tương tác chính (CTA), Icon nổi bật</td>
+              <td style="text-align:center;">Đạt Chuẩn (AA)</td>
+              <td>Nút bấm hành động chính (Bắt đầu, Tìm đường, Đổi quà)</td>
             </tr>
             <tr>
-              <td><code>--eco-mint</code></td>
+              <td><strong>Xanh Bạc Hà Nhạt (Mint)</strong></td>
               <td>#E6F7F0</td>
               <td style="background:#E6F7F0;border:1px solid #10B981;width:40px;"></td>
               <td style="text-align:center;"><strong>12.8 : 1</strong></td>
-              <td style="text-align:center;">AAA</td>
-              <td>Nền khung thông tin, Viền thẻ Card</td>
+              <td style="text-align:center;">Rất Tốt (AAA)</td>
+              <td>Nền khung thông tin ga, Viền thẻ Card</td>
             </tr>
             <tr>
-              <td><code>--badge-upcoming</code></td>
+              <td><strong>Tím Cấp Độ (Upcoming)</strong></td>
               <td>#7C3AED</td>
               <td style="background:#7C3AED;width:40px;"></td>
               <td style="text-align:center;"><strong>6.2 : 1</strong></td>
-              <td style="text-align:center;">AA</td>
+              <td style="text-align:center;">Đạt Chuẩn (AA)</td>
               <td>Huy hiệu 🔒 SẮP MỞ KHÓA (CẤP SAU)</td>
             </tr>
           </tbody>
         </table>
 
-        <h3 class="section-heading">5.2. Quy Chuẩn Kiểu Chữ (Typography System)</h3>
+        <h3 class="section-heading">5.2. Tiêu Chuẩn Kiểu Chữ</h3>
         <p>
-          Hệ thống kết hợp font chữ <strong>Times New Roman</strong> chuẩn mực trong các văn bản báo cáo và font chữ <strong>Inter / Outfit</strong> trên ứng dụng tương tác di động nhằm tối ưu độ đọc trên màn hình Retina.
+          Tài liệu báo cáo sử dụng kiểu chữ <strong>Times New Roman</strong> trang nhã, dễ nhìn. Ứng dụng trên điện thoại sử dụng kiểu chữ hiện đại tối ưu cho màn hình cảm ứng.
         </p>
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(3, document.querySelectorAll('.nav-link')[3])">
-            ⬅️ Xem Chuyên Đề 4: Bản Vẽ Wireframe
+            ⬅️ Xem Chuyên Đề 4: Bản Vẽ Khung Giao Diện
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(5, document.querySelectorAll('.nav-link')[5])">
-            Xem Chuyên Đề 6: Quản Trị &amp; API ➔
+            Xem Chuyên Đề 6: Quản Trị &amp; Kết Nối Dữ Liệu ➔
           </button>
         </div>
       </section>
@@ -1080,65 +1079,65 @@
       <!-- CHAPTER 6: ADMIN & API SPECS -->
       <section id="page-5" class="page-section">
         <h2 class="chapter-title">
-          <span>CHUYÊN ĐỀ 6: QUẢN TRỊ HỆ THỐNG &amp; ĐẶC TẢ API ENDPOINTS</span>
+          <span>CHUYÊN ĐỀ 6: QUẢN TRỊ HỆ THỐNG &amp; KẾT NỐI DỮ LIỆU</span>
           <span class="chapter-badge">Phần 6 / 6</span>
         </h2>
 
-        <h3 class="section-heading">6.1. Danh Mục Các API Endpoints Chính (RESTful API Specification)</h3>
+        <h3 class="section-heading">6.1. Danh Mục Các Cổng Kết Nối Dữ Liệu Chính</h3>
         <table class="formal-table">
           <thead>
             <tr>
-              <th>Phương Thức</th>
-              <th>Đường Dẫn Endpoint</th>
-              <th>Mục Đích Nghiệp Vụ</th>
-              <th>Quyền Truy Cập</th>
+              <th>Hành Động</th>
+              <th>Cổng Kết Nối</th>
+              <th>Chức Năng Xử Lý</th>
+              <th>Ai Được Dùng</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><code>GET</code></td>
+              <td><code>Lấy dữ liệu</code></td>
               <td><code>/api/routes/plan</code></td>
-              <td>Tính toán lộ trình tối ưu đa phương thức Dijkstra</td>
-              <td>Công khai (Public)</td>
+              <td>Tính toán lộ trình xe buýt và tàu Metro nhanh nhất</td>
+              <td>Tất cả mọi người</td>
             </tr>
             <tr>
-              <td><code>GET</code></td>
+              <td><code>Lấy dữ liệu</code></td>
               <td><code>/api/stations</code></td>
               <td>Lấy danh sách 14 ga Metro và 21 địa điểm khám phá</td>
-              <td>Công khai (Public)</td>
+              <td>Tất cả mọi người</td>
             </tr>
             <tr>
-              <td><code>POST</code></td>
+              <td><code>Gửi lên</code></td>
               <td><code>/api/tickets/upload</code></td>
-              <td>Tải ảnh vé xe và khởi chạy nhận dạng quang học OCR</td>
-              <td>Thành viên (User)</td>
+              <td>Gửi ảnh chụp vé xe để hệ thống tự quét và tích điểm</td>
+              <td>Thành viên đăng nhập</td>
             </tr>
             <tr>
-              <td><code>POST</code></td>
+              <td><code>Gửi lên</code></td>
               <td><code>/api/rewards/redeem</code></td>
-              <td>Đổi voucher đối tác (Xanh SM) với Idempotency Key</td>
-              <td>Thành viên (User)</td>
+              <td>Đổi mã voucher taxi điện Xanh SM</td>
+              <td>Thành viên đăng nhập</td>
             </tr>
             <tr>
-              <td><code>GET</code></td>
+              <td><code>Lấy dữ liệu</code></td>
               <td><code>/api/admin/metrics</code></td>
-              <td>Lấy dữ liệu thời gian thực (937 visits, 132 wraps, 45 vouchers)</td>
-              <td>Quản trị viên (Admin)</td>
+              <td>Lấy thống kê thời gian thực (937 truy cập, 132 wrap, 45 voucher)</td>
+              <td>Ban quản trị</td>
             </tr>
           </tbody>
         </table>
 
-        <h3 class="section-heading">6.2. Kiểm Toán &amp; Truy Vết Bảo Mật (Audit Logs)</h3>
+        <h3 class="section-heading">6.2. Nhật Ký Hệ Thống &amp; Bảo Mật</h3>
         <p>
-          Mọi hành động phê duyệt vé, cấp phát voucher và cập nhật cơ sở dữ liệu đều được ghi lại với mã định danh băm IP, dấu thời gian chuẩn ISO 8601 và chữ ký điện tử.
+          Mọi hoạt động duyệt vé, phát mã ưu đãi voucher và các lượt truy cập đều được ghi chép minh bạch, tự động bảo vệ dữ liệu người dùng 24/7.
         </p>
 
         <div class="page-nav-bar">
           <button class="page-nav-btn" onclick="navigateToPage(4, document.querySelectorAll('.nav-link')[4])">
-            ⬅️ Xem Chuyên Đề 5: Design Tokens &amp; WCAG
+            ⬅️ Xem Chuyên Đề 5: Bảng Màu &amp; Độ Tương Phản
           </button>
           <button class="page-nav-btn" onclick="navigateToPage(0, document.querySelectorAll('.nav-link')[0])">
-            Quay Về Chuyên Đề 1 (Trang Bìa) 🔄
+            Quay Về Chuyên Đề 1 (Trang Đầu) 🔄
           </button>
         </div>
       </section>

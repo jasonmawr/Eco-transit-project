@@ -1,84 +1,84 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 620" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" width="100%" height="100%" style="background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
   <!-- Title -->
-  <rect x="20" y="15" width="920" height="42" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
-  <text x="480" y="42" fill="#ffffff" font-size="16" font-weight="bold" text-anchor="middle" letter-spacing="0.5">
-    HÌNH 1. SƠ ĐỒ USE CASE TỔNG THỂ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH (UML USE CASE)
+  <rect x="15" y="10" width="930" height="46" rx="4" fill="#0F3E31" stroke="#082820" stroke-width="1"/>
+  <text x="480" y="39" fill="#ffffff" font-size="18" font-weight="bold" text-anchor="middle" letter-spacing="0.5">
+    HÌNH 1. SƠ ĐỒ CHỨC NĂNG NGHIỆP VỤ HỆ THỐNG — LƯỚT KHÓI CHẠM XANH
   </text>
 
   <!-- Boundary -->
-  <rect x="230" y="75" width="500" height="525" rx="4" fill="#FAFCFB" stroke="#0F3E31" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="480" y="98" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">
-    PHẠM VI HỆ THỐNG LƯỚT KHÓI CHẠM XANH (SYSTEM BOUNDARY)
+  <rect x="220" y="70" width="520" height="555" rx="6" fill="#FAFCFB" stroke="#0F3E31" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="480" y="96" fill="#0F3E31" font-size="15" font-weight="bold" text-anchor="middle">
+    CÁC TÍNH NĂNG TRÊN ỨNG DỤNG LƯỚT KHÓI CHẠM XANH
   </text>
 
   <!-- ACTOR 1 -->
-  <g transform="translate(90, 220)">
-    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Hành Khách (Gen Z)</text>
-    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <g transform="translate(80, 230)">
+    <circle cx="25" cy="18" r="16" fill="#ffffff" stroke="#0F3E31" stroke-width="2.5"/>
+    <line x1="25" y1="34" x2="25" y2="85" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="50" x2="-5" y2="40" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="50" x2="55" y2="40" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="85" x2="-2" y2="130" stroke="#0F3E31" stroke-width="3"/>
+    <line x1="25" y1="85" x2="52" y2="130" stroke="#0F3E31" stroke-width="3"/>
+    <text x="25" y="155" fill="#0F3E31" font-size="16" font-weight="bold" text-anchor="middle">Người Đi Xe / Gen Z</text>
+    <text x="25" y="175" fill="#555555" font-size="13" font-style="italic" text-anchor="middle">(Hành khách)</text>
   </g>
 
   <!-- ACTOR 2 -->
-  <g transform="translate(830, 220)">
-    <circle cx="20" cy="15" r="14" fill="#ffffff" stroke="#0F3E31" stroke-width="2"/>
-    <line x1="20" y1="29" x2="20" y2="75" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="-5" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="45" x2="45" y2="35" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="-2" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <line x1="20" y1="75" x2="42" y2="115" stroke="#0F3E31" stroke-width="2.5"/>
-    <text x="20" y="135" fill="#0F3E31" font-size="13" font-weight="bold" text-anchor="middle">Quản Trị Viên (Admin)</text>
-    <text x="20" y="150" fill="#555555" font-size="11" font-style="italic" text-anchor="middle">&lt;&lt;Actor&gt;&gt;</text>
+  <g transform="translate(830, 230)">
+    <circle cx="25" cy="18" r="16" fill="#ffffff" stroke="#4C1D95" stroke-width="2.5"/>
+    <line x1="25" y1="34" x2="25" y2="85" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="50" x2="-5" y2="40" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="50" x2="55" y2="40" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="85" x2="-2" y2="130" stroke="#4C1D95" stroke-width="3"/>
+    <line x1="25" y1="85" x2="52" y2="130" stroke="#4C1D95" stroke-width="3"/>
+    <text x="25" y="155" fill="#4C1D95" font-size="16" font-weight="bold" text-anchor="middle">Ban Quản Trị (Admin)</text>
+    <text x="25" y="175" fill="#555555" font-size="13" font-style="italic" text-anchor="middle">(Kiểm duyệt viên)</text>
   </g>
 
   <!-- USE CASES -->
-  <g transform="translate(300, 120)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC01: Tra cứu &amp; Tối ưu Lộ trình Xanh</text>
+  <g transform="translate(290, 115)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">1. Tìm &amp; Tối Ưu Lộ Trình Đi Lại</text>
   </g>
 
-  <g transform="translate(300, 185)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC02: Khám phá 21 Ga &amp; Mở khóa Cấp độ</text>
+  <g transform="translate(290, 185)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">2. Khám Phá 21 Ga &amp; Mở Khóa Địa Điểm</text>
   </g>
 
-  <g transform="translate(300, 250)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC03: Quét Vé OCR &amp; Tích Điểm Xanh</text>
+  <g transform="translate(290, 255)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">3. Chụp Vé Xe Tích Điểm Thưởng</text>
   </g>
 
-  <g transform="translate(300, 315)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC04: Đổi Voucher Xanh SM &amp; Quà Tặng</text>
+  <g transform="translate(290, 325)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">4. Đổi Voucher Xanh SM &amp; Quà Tặng</text>
   </g>
 
-  <g transform="translate(300, 380)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#0F3E31" font-size="12" font-weight="bold" text-anchor="middle">UC05: Tạo Hóa Đơn XanhWrap &amp; Quay Số</text>
+  <g transform="translate(290, 395)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#EBF6F0" stroke="#0F3E31" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#0F3E31" font-size="14.5" font-weight="bold" text-anchor="middle">5. Tạo Hóa Đơn XanhWrap &amp; Quay Thưởng</text>
   </g>
 
-  <g transform="translate(300, 450)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC06: Kiểm Duyệt Vé Xanh &amp; Đối Soát</text>
+  <g transform="translate(290, 470)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#4C1D95" font-size="14.5" font-weight="bold" text-anchor="middle">6. Duyệt Vé Xe Thật &amp; Cộng Điểm Ví</text>
   </g>
 
-  <g transform="translate(300, 515)">
-    <ellipse cx="180" cy="20" rx="160" ry="24" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.2"/>
-    <text x="180" y="25" fill="#4C1D95" font-size="12" font-weight="bold" text-anchor="middle">UC07: Giám Sát Chỉ Số 937 Lượt &amp; Audit Logs</text>
+  <g transform="translate(290, 540)">
+    <ellipse cx="190" cy="24" rx="175" ry="26" fill="#F3EEFA" stroke="#4C1D95" stroke-width="1.5"/>
+    <text x="190" y="30" fill="#4C1D95" font-size="14.5" font-weight="bold" text-anchor="middle">7. Xem Thống Kê 937 Lượt &amp; Nhật Ký Hệ Thống</text>
   </g>
 
   <!-- Connectors -->
-  <line x1="130" y1="260" x2="320" y2="140" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="205" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="270" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="335" stroke="#0F3E31" stroke-width="1.2"/>
-  <line x1="130" y1="260" x2="320" y2="400" stroke="#0F3E31" stroke-width="1.2"/>
+  <line x1="125" y1="270" x2="310" y2="140" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="210" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="280" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="350" stroke="#0F3E31" stroke-width="1.5"/>
+  <line x1="125" y1="270" x2="310" y2="420" stroke="#0F3E31" stroke-width="1.5"/>
 
-  <line x1="830" y1="260" x2="640" y2="335" stroke="#4C1D95" stroke-width="1.2"/>
-  <line x1="830" y1="260" x2="640" y2="470" stroke="#4C1D95" stroke-width="1.2"/>
-  <line x1="830" y1="260" x2="640" y2="535" stroke="#4C1D95" stroke-width="1.2"/>
+  <line x1="830" y1="270" x2="650" y2="350" stroke="#4C1D95" stroke-width="1.5"/>
+  <line x1="830" y1="270" x2="650" y2="495" stroke="#4C1D95" stroke-width="1.5"/>
+  <line x1="830" y1="270" x2="650" y2="565" stroke="#4C1D95" stroke-width="1.5"/>
 </svg>
